@@ -9,7 +9,43 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
+        ink: {
+          950: "#000000",
+          900: "#080808",
+          850: "#0B0B0C",
+          800: "#121212",
+          750: "#161616",
+          700: "#1A1A1A",
+          650: "#1C1C1E",
+          500: "#2A2A2D",
+        },
+        mint: {
+          DEFAULT: "#B8FFD2",
+          soft: "rgba(184,255,210,0.16)",
+          glow: "rgba(184,255,210,0.34)",
+        },
+        clinical: {
+          teal: "#00D7B5",
+          tealSoft: "rgba(0,215,181,0.16)",
+          red: "#FF453A",
+          redSoft: "rgba(255,69,58,0.16)",
+          amber: "#FFD60A",
+          blue: "#64D2FF",
+        },
+        text: {
+          primary: "#F5F5F7",
+          secondary: "#B8B8BE",
+          muted: "#7A7A80",
+          disabled: "#4A4A4F",
+          inverse: "#050505",
+        },
+        border: {
+          DEFAULT: "#1C1C1E",
+          soft: "rgba(255,255,255,0.07)",
+          strong: "rgba(255,255,255,0.14)",
+          mint: "rgba(184,255,210,0.38)",
+          red: "rgba(255,69,58,0.48)",
+        },
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
@@ -43,8 +79,28 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontFamily: {
+        heading: ["Geist-ExtraBold", "Inter_600SemiBold"],
+        headingBold: ["Geist-Bold", "Inter_600SemiBold"],
+        body: ["Inter_500Medium", "Inter_400Regular"],
+        bodySemi: ["Inter_600SemiBold"],
+      },
+      spacing: {
+        safe: "env(safe-area-inset-bottom)",
+        touch: "48px",
+        cockpit: "76px",
+      },
+      borderRadius: {
+        clinical: "24px",
+        xl2: "28px",
+        pill: "999px",
+      },
       borderWidth: {
         hairline: hairlineWidth(),
+      },
+      boxShadow: {
+        mintGlow: "0 0 32px rgba(184,255,210,0.22)",
+        redGlow: "0 0 32px rgba(255,69,58,0.28)",
       },
       keyframes: {
         "accordion-down": {
