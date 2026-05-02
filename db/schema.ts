@@ -179,3 +179,59 @@ export const caseLogs = sqliteTable("case_logs", {
   loggedAt: text("logged_at").default(sql`(CURRENT_TIMESTAMP)`),
   synced: integer("synced", { mode: "boolean" }).default(false),
 });
+
+// ─── Content sync, legal imports, and offline media ──────────────────────────
+
+export const contentVersions = sqliteTable("content_versions", {
+  id: text("id").primaryKey(),
+  contentType: text("content_type").notNull(), // drugs | protocols | media | alerts | labs
+  version: text("version").notNull(),
+  sourceName: text("source_name"),
+  sourceUrl: text("source_url"),
+  checksum: text("checksum"),
+  appliedAt: text("applied_at").default(sql`(CURRENT_TIMESTAMP)`),
+  status: text("status").default("active"),
+  notes: text("notes"),
+});
+
+export const syncManifest = sqliteTable("sync_manifest", {
+  id: text("id").primaryKey(),
+  module: text("module").notNull(), // gp | dims | er | media | alerts
+  remoteUrl: text("remote_url").notNull(),
+  localVersion: text("local_version"),
+  remoteVersion: text("remote_version"),
+  checksum: text("checksum"),
+  enabled: integer("enabled", { mode: "boolean" }).default(true),
+  lastCheckedAt: text("last_checked_at"),
+  lastSyncedAt: text("last_synced_at"),
+  notes: text("notes"),
+});
+
+export const mediaAssets = sqliteTable("media_assets", {
+  id: text("id").primaryKey(),
+  module: text("module").notNull(), // gp | dims | er
+  entityType: text("entity_type").notNull(), // condition | generic | ecg | cxr | protocol
+  entityId: text("entity_id").notNull(),
+  title: text("title"),
+  remoteUrl: text("remote_url"),
+  localUri: text("local_uri"),
+  mimeType: text("mime_type"),
+  checksum: text("checksum"),
+  sizeBytes: integer("size_bytes"),
+  lastSyncedAt: text("last_synced_at"),
+  offlineAvailable: integer("offline_available", { mode: "boolean" }).default(false),
+});
+
+export const appAlerts = sqliteTable("app_alerts", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  module: text("module"), // gp | dims | er | system
+  severity: text("severity").default("info"), // info | warning | critical
+  startsAt: text("starts_at"),
+  endsAt: text("ends_at"),
+  sourceName: text("source_name"),
+  sourceUrl: text("source_url"),
+  dismissed: integer("dismissed", { mode: "boolean" }).default(false),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
