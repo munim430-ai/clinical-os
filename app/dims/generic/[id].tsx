@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "rea
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { eq, sql } from "drizzle-orm";
-import { ArrowLeft } from "lucide-react-native";
+import { ArrowLeft } from "lucide-react";
 import { useDatabase } from "@/db/provider";
 import { generics, medicines, dosageForms, manufacturers, drugClasses } from "@/db/schema";
 

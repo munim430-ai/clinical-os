@@ -1,4 +1,5 @@
 -- OSCE Practice Cases - 30 cases across medical systems
+PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 
 -- Cardiology OSCE Cases
@@ -82,3 +83,4 @@ INSERT OR IGNORE INTO osce_cards (condition_id, question, answer, station_type) 
 ('paediatrics', 'Station: A 4-year-old child presents with wheezing and cough for 2 days. History of similar episodes in past. On examination: diffuse wheezes, use of accessory muscles, SpO2 94% on room air. What is the diagnosis and acute management?', 'Diagnosis: Acute asthma exacerbation. Acute management: Salbutamol nebulization 2.5-5 mg every 20 minutes for 3 doses, systemic steroids (prednisolone 1-2 mg/kg), oxygen if SpO2 <94%, consider continuous nebulization if severe, admit if no improvement', 'management');
 
 COMMIT;
+PRAGMA foreign_keys=ON;

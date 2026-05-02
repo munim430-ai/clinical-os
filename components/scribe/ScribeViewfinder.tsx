@@ -1,6 +1,5 @@
 import { View, Text } from "react-native";
-import { MotiView } from "moti";
-import { ScanLine } from "lucide-react-native";
+import { ScanLine } from "lucide-react";
 
 type ScribeViewfinderProps = {
   status?: string;
@@ -18,10 +17,7 @@ export function ScribeViewfinder({ status = "Align prescription or notes inside 
           <View className="absolute bottom-0 left-0 h-10 w-10 border-b-2 border-l-2 border-mint" />
           <View className="absolute bottom-0 right-0 h-10 w-10 border-b-2 border-r-2 border-mint" />
 
-          <MotiView
-            from={{ translateY: 20, opacity: 0.18 }}
-            animate={{ translateY: 380, opacity: [0.18, 1, 0.18] }}
-            transition={{ type: "timing", duration: 1800, loop: true }}
+          <View
             className="absolute left-6 right-6 h-[2px] rounded-pill bg-mint"
             style={{
               shadowColor: "#B8FFD2",

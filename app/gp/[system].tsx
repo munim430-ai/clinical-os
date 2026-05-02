@@ -2,7 +2,7 @@ import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { eq } from "drizzle-orm";
-import { ArrowLeft, AlertCircle } from "lucide-react-native";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import { useDatabase } from "@/db/provider";
 import { conditions } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";

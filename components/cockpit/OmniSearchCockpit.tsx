@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { BlurView } from "expo-blur";
-import { Search, Pill, ClipboardList, Siren, Calculator, Bookmark, Sparkles } from "lucide-react-native";
-import { MotiView } from "moti";
+import { Search, Pill, ClipboardList, Siren, Calculator, Bookmark, Sparkles } from "lucide-react";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 type OmniSearchResult = {
@@ -43,9 +42,7 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
     <View pointerEvents="box-none" className="z-20">
       {focused ? <BlurView intensity={36} tint="dark" className="absolute -left-4 -right-4 -top-8 h-screen" /> : null}
 
-      <MotiView
-        animate={{ translateY: focused ? 18 : 0, scale: focused ? 1.01 : 1 }}
-        transition={{ type: "timing", duration: 220 }}
+      <View
         className="overflow-hidden rounded-[28px] border border-border bg-ink-800/80"
       >
         <BlurView intensity={28} tint="dark" className="px-4 py-3">
@@ -103,7 +100,7 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
             </View>
           ) : null}
         </BlurView>
-      </MotiView>
+      </View>
     </View>
   );
 }

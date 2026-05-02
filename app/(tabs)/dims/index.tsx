@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
-import { Search, X, Pill } from "lucide-react-native";
+import { Search, X, Pill } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { router } from "expo-router";
 import { useDatabase } from "@/db/provider";

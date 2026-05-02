@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { AlertTriangle } from "lucide-react-native";
+import { AlertTriangle } from "lucide-react";
 
 export function Disclaimer() {
   return (

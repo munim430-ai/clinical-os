@@ -12,7 +12,7 @@ import {
   FlaskConical,
   GraduationCap,
   Stethoscope,
-} from "lucide-react-native";
+} from "lucide-react";
 import { useDatabase } from "@/db/provider";
 import { conditions, symptoms, protocols, protocolSteps, examSteps, osceCards, labReferences } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";

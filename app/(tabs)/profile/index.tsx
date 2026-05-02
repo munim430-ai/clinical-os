@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { GraduationCap, Stethoscope, UserCheck, Activity, AlertTriangle, Database, RefreshCcw } from "lucide-react-native";
+import { GraduationCap, Stethoscope, UserCheck, Activity, AlertTriangle, Database, RefreshCcw } from "lucide-react";
 import { getPersona, setPersona, type Persona } from "@/lib/persona";
 import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
 import { getContentSummary } from "@/lib/content-sync";

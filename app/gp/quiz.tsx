@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Trophy, RotateCcw } from "lucide-react-native";
+import { ArrowLeft, Trophy, RotateCcw } from "lucide-react";
 import { useDatabase } from "@/db/provider";
 import { osceCards } from "@/db/schema";
 import { MMKV } from "react-native-mmkv";

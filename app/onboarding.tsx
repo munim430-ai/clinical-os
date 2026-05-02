@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { GraduationCap, Stethoscope, UserCheck } from "lucide-react-native";
+import { GraduationCap, Stethoscope, UserCheck } from "lucide-react";
 import { setPersona, markOnboarded, type Persona } from "@/lib/persona";
 
 const OPTIONS = [

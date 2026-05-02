@@ -14,6 +14,11 @@ module.exports = (api) => {
     plugins: [
       "react-native-reanimated/plugin",
       ["inline-import", { extensions: [".sql"] }],
+      ["@babel/plugin-transform-runtime", {
+        "regenerator": true,
+        "helpers": true,
+        "useESModules": false
+      }],
     ],
   };
 };

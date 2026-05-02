@@ -1,4 +1,5 @@
 -- Quiz questions - 10 questions per medical system (100 total)
+PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 
 -- Cardiology Questions
@@ -132,3 +133,4 @@ INSERT OR IGNORE INTO osce_cards (condition_id, question, answer, station_type) 
 ('paediatrics', 'What are the immunization contraindications according to EPI schedule?', 'Absolute contraindications: Severe allergic reaction to previous dose, encephalopathy within 7 days of pertussis vaccine. Relative: Moderate/severe illness, immunosuppression (live vaccines)', 'data-interpretation');
 
 COMMIT;
+PRAGMA foreign_keys=ON;

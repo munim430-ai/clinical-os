@@ -55,15 +55,14 @@ import {
   UserPlus,
   Users,
   X,
-} from "lucide-react-native";
+} from "lucide-react";
 import {cssInterop} from "nativewind";
 function interopIcon(icon: LucideIcon) {
   cssInterop(icon, {
     className: {
       target: "style",
       nativeStyleToProp: {
-        color: true,
-        opacity: true,
+        color: "color",
       },
     },
   });

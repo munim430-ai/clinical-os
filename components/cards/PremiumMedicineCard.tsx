@@ -1,6 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Pill, ShieldCheck, AlertTriangle, ChevronRight } from "lucide-react-native";
-import { MotiView } from "moti";
+import { Pill, ShieldCheck, AlertTriangle, ChevronRight } from "lucide-react";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 type PremiumMedicineCardProps = {
@@ -32,11 +31,9 @@ export function PremiumMedicineCard({
   return (
     <Pressable onPress={handlePress}>
       {({ pressed }) => (
-        <MotiView
-          from={{ opacity: 0, translateY: 10, scale: 0.98 }}
-          animate={{ opacity: 1, translateY: 0, scale: pressed ? 0.985 : 1 }}
-          transition={{ type: "timing", duration: 180 }}
+        <View
           className="overflow-hidden rounded-clinical border border-border bg-ink-800 p-4"
+          style={{ opacity: 1, transform: [{ scale: pressed ? 0.985 : 1 }] }}
         >
           <View className="flex-row items-start justify-between">
             <View className="flex-1 pr-3">
@@ -97,7 +94,7 @@ export function PremiumMedicineCard({
               </Text>
             </View>
           )}
-        </MotiView>
+        </View>
       )}
     </Pressable>
   );

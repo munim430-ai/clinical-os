@@ -58,7 +58,7 @@ INSERT OR IGNORE INTO ecg_patterns (name, description, key_features_json, condit
 
 -- Supraventricular Tachycardia (SVT)
 INSERT OR IGNORE INTO ecg_patterns (name, description, key_features_json, condition_id) VALUES
-('Supraventricular Tachycardia', "Narrow complex tachycardia originating above ventricles", '[
+('Supraventricular Tachycardia', 'Narrow complex tachycardia originating above ventricles', '[
   {"feature": "Heart Rate", "value": "150-250 bpm"},
   {"feature": "Rhythm", "value": "Regular"},
   {"feature": "P waves", "value": "Often hidden or retrograde in QRS"},

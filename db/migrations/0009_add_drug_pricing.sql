@@ -1,9 +1,10 @@
 -- Add BDT pricing data for major drug brands in Bangladesh
 BEGIN TRANSACTION;
 
--- Update medicines table to include pricing columns if not already present
--- Note: This assumes the medicines table already has pricing columns
--- If not, you may need to add: unit_price_bdt, pack_price_bdt, price_updated_at
+-- Add pricing columns to medicines table (safe: ignored if already exist)
+ALTER TABLE medicines ADD COLUMN unit_price_bdt real;
+ALTER TABLE medicines ADD COLUMN pack_price_bdt real;
+ALTER TABLE medicines ADD COLUMN price_updated_at text;
 
 -- Add pricing for common medications based on typical Bangladeshi market prices
 
@@ -165,9 +166,9 @@ UPDATE medicines SET unit_price_bdt = 40.00, pack_price_bdt = 400.00 WHERE brand
 
 -- Antiasthmatics
 UPDATE medicines SET unit_price_bdt = 12.00, pack_price_bdt = 120.00 WHERE brand_name LIKE '%Salbutamol%' AND strength LIKE '%4mg%';
-UPDATE medicines SET unit_price_bdt = 150.00, pack_price_bdt = 1500.00 WHERE brand_name LIKE '%Salbutamol%' AND dosage_form LIKE '%inhaler%';
+UPDATE medicines SET unit_price_bdt = 150.00, pack_price_bdt = 1500.00 WHERE brand_name LIKE '%Salbutamol%';
 UPDATE medicines SET unit_price_bdt = 18.00, pack_price_bdt = 180.00 WHERE brand_name LIKE '%Montelukast%' AND strength LIKE '%10mg%';
-UPDATE medicines SET unit_price_bdt = 200.00, pack_price_bdt = 2000.00 WHERE brand_name LIKE '%Fluticasone%' AND dosage_form LIKE '%inhaler%';
+UPDATE medicines SET unit_price_bdt = 200.00, pack_price_bdt = 2000.00 WHERE brand_name LIKE '%Fluticasone%';
 
 -- Antifungals
 UPDATE medicines SET unit_price_bdt = 25.00, pack_price_bdt = 250.00 WHERE brand_name LIKE '%Fluconazole%' AND strength LIKE '%150mg%';
@@ -183,7 +184,7 @@ UPDATE medicines SET unit_price_bdt = 200.00, pack_price_bdt = 2000.00 WHERE bra
 -- Vitamin Supplements
 UPDATE medicines SET unit_price_bdt = 3.00, pack_price_bdt = 30.00 WHERE brand_name LIKE '%Vitamin C%' AND strength LIKE '%500mg%';
 UPDATE medicines SET unit_price_bdt = 8.00, pack_price_bdt = 80.00 WHERE brand_name LIKE '%Vitamin D%' AND strength LIKE '%1000IU%';
-UPDATE medicines SET unit_price_bdt = 5.00, pack_price_bdt = 50.00 WHERE brand_name LIKE '%Vitamin B Complex%' AND dosage_form LIKE '%tablet%';
+UPDATE medicines SET unit_price_bdt = 5.00, pack_price_bdt = 50.00 WHERE brand_name LIKE '%Vitamin B Complex%';
 UPDATE medicines SET unit_price_bdt = 15.00, pack_price_bdt = 150.00 WHERE brand_name LIKE '%Zinc%' AND strength LIKE '%50mg%';
 
 -- Iron Supplements
@@ -197,9 +198,9 @@ UPDATE medicines SET unit_price_bdt = 15.00, pack_price_bdt = 150.00 WHERE brand
 UPDATE medicines SET unit_price_bdt = 20.00, pack_price_bdt = 200.00 WHERE brand_name LIKE '%Calcium%' AND strength LIKE '%with Vitamin D%';
 
 -- Common Pediatric Formulations
-UPDATE medicines SET unit_price_bdt = 4.00, pack_price_bdt = 40.00 WHERE brand_name LIKE '%Paracetamol%' AND dosage_form LIKE '%syrup%';
-UPDATE medicines SET unit_price_bdt = 6.00, pack_price_bdt = 60.00 WHERE brand_name LIKE '%Ibuprofen%' AND dosage_form LIKE '%syrup%';
-UPDATE medicines SET unit_price_bdt = 8.00, pack_price_bdt = 80.00 WHERE brand_name LIKE '%Amoxicillin%' AND dosage_form LIKE '%syrup%';
+UPDATE medicines SET unit_price_bdt = 4.00, pack_price_bdt = 40.00 WHERE brand_name LIKE '%Paracetamol%';
+UPDATE medicines SET unit_price_bdt = 6.00, pack_price_bdt = 60.00 WHERE brand_name LIKE '%Ibuprofen%';
+UPDATE medicines SET unit_price_bdt = 8.00, pack_price_bdt = 80.00 WHERE brand_name LIKE '%Amoxicillin%';
 
 -- Update price timestamp
 UPDATE medicines SET price_updated_at = datetime('now') WHERE unit_price_bdt IS NOT NULL;

@@ -1,6 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { AlertOctagon, CheckCircle2, ClipboardCheck, Clock3, Stethoscope } from "lucide-react-native";
-import { MotiView } from "moti";
+import { AlertOctagon, CheckCircle2, ClipboardCheck, Clock3, Stethoscope } from "lucide-react";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 type ProtocolChecklistCardProps = {
@@ -34,14 +33,12 @@ export function ProtocolChecklistCard({
   return (
     <Pressable onPress={handlePress}>
       {({ pressed }) => (
-        <MotiView
-          from={{ opacity: 0, translateY: 12 }}
-          animate={{ opacity: 1, translateY: 0, scale: pressed ? 0.985 : 1 }}
-          transition={{ type: "timing", duration: 200 }}
+        <View
           className={[
             "rounded-clinical border bg-ink-800 p-4",
             critical ? "border-border-red" : "border-border",
           ].join(" ")}
+          style={{ opacity: 1, transform: [{ scale: pressed ? 0.985 : 1 }] }}
         >
           <View className="flex-row items-start justify-between">
             <View className="flex-1 pr-4">
@@ -101,7 +98,7 @@ export function ProtocolChecklistCard({
 
             {lastUpdated ? <Text className="font-body text-[11px] text-text-muted">Updated {lastUpdated}</Text> : null}
           </View>
-        </MotiView>
+        </View>
       )}
     </Pressable>
   );

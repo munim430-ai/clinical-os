@@ -9,6 +9,47 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Premium 8k Matte Black Design System
+        background: {
+          DEFAULT: "#000000", // Pure Matte Black
+          surface: "#121212", // Dark Grey for cards/modals
+          overlay: "rgba(0,0,0,0.8)", // Glassmorphism base
+        },
+        accent: {
+          primary: "#B8FFD2", // Luminous Mint
+          primarySoft: "rgba(184,255,210,0.16)",
+          primaryGlow: "rgba(184,255,210,0.34)",
+          success: "#00D7B5", // Surgical Teal
+          successSoft: "rgba(0,215,181,0.16)",
+          critical: "#FF453A", // Emergency Red
+          criticalSoft: "rgba(255,69,58,0.16)",
+          warning: "#FFD60A", // Amber for alerts
+          info: "#64D2FF", // Clinical Blue
+        },
+        surface: {
+          DEFAULT: "#121212", // Dark Grey surfaces
+          elevated: "#1A1A1A", // Elevated surfaces
+          glass: "rgba(18,18,18,0.7)", // Glassmorphism
+          glassBorder: "rgba(255,255,255,0.1)", // Glass border
+        },
+        border: {
+          DEFAULT: "#1C1C1E", // Strict 1px border color
+          soft: "rgba(255,255,255,0.05)",
+          medium: "rgba(255,255,255,0.1)",
+          strong: "rgba(255,255,255,0.2)",
+          accent: "#B8FFD2",
+          critical: "#FF453A",
+        },
+        text: {
+          primary: "#FFFFFF", // High contrast
+          secondary: "#B8B8BE", // Medium contrast
+          tertiary: "#7A7A80", // Muted text
+          disabled: "#4A4A4F", // Disabled state
+          inverse: "#000000", // Inverse text
+          accent: "#B8FFD2", // Accent text
+          critical: "#FF453A", // Critical text
+        },
+        // Legacy color compatibility
         ink: {
           950: "#000000",
           900: "#080808",
@@ -32,58 +73,47 @@ export default {
           amber: "#FFD60A",
           blue: "#64D2FF",
         },
-        text: {
-          primary: "#F5F5F7",
-          secondary: "#B8B8BE",
-          muted: "#7A7A80",
-          disabled: "#4A4A4F",
-          inverse: "#050505",
-        },
-        border: {
-          DEFAULT: "#1C1C1E",
-          soft: "rgba(255,255,255,0.07)",
-          strong: "rgba(255,255,255,0.14)",
-          mint: "rgba(184,255,210,0.38)",
-          red: "rgba(255,69,58,0.48)",
-        },
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+        // Shadcn UI compatibility
+        shadcn: {
+          input: "hsl(var(--input))",
+          ring: "hsl(var(--ring))",
+          background: "hsl(var(--background))",
+          foreground: "hsl(var(--foreground))",
+          primary: {
+            DEFAULT: "hsl(var(--primary))",
+            foreground: "hsl(var(--primary-foreground))",
+          },
+          secondary: {
+            DEFAULT: "hsl(var(--secondary))",
+            foreground: "hsl(var(--secondary-foreground))",
+          },
+          destructive: {
+            DEFAULT: "hsl(var(--destructive))",
+            foreground: "hsl(var(--destructive-foreground))",
+          },
+          muted: {
+            DEFAULT: "hsl(var(--muted))",
+            foreground: "hsl(var(--muted-foreground))",
+          },
+          popover: {
+            DEFAULT: "hsl(var(--popover))",
+            foreground: "hsl(var(--popover-foreground))",
+          },
+          card: {
+            DEFAULT: "hsl(var(--card))",
+            foreground: "hsl(var(--card-foreground))",
+          },
         },
       },
       fontFamily: {
-        heading: ["Geist-ExtraBold", "Inter_600SemiBold"],
-        headingBold: ["Geist-Bold", "Inter_600SemiBold"],
-        body: ["Inter_500Medium", "Inter_400Regular"],
-        bodySemi: ["Inter_600SemiBold"],
+        // Premium Medical Typography System
+        heading: ["Geist-ExtraBold", "Inter_700Bold", "system-ui"],
+        headingBold: ["Geist-Bold", "Inter_600SemiBold", "system-ui"],
+        headingSemi: ["Geist-SemiBold", "Inter_600SemiBold", "system-ui"],
+        body: ["InterVariable", "Inter_500Medium", "Inter_400Regular", "system-ui"],
+        bodySemi: ["InterVariable", "Inter_600SemiBold", "system-ui"],
+        bodyLight: ["InterVariable", "Inter_300Light", "Inter_400Regular", "system-ui"],
+        mono: ["JetBrainsMonoVariable", "Courier New", "monospace"],
       },
       spacing: {
         safe: "env(safe-area-inset-bottom)",

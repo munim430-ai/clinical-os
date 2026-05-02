@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { Siren, ArrowLeft, Search } from "lucide-react-native";
+import { Siren, ArrowLeft, Search } from "lucide-react";
 import { triggerAlertHaptic, triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 type ERModeDashboardProps = {

@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react-native";
+import type { LucideIcon } from "lucide-react";
 import { cssInterop } from "nativewind";
 
 export function iconWithClassName(icon: LucideIcon) {
@@ -6,10 +6,7 @@ export function iconWithClassName(icon: LucideIcon) {
     className: {
       target: "style",
       nativeStyleToProp: {
-        color: true,
-        opacity: true,
-        width: true,
-        height: true,
+        color: "color",
       },
     },
   });

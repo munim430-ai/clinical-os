@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ScrollView, Text, View } from "react-native";
-import { ListTree } from "lucide-react-native";
+import { ListTree } from "lucide-react";
 
 type TocItem = {
   id: string;

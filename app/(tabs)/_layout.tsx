@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { BookOpen, Pill, Zap, User } from "lucide-react-native";
+import Icons from "@/components/IconLibraryFixed";
 
 export const unstable_settings = {
   initialRouteName: "gp/index",
@@ -34,7 +34,7 @@ export default function TabLayout() {
         options={{
           title: "GP Master",
           tabBarIcon: ({ focused }) => (
-            <BookOpen size={iconSize} color={focused ? activeColor : inactiveColor} />
+            <Icons.Protocol size={iconSize} color={focused ? activeColor : inactiveColor} />
           ),
         }}
       />
@@ -43,7 +43,7 @@ export default function TabLayout() {
         options={{
           title: "DIMS",
           tabBarIcon: ({ focused }) => (
-            <Pill size={iconSize} color={focused ? activeColor : inactiveColor} />
+            <Icons.Drug size={iconSize} color={focused ? activeColor : inactiveColor} />
           ),
         }}
       />
@@ -52,7 +52,7 @@ export default function TabLayout() {
         options={{
           title: "ER",
           tabBarIcon: ({ focused }) => (
-            <Zap size={iconSize} color={focused ? activeColor : inactiveColor} />
+            <Icons.ER size={iconSize} color={focused ? activeColor : inactiveColor} />
           ),
         }}
       />
@@ -61,7 +61,7 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ focused }) => (
-            <User size={iconSize} color={focused ? activeColor : inactiveColor} />
+            <Icons.Settings size={iconSize} color={focused ? activeColor : inactiveColor} />
           ),
         }}
       />
