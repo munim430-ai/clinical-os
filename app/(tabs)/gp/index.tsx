@@ -19,12 +19,13 @@ export default function GPMasterScreen() {
   const { db } = useDatabase();
   const [sysList, setSysList] = useState<any[]>([]);
   const [condCount, setCondCount] = useState(0);
-  const totalCases = getTotalCases();
+  const [totalCases, setTotalCases] = useState(0);
 
   useEffect(() => {
     if (!db) return;
     db.select().from(systems).then(setSysList);
     db.select().from(conditions).then((r) => setCondCount(r.length));
+    getTotalCases().then(setTotalCases);
   }, [db]);
 
   return (
