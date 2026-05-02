@@ -26,7 +26,7 @@ jobs:
         run: bun install
 
       - name: Check Expo dependency compatibility
-        run: bun expo install --check
+        run: bunx expo install --check
 
       - name: Build Expo web export
         run: bun run build:web
