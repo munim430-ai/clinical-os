@@ -12,6 +12,19 @@ config.resolver.extraNodeModules = {
   tslib: path.resolve(__dirname, "node_modules/tslib"),
 };
 
+// Force framer-motion (pulled in by moti) to use its CJS build.
+// The ESM .mjs build breaks Metro's tslib interop at static render time.
+const _defaultResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === "framer-motion") {
+    return {
+      filePath: path.resolve(__dirname, "node_modules/framer-motion/dist/cjs/index.js"),
+      type: "sourceFile",
+    };
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
+
 // Add wasm asset support
 config.resolver.assetExts.push("wasm");
 
