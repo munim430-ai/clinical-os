@@ -1,8 +1,9 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { GraduationCap, Stethoscope, UserCheck, Activity, Pill, BookOpen, AlertTriangle } from "lucide-react-native";
+import { GraduationCap, Stethoscope, UserCheck, Activity, AlertTriangle, Database, RefreshCcw } from "lucide-react-native";
 import { getPersona, setPersona, type Persona } from "@/lib/persona";
-import { getCaseCounts } from "@/lib/surveillance";
-import { useState } from "react";
+import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
+import { getContentSummary } from "@/lib/content-sync";
+import { useEffect, useState } from "react";
 
 const PERSONAS = [
   { id: "student" as Persona, label: "Medical Student", sub: "OSCE prep & quiz mode", icon: GraduationCap, color: "#4499FF" },
@@ -16,8 +17,18 @@ const DISEASE_LABELS: Record<string, string> = {
 
 export default function ProfileScreen() {
   const [current, setCurrent] = useState<Persona>(getPersona());
-  const caseCounts = getCaseCounts();
+  const [caseCounts, setCaseCounts] = useState<CaseCounts>({} as CaseCounts);
+  const [contentSummary, setContentSummary] = useState<{ versions: number; syncFeeds: number; mediaAssets: number }>({
+    versions: 0,
+    syncFeeds: 0,
+    mediaAssets: 0,
+  });
   const totalCases = Object.values(caseCounts).reduce((a, b) => a + b, 0);
+
+  useEffect(() => {
+    getCaseCounts().then(setCaseCounts);
+    getContentSummary().then(setContentSummary);
+  }, []);
 
   function handleSelect(p: Persona) {
     setPersona(p);
@@ -27,9 +38,8 @@ export default function ProfileScreen() {
   return (
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 16 }}>
       <Text className="text-foreground text-2xl font-bold mb-1">Profile</Text>
-      <Text className="text-muted-foreground text-sm mb-6">Manage your role and view activity</Text>
+      <Text className="text-muted-foreground text-sm mb-6">Manage your role, content, and local activity</Text>
 
-      {/* Persona selector */}
       <Text className="text-muted-foreground text-xs uppercase tracking-wider mb-3">Your Role</Text>
       {PERSONAS.map((p) => {
         const Icon = p.icon;
@@ -53,7 +63,25 @@ export default function ProfileScreen() {
         );
       })}
 
-      {/* Surveillance stats */}
+      <View className="mt-4">
+        <Text className="text-muted-foreground text-xs uppercase tracking-wider mb-3">Free Content System</Text>
+        <View className="bg-card rounded-2xl border border-border p-4">
+          <View className="flex-row items-center mb-3">
+            <Database size={16} color="#00C896" />
+            <Text className="text-foreground font-semibold ml-2">Offline Content Registry</Text>
+          </View>
+          <InfoRow label="Content versions" value={contentSummary.versions} />
+          <InfoRow label="Configured sync feeds" value={contentSummary.syncFeeds} />
+          <InfoRow label="Offline media assets" value={contentSummary.mediaAssets} />
+          <View className="flex-row items-start gap-2 bg-primary/10 border border-primary/20 rounded-xl p-3 mt-3">
+            <RefreshCcw size={13} color="#00C896" style={{ marginTop: 1 }} />
+            <Text className="text-primary text-xs flex-1 leading-relaxed">
+              This app is built to import owned, public, or licensed GP/DIMS-style data and keep it free for doctors.
+            </Text>
+          </View>
+        </View>
+      </View>
+
       {totalCases > 0 && (
         <View className="mt-4">
           <Text className="text-muted-foreground text-xs uppercase tracking-wider mb-3">Cases Logged (Anonymous)</Text>
@@ -71,27 +99,35 @@ export default function ProfileScreen() {
               </View>
             ))}
             <Text className="text-muted-foreground text-xs mt-3">
-              These counts are stored locally and contain no patient data. They power the national disease surveillance pitch to DGHS.
+              These counts are stored locally in SQLite and contain no patient-identifying data.
             </Text>
           </View>
         </View>
       )}
 
-      {/* App info */}
       <View className="mt-6 bg-card rounded-2xl border border-border p-4">
         <Text className="text-foreground font-semibold mb-2">Clinical OS</Text>
         <Text className="text-muted-foreground text-xs leading-relaxed mb-3">
-          Offline-first clinical reference for Bangladeshi doctors. Drug data: 21,700+ brands. Protocols: DGHS + WHO guidelines.
+          Offline-first clinical reference for Bangladeshi doctors. Built for GP protocols, drug search, emergency tools, and legally sourced free content.
         </Text>
         <View className="flex-row items-start gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
           <AlertTriangle size={13} color="#EAB308" style={{ marginTop: 1 }} />
           <Text className="text-yellow-500/80 text-xs flex-1 leading-relaxed">
-            For clinical reference only. All content must be verified by a qualified medical professional before clinical application.
+            For clinical reference only. All content must be reviewed by qualified medical professionals before clinical use.
           </Text>
         </View>
       </View>
 
-      <Text className="text-muted-foreground text-xs text-center mt-6">Version 1.0.0 · Phase 1</Text>
+      <Text className="text-muted-foreground text-xs text-center mt-6">Version 1.0.0 · Free Clinical OS</Text>
     </ScrollView>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: number }) {
+  return (
+    <View className="flex-row items-center justify-between py-1.5 border-b border-border/30">
+      <Text className="text-muted-foreground text-sm">{label}</Text>
+      <Text className="text-primary text-sm font-semibold">{value}</Text>
+    </View>
   );
 }
