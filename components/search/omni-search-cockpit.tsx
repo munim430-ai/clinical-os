@@ -8,22 +8,22 @@ import {
   Animated,
   KeyboardAvoidingView,
   Platform,
-  FlatList,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
-import { Search, Pill, ClipboardList, AlertTriangle, Calculator, Bookmark, Sparkles } from 'lucide-react';
+import { Search, Pill, ClipboardList, Sparkles } from 'lucide-react';
 import { MotiView } from 'moti';
 import { FrostedGlass, GlassCard } from '@/components/ui/glassmorphism';
 import { AmbientMeshGradient } from '@/components/backgrounds/mesh-gradient';
 import { triggerSelectionHaptic } from '@/lib/clinical-haptics';
-import { cn } from '@/lib/utils';
+import { useDatabase } from '@/db/provider';
+import { medicines, generics, dosageForms, conditions } from '@/db/schema';
+import { like, or, eq } from 'drizzle-orm';
 
-interface SearchResult {
+export interface SearchResult {
   id: string;
   title: string;
   subtitle?: string;
-  category: 'medicine' | 'protocol' | 'er' | 'calculator' | 'saved' | 'ai';
-  icon: React.ReactNode;
+  category: 'medicine' | 'condition';
+  route: string;
 }
 
 interface OmniSearchCockpitProps {
@@ -33,95 +33,71 @@ interface OmniSearchCockpitProps {
 }
 
 export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCockpitProps) {
+  const { db } = useDatabase();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(100)).current;
-
-  // Sample data for demonstration
-  const sampleResults: SearchResult[] = [
-    {
-      id: '1',
-      title: 'Paracetamol 500mg',
-      subtitle: 'Analgesic - Antipyretic',
-      category: 'medicine',
-      icon: <Pill size={20} color="#B8FFD2" />,
-    },
-    {
-      id: '2',
-      title: 'CPR Protocol',
-      subtitle: 'Emergency resuscitation',
-      category: 'protocol',
-      icon: <ClipboardList size={20} color="#00D7B5" />,
-    },
-    {
-      id: '3',
-      title: 'Anaphylaxis Management',
-      subtitle: 'Emergency treatment',
-      category: 'er',
-      icon: <AlertTriangle size={20} color="#FF453A" />,
-    },
-    {
-      id: '4',
-      title: 'Drug Dosage Calculator',
-      subtitle: 'Pediatric calculations',
-      category: 'calculator',
-      icon: <Calculator size={20} color="#64D2FF" />,
-    },
-    {
-      id: '5',
-      title: 'Saved Protocols',
-      subtitle: 'Your bookmarked items',
-      category: 'saved',
-      icon: <Bookmark size={20} color="#FFD60A" />,
-    },
-  ];
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (visible) {
-      // Animate in
       Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
       ]).start();
     } else {
-      // Animate out
       Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 100,
-          duration: 250,
-          useNativeDriver: true,
-        }),
+        Animated.timing(fadeAnim, { toValue: 0, duration: 250, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 100, duration: 250, useNativeDriver: true }),
       ]).start();
+      setQuery('');
+      setResults([]);
     }
   }, [visible]);
 
   useEffect(() => {
-    // Filter results based on query
-    if (query.trim()) {
-      const filtered = sampleResults.filter(result =>
-        result.title.toLowerCase().includes(query.toLowerCase()) ||
-        result.subtitle?.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filtered);
-    } else {
-      setResults(sampleResults);
-    }
-  }, [query]);
+    if (timer.current) clearTimeout(timer.current);
+    if (!db || query.trim().length < 2) { setResults([]); return; }
+    timer.current = setTimeout(async () => {
+      const term = `%${query.trim()}%`;
+      const [medRows, condRows] = await Promise.all([
+        db.select({
+          id: medicines.id,
+          brandName: medicines.brandName,
+          strength: medicines.strength,
+          genericName: generics.name,
+          dosageForm: dosageForms.name,
+        })
+          .from(medicines)
+          .leftJoin(generics, eq(medicines.genericId, generics.id))
+          .leftJoin(dosageForms, eq(medicines.dosageFormId, dosageForms.id))
+          .where(or(like(medicines.brandName, term), like(generics.name, term)))
+          .limit(6),
+        db.select({ id: conditions.id, name: conditions.name, systemId: conditions.systemId })
+          .from(conditions)
+          .where(like(conditions.name, term))
+          .limit(4),
+      ]);
+      const medResults: SearchResult[] = medRows.map(r => ({
+        id: `med-${r.id}`,
+        title: r.brandName,
+        subtitle: [r.genericName, r.strength, r.dosageForm].filter(Boolean).join(' · '),
+        category: 'medicine',
+        route: `/dims/brand/${r.id}`,
+      }));
+      const condResults: SearchResult[] = condRows.map(r => ({
+        id: `cond-${r.id}`,
+        title: r.name,
+        subtitle: 'Clinical condition',
+        category: 'condition',
+        route: `/gp/condition/${r.id}`,
+      }));
+      setResults([...medResults, ...condResults]);
+    }, 300);
+    return () => { if (timer.current) clearTimeout(timer.current); };
+  }, [query, db]);
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -139,27 +115,13 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
   };
 
   const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'medicine': return '#B8FFD2';
-      case 'protocol': return '#00D7B5';
-      case 'er': return '#FF453A';
-      case 'calculator': return '#64D2FF';
-      case 'saved': return '#FFD60A';
-      case 'ai': return '#B8FFD2';
-      default: return '#7A7A80';
-    }
+    return category === 'medicine' ? '#B8FFD2' : '#00D7B5';
   };
 
-  const getCategoryBg = (category: string) => {
-    switch (category) {
-      case 'medicine': return 'bg-accent-primarySoft/20';
-      case 'protocol': return 'bg-accent-successSoft/20';
-      case 'er': return 'bg-accent-criticalSoft/20';
-      case 'calculator': return 'bg-accent-info/20';
-      case 'saved': return 'bg-accent-warning/20';
-      case 'ai': return 'bg-accent-primarySoft/20';
-      default: return 'bg-surface-elevated';
-    }
+  const getCategoryIcon = (category: string) => {
+    return category === 'medicine'
+      ? <Pill size={20} color={getCategoryColor(category)} />
+      : <ClipboardList size={20} color={getCategoryColor(category)} />;
   };
 
   if (!visible) return null;
@@ -234,7 +196,7 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
                 keyboardShouldPersistTaps="handled"
               >
                 {results.length > 0 ? (
-                  results.map((result, index) => (
+                  results.map((result) => (
                     <TouchableOpacity
                       key={result.id}
                       style={styles.resultItem}
@@ -244,7 +206,7 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
                       <GlassCard elevated style={styles.resultCard}>
                         <View style={styles.resultContent}>
                           <View style={styles.resultIcon}>
-                            {result.icon}
+                            {getCategoryIcon(result.category)}
                           </View>
                           <View style={styles.resultText}>
                             <Text style={styles.resultTitle}>{result.title}</Text>
