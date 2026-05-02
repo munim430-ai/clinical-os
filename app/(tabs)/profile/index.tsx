@@ -1,8 +1,9 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { GraduationCap, Stethoscope, UserCheck, Activity, AlertTriangle, Database, RefreshCcw } from "lucide-react-native";
+import { GraduationCap, Stethoscope, UserCheck, Activity, AlertTriangle, Database, RefreshCcw, Sun, Moon } from "lucide-react-native";
 import { getPersona, setPersona, type Persona } from "@/lib/persona";
 import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
 import { getContentSummary } from "@/lib/content-sync";
+import { useColorScheme } from "@/lib/useColorScheme";
 import { useEffect, useState } from "react";
 
 const PERSONAS = [
@@ -24,6 +25,7 @@ export default function ProfileScreen() {
     mediaAssets: 0,
   });
   const totalCases = Object.values(caseCounts).reduce((a, b) => a + b, 0);
+  const { isDarkColorScheme, toggleColorScheme } = useColorScheme();
 
   useEffect(() => {
     getCaseCounts().then(setCaseCounts);
@@ -39,6 +41,53 @@ export default function ProfileScreen() {
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 16 }}>
       <Text className="text-foreground text-2xl font-bold mb-1">Profile</Text>
       <Text className="text-muted-foreground text-sm mb-6">Manage your role, content, and local activity</Text>
+
+      {/* ── Day / Dark Mode Toggle ── */}
+      <Text className="text-muted-foreground text-xs uppercase tracking-wider mb-3">Appearance</Text>
+      <TouchableOpacity
+        onPress={toggleColorScheme}
+        className="flex-row items-center bg-card rounded-2xl p-4 mb-6 border border-border"
+        activeOpacity={0.7}
+      >
+        <View
+          className="w-12 h-12 rounded-full items-center justify-center mr-4"
+          style={{ backgroundColor: isDarkColorScheme ? "rgba(0,200,150,0.12)" : "rgba(245,158,11,0.12)" }}
+        >
+          {isDarkColorScheme
+            ? <Moon size={22} color="#B8FFD2" />
+            : <Sun  size={22} color="#F59E0B" />
+          }
+        </View>
+        <View className="flex-1">
+          <Text className="text-foreground font-semibold">
+            {isDarkColorScheme ? "Dark Mode" : "Day Mode"}
+          </Text>
+          <Text className="text-muted-foreground text-xs mt-0.5">
+            {isDarkColorScheme ? "Tap to switch to day mode" : "Tap to switch to dark mode"}
+          </Text>
+        </View>
+        {/* Toggle pill */}
+        <View
+          style={{
+            width: 48,
+            height: 28,
+            borderRadius: 14,
+            backgroundColor: isDarkColorScheme ? "#B8FFD2" : "#F59E0B",
+            padding: 3,
+            justifyContent: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: 11,
+              backgroundColor: isDarkColorScheme ? "#000" : "#fff",
+              transform: [{ translateX: isDarkColorScheme ? 20 : 0 }],
+            }}
+          />
+        </View>
+      </TouchableOpacity>
 
       <Text className="text-muted-foreground text-xs uppercase tracking-wider mb-3">Your Role</Text>
       {PERSONAS.map((p) => {

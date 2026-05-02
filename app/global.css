@@ -46,4 +46,27 @@
     --input: 240 4% 11%;
     --ring: 140 100% 86%;
   }
+
+  /* ── LIGHT / DAY MODE ── */
+  .light:root {
+    --background: 210 20% 98%;
+    --foreground: 222 20% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 20% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 20% 8%;
+    --primary: 152 52% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 16% 93%;
+    --secondary-foreground: 222 20% 8%;
+    --muted: 210 16% 95%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 152 52% 36%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 152 52% 36%;
+  }
 }
