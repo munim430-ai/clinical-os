@@ -2,9 +2,11 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "rea
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { eq, sql } from "drizzle-orm";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { useDatabase } from "@/db/provider";
-import { generics, medicines, dosageForms, manufacturers, drugClasses } from "@/db/schema";
+import { generics, medicines, dosageForms, manufacturers } from "@/db/schema";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 const SECTIONS = [
   { key: "pharmacology", label: "Pharmacology" },
@@ -49,79 +51,91 @@ export default function GenericDetailScreen() {
 
   if (!generic) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color="#00C896" />
-      </View>
+      <ClinicalShell>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#B8FFD2" />
+        </View>
+      </ClinicalShell>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="px-4 pt-4 pb-2 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <ArrowLeft size={22} color="#F2F2F2" />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-foreground text-lg font-bold">{generic.name}</Text>
-          {generic.indicationText && (
-            <Text className="text-primary text-xs mt-0.5" numberOfLines={1}>{generic.indicationText}</Text>
-          )}
-        </View>
-      </View>
-
-      <View className="px-4 pb-6">
-        {/* Clinical Sections */}
-        {SECTIONS.map(({ key, label }) => {
-          const content = generic[key];
-          if (!content) return null;
-          const open = expanded === key;
-          return (
+    <ClinicalShell padded={false}>
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 36 }}>
+        <View className="px-4 pt-2">
+          {/* Header */}
+          <View className="mb-4 flex-row items-center">
             <TouchableOpacity
-              key={key}
-              onPress={() => setExpanded(open ? null : key)}
-              className="bg-card rounded-2xl border border-border mb-2 overflow-hidden"
+              onPress={() => { triggerSelectionHaptic(); router.back(); }}
+              className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
             >
-              <View className="flex-row items-center justify-between p-4">
-                <Text className="text-foreground font-medium">{label}</Text>
-                <Text className="text-muted-foreground text-lg">{open ? "−" : "+"}</Text>
-              </View>
-              {open && (
-                <View className="px-4 pb-4 border-t border-border">
-                  <Text className="text-muted-foreground text-sm leading-relaxed mt-3">{content}</Text>
-                </View>
-              )}
+              <ArrowLeft size={21} color="#F5F5F7" strokeWidth={1.7} />
             </TouchableOpacity>
-          );
-        })}
-
-        {/* Brands */}
-        {brands.length > 0 && (
-          <View className="mt-4">
-            <Text className="text-foreground font-semibold mb-3">
-              Available Brands ({brands.length})
+            <Text className="flex-1 font-bodySemi text-[13px] uppercase tracking-[1.6px] text-text-muted">
+              Generic Monograph
             </Text>
-            {brands.map((b) => (
-              <TouchableOpacity
-                key={b.id}
-                onPress={() => router.push(`/dims/brand/${b.id}` as any)}
-                className="bg-card rounded-xl border border-border p-3 mb-2 flex-row items-center justify-between"
-              >
-                <View className="flex-1">
-                  <Text className="text-foreground text-sm font-medium">{b.brandName}</Text>
-                  <Text className="text-muted-foreground text-xs mt-0.5">
-                    {[b.strength, b.dosageForm].filter(Boolean).join(" · ")}
-                  </Text>
-                </View>
-                {b.manufacturerName && (
-                  <Text className="text-muted-foreground text-xs ml-2" numberOfLines={1} style={{ maxWidth: 100 }}>
-                    {b.manufacturerName}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ))}
           </View>
-        )}
-      </View>
-    </ScrollView>
+
+          <View className="mb-4 rounded-[28px] border border-border bg-ink-800 p-5">
+            <Text className="font-heading text-[28px] leading-9 text-text-primary">{generic.name}</Text>
+            {generic.indicationText ? (
+              <Text className="mt-2 font-body text-[14px] leading-5 text-text-muted" numberOfLines={2}>
+                {generic.indicationText}
+              </Text>
+            ) : null}
+          </View>
+
+          {/* Clinical sections */}
+          {SECTIONS.map(({ key, label }) => {
+            const content = generic[key];
+            if (!content) return null;
+            const open = expanded === key;
+            return (
+              <TouchableOpacity
+                key={key}
+                onPress={() => { triggerSelectionHaptic(); setExpanded(open ? null : key); }}
+                className="mb-2 overflow-hidden rounded-clinical border border-border bg-ink-800"
+                activeOpacity={0.82}
+              >
+                <View className="flex-row items-center justify-between p-4">
+                  <Text className="flex-1 font-bodySemi text-[15px] text-text-primary">{label}</Text>
+                  <Text className="font-heading text-[22px] text-text-muted">{open ? "−" : "+"}</Text>
+                </View>
+                {open ? (
+                  <View className="border-t border-border-soft px-4 pb-4 pt-3">
+                    <Text className="font-body text-[14px] leading-6 text-text-secondary">{content}</Text>
+                  </View>
+                ) : null}
+              </TouchableOpacity>
+            );
+          })}
+
+          {/* Available brands */}
+          {brands.length > 0 ? (
+            <View className="mt-4">
+              <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.7px] text-text-muted">
+                Available Brands ({brands.length})
+              </Text>
+              {brands.map((b) => (
+                <TouchableOpacity
+                  key={b.id}
+                  onPress={() => { triggerSelectionHaptic(); router.push(`/dims/brand/${b.id}` as any); }}
+                  className="mb-2 flex-row items-center justify-between rounded-clinical border border-border bg-ink-800 p-4"
+                  activeOpacity={0.78}
+                >
+                  <View className="flex-1 pr-3">
+                    <Text className="font-bodySemi text-[14px] text-text-primary">{b.brandName}</Text>
+                    <Text className="mt-0.5 font-body text-[12px] text-text-muted">
+                      {[b.strength, b.dosageForm, b.manufacturerName].filter(Boolean).join(" · ")}
+                    </Text>
+                  </View>
+                  <ChevronRight size={17} color="#7A7A80" strokeWidth={1.6} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : null}
+        </View>
+      </ScrollView>
+    </ClinicalShell>
   );
 }

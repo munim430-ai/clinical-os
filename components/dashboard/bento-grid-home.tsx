@@ -29,6 +29,7 @@ import { GlassCard, FrostedGlass } from '@/components/ui/glassmorphism';
 import { AmbientMeshGradient } from '@/components/backgrounds/mesh-gradient';
 import { triggerSelectionHaptic } from '@/lib/clinical-haptics';
 import { router } from 'expo-router';
+import { sql } from 'drizzle-orm';
 import { useDatabase } from '@/db/provider';
 import { systems as systemsTable, conditions as conditionsTable } from '@/db/schema';
 import { getTotalCases } from '@/lib/surveillance';
@@ -152,11 +153,20 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
     
     const loadData = async () => {
       try {
-        const sysRows = await db.select().from(systemsTable);
-        setSysList(sysRows);
-
-        const condRows = await db.select({ id: conditionsTable.id }).from(conditionsTable);
-        setCondCount(condRows.length);
+        const [sysRows, countRows] = await Promise.all([
+          db.select().from(systemsTable),
+          db.select({
+            systemId: conditionsTable.systemId,
+            count: sql<number>`count(*)`,
+          }).from(conditionsTable).groupBy(conditionsTable.systemId),
+        ]);
+        const countMap = countRows.reduce<Record<string, number>>((acc, row) => {
+          if (row.systemId) acc[row.systemId] = Number(row.count);
+          return acc;
+        }, {});
+        const total = countRows.reduce((sum, row) => sum + Number(row.count), 0);
+        setSysList(sysRows.map(s => ({ ...s, conditionCount: countMap[s.id] ?? 0 })));
+        setCondCount(total);
         
         const cases = await getTotalCases();
         setTotalCases(cases);
@@ -248,7 +258,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
                 <BentoCard
                   key={system.id}
                   title={system.name}
-                  subtitle={`${system.conditions || 0} conditions`}
+                  subtitle={`${system.conditionCount ?? 0} conditions`}
                   icon={<IconComponent size={20} color={system.color || "#B8FFD2"} />}
                   color={system.color || "#B8FFD2"}
                   size="medium"
