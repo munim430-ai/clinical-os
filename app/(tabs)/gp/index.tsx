@@ -1,55 +1,23 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
-import {
-  Heart, Wind, Activity, Brain, Microscope,
-  Baby, FlaskConical, Stethoscope, Syringe, User2,
-  BookOpen, Trophy, ChevronRight,
-} from "lucide-react";
+import { View } from "react-native";
 import { router } from "expo-router";
-import { useDatabase } from "@/db/provider";
-import { systems, conditions } from "@/db/schema";
-import { ClinicalShell } from "@/components/layout/ClinicalShell";
-import { PremiumMedicineCard } from "@/components/cards/PremiumMedicineCard";
-import { ProtocolChecklistCard } from "@/components/cards/ProtocolChecklistCard";
+import { useState } from "react";
 import { BentoGridHome } from "@/components/dashboard/bento-grid-home";
-import { AIAssistantButton } from "@/components/ai/ai-assistant-button";
-import { OmniSearchCockpit } from "@/components/search/omni-search-cockpit";
-import { logCase } from "@/lib/surveillance";
-import { getTotalCases } from "@/lib/surveillance";
-import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
-import { setAndroidNavigationBar } from "@/lib/android-navigation-bar";
-import { useEffect, useState } from "react";
-
-const ICONS: Record<string, any> = {
-  Heart, Wind, Activity, Brain, Microscope,
-  Baby, FlaskConical, Stethoscope, Syringe, User2,
-};
+import { OmniSearchCockpit, type SearchResult } from "@/components/search/omni-search-cockpit";
 
 export default function GPMasterScreen() {
   const [showSearch, setShowSearch] = useState(false);
-  const [showAI, setShowAI] = useState(false);
+
+  const handleSelect = (result: SearchResult) => {
+    router.push(result.route as any);
+  };
 
   return (
     <View style={{ flex: 1 }}>
-      <BentoGridHome navigation={router} />
-      
-      {/* Omni-Search Cockpit */}
+      <BentoGridHome onSearchPress={() => setShowSearch(true)} />
       <OmniSearchCockpit
         visible={showSearch}
         onClose={() => setShowSearch(false)}
-        onSelect={(result) => {
-          console.log('Selected:', result);
-        }}
-      />
-      
-      {/* AI Assistant Button */}
-      <AIAssistantButton
-        visible={true}
-        onPress={() => {
-          console.log('AI Assistant pressed');
-        }}
-        onChatToggle={(isOpen) => {
-          setShowAI(isOpen);
-        }}
+        onSelect={handleSelect}
       />
     </View>
   );

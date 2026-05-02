@@ -7,29 +7,31 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import { 
-  Heart, 
-  Wind, 
-  Activity, 
-  Brain, 
-  Baby, 
-  FlaskConical, 
-  Stethoscope, 
-  Syringe, 
+import {
+  Heart,
+  Wind,
+  Activity,
+  Brain,
+  Baby,
+  FlaskConical,
+  Stethoscope,
+  Syringe,
   AlertTriangle,
   BookOpen,
   Clock,
   TrendingUp,
-  Calendar,
   Pill,
   FileText,
+  Search,
 } from 'lucide-react';
 import { MotiView } from 'moti';
 import { GlassCard, FrostedGlass } from '@/components/ui/glassmorphism';
 import { AmbientMeshGradient } from '@/components/backgrounds/mesh-gradient';
 import { triggerSelectionHaptic } from '@/lib/clinical-haptics';
+import { router } from 'expo-router';
+import { sql } from 'drizzle-orm';
 import { useDatabase } from '@/db/provider';
-import { systems, conditions } from '@/db/schema';
+import { systems as systemsTable, conditions as conditionsTable } from '@/db/schema';
 import { getTotalCases } from '@/lib/surveillance';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -139,7 +141,7 @@ function BentoCard({
   );
 }
 
-export function BentoGridHome({ navigation }: any) {
+export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any; onSearchPress?: () => void }) {
   const { db } = useDatabase();
   const [sysList, setSysList] = useState<any[]>([]);
   const [condCount, setCondCount] = useState(0);
@@ -151,11 +153,20 @@ export function BentoGridHome({ navigation }: any) {
     
     const loadData = async () => {
       try {
-        const systems = await db.select().from(systems);
-        setSysList(systems);
-        
-        const conditions = await db.select().from(conditions);
-        setCondCount(conditions.length);
+        const [sysRows, countRows] = await Promise.all([
+          db.select().from(systemsTable),
+          db.select({
+            systemId: conditionsTable.systemId,
+            count: sql<number>`count(*)`,
+          }).from(conditionsTable).groupBy(conditionsTable.systemId),
+        ]);
+        const countMap = countRows.reduce<Record<string, number>>((acc, row) => {
+          if (row.systemId) acc[row.systemId] = Number(row.count);
+          return acc;
+        }, {});
+        const total = countRows.reduce((sum, row) => sum + Number(row.count), 0);
+        setSysList(sysRows.map(s => ({ ...s, conditionCount: countMap[s.id] ?? 0 })));
+        setCondCount(total);
         
         const cases = await getTotalCases();
         setTotalCases(cases);
@@ -170,19 +181,19 @@ export function BentoGridHome({ navigation }: any) {
   }, [db]);
 
   const handleSystemPress = (system: any) => {
-    navigation.navigate('gp/[system]', { id: system.id });
+    router.push(`/gp/${system.id}` as any);
   };
 
   const handleERPress = () => {
-    navigation.navigate('er');
+    router.push('/(tabs)/er');
   };
 
   const handleDIMSPress = () => {
-    navigation.navigate('dims');
+    router.push('/(tabs)/dims');
   };
 
   const handleQuizPress = () => {
-    navigation.navigate('gp/quiz');
+    router.push('/gp/quiz');
   };
 
   if (loading) {
@@ -205,8 +216,21 @@ export function BentoGridHome({ navigation }: any) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Clinical OS</Text>
-          <Text style={styles.headerSubtitle}>Premium Medical Dashboard</Text>
+          <View style={styles.headerRow}>
+            <View>
+              <Text style={styles.headerTitle}>Clinical OS</Text>
+              <Text style={styles.headerSubtitle}>Premium Medical Dashboard</Text>
+            </View>
+            {onSearchPress && (
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={() => { triggerSelectionHaptic(); onSearchPress(); }}
+                activeOpacity={0.7}
+              >
+                <Search size={20} color="#B8FFD2" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* Bento Grid */}
@@ -234,7 +258,7 @@ export function BentoGridHome({ navigation }: any) {
                 <BentoCard
                   key={system.id}
                   title={system.name}
-                  subtitle={`${system.conditions || 0} conditions`}
+                  subtitle={`${system.conditionCount ?? 0} conditions`}
                   icon={<IconComponent size={20} color={system.color || "#B8FFD2"} />}
                   color={system.color || "#B8FFD2"}
                   size="medium"
@@ -342,6 +366,21 @@ const styles = {
   header: {
     paddingHorizontal: 12,
     marginBottom: 24,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  searchButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(184,255,210,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(184,255,210,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 32,
