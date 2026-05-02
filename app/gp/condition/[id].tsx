@@ -1,31 +1,43 @@
-import {
-  View, Text, ScrollView, TouchableOpacity,
-  ActivityIndicator, FlatList,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { eq } from "drizzle-orm";
-import { ArrowLeft, BookOpen, Stethoscope, FlaskConical, ClipboardList, GraduationCap } from "lucide-react-native";
+import {
+  ArrowLeft,
+  AlertTriangle,
+  BookOpen,
+  CheckCircle2,
+  ClipboardList,
+  FlaskConical,
+  GraduationCap,
+  Stethoscope,
+} from "lucide-react-native";
 import { useDatabase } from "@/db/provider";
 import { conditions, symptoms, protocols, protocolSteps, examSteps, osceCards, labReferences } from "@/db/schema";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { ClinicalReaderFrame, ReaderDoseBlock } from "@/components/reader/ClinicalReaderFrame";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { logCase } from "@/lib/surveillance";
-
-const TABS = [
-  { key: "overview",  label: "Overview",  Icon: BookOpen },
-  { key: "protocol",  label: "Protocol",  Icon: ClipboardList },
-  { key: "exam",      label: "Exam",      Icon: Stethoscope },
-  { key: "interpret", label: "Interpret", Icon: FlaskConical },
-  { key: "osce",      label: "OSCE",      Icon: GraduationCap },
-];
+import { triggerSelectionHaptic, triggerSuccessHaptic } from "@/lib/clinical-haptics";
 
 const LOGGABLE = ["dengue", "typhoid", "malaria", "cholera"];
 const EXAM_CATS = ["inspection", "palpation", "percussion", "auscultation"];
 
+type ReaderTab = "overview" | "protocol" | "exam" | "interpret" | "osce";
+
+const TABS: { key: ReaderTab; label: string; Icon: any }[] = [
+  { key: "overview", label: "Overview", Icon: BookOpen },
+  { key: "protocol", label: "Protocol", Icon: ClipboardList },
+  { key: "exam", label: "Exam", Icon: Stethoscope },
+  { key: "interpret", label: "Labs", Icon: FlaskConical },
+  { key: "osce", label: "OSCE", Icon: GraduationCap },
+];
+
 export default function ConditionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { db } = useDatabase();
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState<ReaderTab>("overview");
   const [condition, setCondition] = useState<any>(null);
   const [symptomList, setSymptomList] = useState<any[]>([]);
   const [protocolList, setProtocolList] = useState<any[]>([]);
@@ -38,6 +50,8 @@ export default function ConditionScreen() {
 
   useEffect(() => {
     if (!db || !id) return;
+    setLoading(true);
+
     Promise.all([
       db.select().from(conditions).where(eq(conditions.id, id)),
       db.select().from(symptoms).where(eq(symptoms.conditionId, id)),
@@ -52,228 +66,285 @@ export default function ConditionScreen() {
       setExamList(exam);
       setOsceList(osce);
       setLabs(labsData);
+
       if (prot[0]) {
         db.select().from(protocolSteps)
           .where(eq(protocolSteps.protocolId, prot[0].id))
           .then(setStepList);
+      } else {
+        setStepList([]);
       }
+
       setLoading(false);
     });
   }, [db, id]);
 
+  const toc = useMemo(() => TABS.map((item) => ({ id: item.key, title: item.label })), []);
+  const warningSigns = symptomList.filter((symptom) => symptom.isWarnSign);
+  const regularSymptoms = symptomList.filter((symptom) => !symptom.isWarnSign);
+  const activeProtocol = protocolList[0];
+
   if (loading) {
-    return <View className="flex-1 bg-background items-center justify-center"><ActivityIndicator color="#00C896" /></View>;
+    return (
+      <ClinicalShell>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#B8FFD2" />
+          <Text className="mt-3 font-body text-[13px] text-text-muted">Loading clinical reader</Text>
+        </View>
+      </ClinicalShell>
+    );
   }
+
   if (!condition) {
-    return <View className="flex-1 bg-background items-center justify-center"><Text className="text-muted-foreground">Not found</Text></View>;
+    return (
+      <ClinicalShell>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="font-headingBold text-[18px] text-text-primary">Condition not found</Text>
+          <Text className="mt-2 text-center font-body text-[13px] text-text-muted">The requested GP Master entry is unavailable offline.</Text>
+        </View>
+      </ClinicalShell>
+    );
   }
 
   return (
-    <View className="flex-1 bg-background">
-      {/* Header */}
-      <View className="px-4 pt-12 pb-2 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3 w-9 h-9 items-center justify-center">
-          <ArrowLeft size={22} color="#F2F2F2" />
-        </TouchableOpacity>
-        <View className="flex-1">
-          <Text className="text-foreground text-lg font-bold" numberOfLines={1}>{condition.name}</Text>
-          {condition.icd10Code && <Text className="text-muted-foreground text-xs">ICD-10: {condition.icd10Code}</Text>}
-        </View>
-        {LOGGABLE.includes(id) && (
-          <TouchableOpacity
-            onPress={() => { if (!loggedRef.current) { logCase(id as any); loggedRef.current = true; } }}
-            className="bg-primary/20 border border-primary/40 rounded-xl px-3 py-1.5"
-          >
-            <Text className="text-primary text-xs font-medium">Log Case</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+    <ClinicalShell padded={false}>
+      <View className="flex-1">
+        <ClinicalReaderFrame
+          title={condition.name}
+          subtitle={condition.icd10Code ? `ICD-10 ${condition.icd10Code} · GP Master protocol` : "GP Master protocol"}
+          toc={toc}
+        >
+          <View className="mb-4 flex-row items-center gap-2">
+            <TouchableOpacity
+              onPress={() => {
+                triggerSelectionHaptic();
+                router.back();
+              }}
+              className="h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
+            >
+              <ArrowLeft size={21} color="#F5F5F7" strokeWidth={1.7} />
+            </TouchableOpacity>
 
-      {/* Tab Bar */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}
-        className="border-b border-border" contentContainerStyle={{ paddingHorizontal: 12 }}>
-        {TABS.map(({ key, label, Icon }) => (
-          <TouchableOpacity key={key} onPress={() => setTab(key)}
-            className="flex-row items-center px-3 py-3 mr-1"
-            style={{ borderBottomWidth: 2, borderBottomColor: tab === key ? "#00C896" : "transparent" }}>
-            <Icon size={14} color={tab === key ? "#00C896" : "#555"} />
-            <Text style={{ color: tab === key ? "#00C896" : "#555", fontSize: 13, marginLeft: 4, fontWeight: tab === key ? "600" : "400" }}>
-              {label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 32 }}>
-        <Disclaimer />
-
-        {tab === "overview" && (
-          <View className="px-4">
-            <Text className="text-foreground text-sm leading-relaxed mb-4">{condition.overview}</Text>
-
-            {symptomList.filter(s => !s.isWarnSign).length > 0 && (
-              <Section title="Symptoms & Signs">
-                {symptomList.filter(s => !s.isWarnSign).map((s, i) => (
-                  <BulletRow key={i} text={s.text} />
-                ))}
-              </Section>
-            )}
-
-            {symptomList.filter(s => s.isWarnSign).length > 0 && (
-              <Section title="⚠️ Warning Signs" accent>
-                {symptomList.filter(s => s.isWarnSign).map((s, i) => (
-                  <BulletRow key={i} text={s.text} warn />
-                ))}
-              </Section>
-            )}
+            {LOGGABLE.includes(id) ? (
+              <TouchableOpacity
+                onPress={() => {
+                  if (!loggedRef.current) {
+                    logCase(id as any);
+                    loggedRef.current = true;
+                    triggerSuccessHaptic();
+                  }
+                }}
+                className="rounded-2xl border border-border-mint bg-mint-soft px-4 py-3"
+              >
+                <Text className="font-bodySemi text-[12px] text-mint">Log Case</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
-        )}
 
-        {tab === "protocol" && (
-          <View className="px-4">
-            {protocolList[0] && (
-              <View className="mb-3 flex-row items-center gap-2">
-                <View className="bg-primary/10 border border-primary/20 rounded-lg px-3 py-1.5">
-                  <Text className="text-primary text-xs">{protocolList[0].source} · {protocolList[0].version}</Text>
-                </View>
-              </View>
-            )}
-            {stepList.length === 0 ? (
-              <Text className="text-muted-foreground text-sm">Protocol content coming soon.</Text>
-            ) : (
-              stepList.map((step) => <ProtocolStepCard key={step.id} step={step} />)
-            )}
-          </View>
-        )}
+          <Disclaimer />
 
-        {tab === "exam" && (
-          <View className="px-4">
-            {examList.length === 0 ? (
-              <Text className="text-muted-foreground text-sm">Exam content coming soon.</Text>
-            ) : (
-              EXAM_CATS.map((cat) => {
-                const catSteps = examList.filter(e => e.category === cat);
-                if (!catSteps.length) return null;
-                return (
-                  <Section key={cat} title={cat.charAt(0).toUpperCase() + cat.slice(1)}>
-                    {catSteps.map((s, i) => <BulletRow key={i} text={s.text} />)}
-                  </Section>
-                );
-              })
-            )}
-            {examList.length === 0 && (
-              <IPPAPlaceholder />
-            )}
-          </View>
-        )}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="my-4" contentContainerStyle={{ gap: 8 }}>
+            {TABS.map(({ key, label, Icon }) => {
+              const active = tab === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => {
+                    triggerSelectionHaptic();
+                    setTab(key);
+                  }}
+                  className={[
+                    "flex-row items-center gap-2 rounded-pill border px-4 py-2.5",
+                    active ? "border-border-mint bg-mint-soft" : "border-border bg-ink-800",
+                  ].join(" ")}
+                >
+                  <Icon size={15} color={active ? "#B8FFD2" : "#7A7A80"} strokeWidth={1.6} />
+                  <Text className={active ? "font-bodySemi text-[13px] text-mint" : "font-bodySemi text-[13px] text-text-muted"}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
 
-        {tab === "interpret" && (
-          <View className="px-4">
-            <Text className="text-foreground font-semibold mb-3">Lab Reference Ranges</Text>
-            {labs.map((lab) => (
-              <View key={lab.id} className="bg-card rounded-xl border border-border p-3 mb-2">
-                <View className="flex-row items-center justify-between">
-                  <Text className="text-foreground text-sm font-medium flex-1">{lab.name}</Text>
-                  <Text className="text-primary text-sm font-semibold ml-2">
-                    {lab.normalMin}–{lab.normalMax} {lab.unit}
+          {tab === "overview" ? (
+            <View>
+              <ReaderSection title="Overview" accent="mint">
+                <Text className="font-body text-[16px] leading-7 text-text-secondary">
+                  {condition.overview || "Overview content coming soon."}
+                </Text>
+              </ReaderSection>
+
+              {regularSymptoms.length > 0 ? (
+                <ReaderSection title="Symptoms & Signs" accent="teal">
+                  {regularSymptoms.map((symptom, index) => (
+                    <ClinicalBullet key={symptom.id ?? index} text={symptom.text} />
+                  ))}
+                </ReaderSection>
+              ) : null}
+
+              {warningSigns.length > 0 ? (
+                <ReaderSection title="Warning Signs" accent="red">
+                  {warningSigns.map((symptom, index) => (
+                    <ClinicalBullet key={symptom.id ?? index} text={symptom.text} warn />
+                  ))}
+                </ReaderSection>
+              ) : null}
+            </View>
+          ) : null}
+
+          {tab === "protocol" ? (
+            <View>
+              {activeProtocol ? (
+                <View className="mb-4 rounded-clinical border border-border-mint bg-mint-soft p-4">
+                  <Text className="font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Protocol Source</Text>
+                  <Text className="mt-2 font-headingBold text-[18px] text-mint">
+                    {[activeProtocol.source, activeProtocol.version, activeProtocol.year].filter(Boolean).join(" · ")}
                   </Text>
                 </View>
-                {lab.criticalLow != null && (
-                  <Text className="text-red-400 text-xs mt-1">Critical low: &lt;{lab.criticalLow}</Text>
-                )}
-                {lab.criticalHigh != null && (
-                  <Text className="text-red-400 text-xs mt-0.5">Critical high: &gt;{lab.criticalHigh}</Text>
-                )}
-                {lab.notes && <Text className="text-muted-foreground text-xs mt-1">{lab.notes}</Text>}
-              </View>
-            ))}
-          </View>
-        )}
+              ) : null}
 
-        {tab === "osce" && (
-          <View className="px-4">
-            {osceList.length === 0 ? (
-              <Text className="text-muted-foreground text-sm">OSCE cards coming soon.</Text>
-            ) : (
-              osceList.map((card) => <OSCECard key={card.id} card={card} />)
-            )}
-          </View>
-        )}
-      </ScrollView>
-    </View>
+              {stepList.length === 0 ? (
+                <EmptyBlock message="Protocol content coming soon." />
+              ) : (
+                stepList.map((step) => <PremiumProtocolStep key={step.id} step={step} />)
+              )}
+            </View>
+          ) : null}
+
+          {tab === "exam" ? (
+            <View>
+              {examList.length === 0 ? (
+                <View>
+                  <EmptyBlock message="Condition-specific exam content coming soon. Showing IPPA baseline." />
+                  <IPPAPlaceholder />
+                </View>
+              ) : (
+                EXAM_CATS.map((cat) => {
+                  const catSteps = examList.filter((exam) => exam.category === cat);
+                  if (!catSteps.length) return null;
+                  return (
+                    <ReaderSection key={cat} title={cat.charAt(0).toUpperCase() + cat.slice(1)} accent="mint">
+                      {catSteps.map((step, index) => <ClinicalBullet key={step.id ?? index} text={step.text} />)}
+                    </ReaderSection>
+                  );
+                })
+              )}
+            </View>
+          ) : null}
+
+          {tab === "interpret" ? (
+            <View>
+              <ReaderSection title="Lab Reference Ranges" accent="teal">
+                {labs.map((lab) => <LabReferenceCard key={lab.id} lab={lab} />)}
+              </ReaderSection>
+            </View>
+          ) : null}
+
+          {tab === "osce" ? (
+            <View>
+              {osceList.length === 0 ? (
+                <EmptyBlock message="OSCE cards coming soon." />
+              ) : (
+                osceList.map((card) => <PremiumOSCECard key={card.id} card={card} />)
+              )}
+            </View>
+          ) : null}
+        </ClinicalReaderFrame>
+      </View>
+    </ClinicalShell>
   );
 }
 
-function Section({ title, children, accent = false }: any) {
+function ReaderSection({ title, children, accent = "mint" }: { title: string; children: ReactNode; accent?: "mint" | "teal" | "red" }) {
+  const colorClass = accent === "red" ? "text-clinical-red" : accent === "teal" ? "text-clinical-teal" : "text-mint";
+  const borderClass = accent === "red" ? "border-border-red" : "border-border";
+  const bgClass = accent === "red" ? "bg-clinical-redSoft" : "bg-ink-800";
+
   return (
     <View className="mb-5">
-      <Text style={{ color: accent ? "#EAB308" : "#00C896" }} className="text-xs font-semibold uppercase tracking-wider mb-2">
-        {title}
-      </Text>
-      <View className={`rounded-2xl border p-3 ${accent ? "bg-yellow-500/5 border-yellow-500/20" : "bg-card border-border"}`}>
-        {children}
-      </View>
+      <Text className={`mb-2 font-bodySemi text-[11px] uppercase tracking-[1.7px] ${colorClass}`}>{title}</Text>
+      <View className={`rounded-clinical border p-4 ${borderClass} ${bgClass}`}>{children}</View>
     </View>
   );
 }
 
-function BulletRow({ text, warn = false }: { text: string; warn?: boolean }) {
+function ClinicalBullet({ text, warn = false }: { text: string; warn?: boolean }) {
   return (
-    <View className="flex-row items-start py-1.5 border-b border-border/30">
-      <Text style={{ color: warn ? "#EAB308" : "#00C896" }} className="text-xs mr-2 mt-0.5">•</Text>
-      <Text className="text-foreground text-sm flex-1 leading-relaxed">{text}</Text>
-    </View>
-  );
-}
-
-function ProtocolStepCard({ step, defaultOpen = false }: { step: any; defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
-  const subSteps: string[] = step.subStepsJson ? JSON.parse(step.subStepsJson) : [];
-  const table = step.tableJson ? JSON.parse(step.tableJson) : null;
-
-  return (
-    <TouchableOpacity onPress={() => setOpen(!open)}
-      className="bg-card rounded-2xl border border-border mb-3 overflow-hidden" activeOpacity={0.8}>
-      <View className="flex-row items-center p-4">
-        <View className="w-7 h-7 rounded-full bg-primary/20 items-center justify-center mr-3">
-          <Text className="text-primary text-xs font-bold">{step.stepNumber}</Text>
-        </View>
-        <Text className="text-foreground font-semibold flex-1">{step.heading}</Text>
-        <Text className="text-muted-foreground text-lg">{open ? "−" : "+"}</Text>
-      </View>
-      {open && (
-        <View className="px-4 pb-4 border-t border-border">
-          <Text className="text-muted-foreground text-sm leading-relaxed mt-3 mb-2">{step.body}</Text>
-          {subSteps.map((s, i) => (
-            <View key={i} className="flex-row items-start mb-1.5">
-              <Text className="text-primary text-xs mr-2 mt-0.5">›</Text>
-              <Text className="text-foreground text-sm flex-1 leading-relaxed">{s}</Text>
-            </View>
-          ))}
-          {table && <TableCard table={table} />}
-        </View>
+    <View className="flex-row items-start border-b border-border-soft py-2.5 last:border-b-0">
+      {warn ? (
+        <AlertTriangle size={15} color="#FF453A" strokeWidth={1.7} style={{ marginTop: 3, marginRight: 8 }} />
+      ) : (
+        <CheckCircle2 size={15} color="#00D7B5" strokeWidth={1.7} style={{ marginTop: 3, marginRight: 8 }} />
       )}
+      <Text className="flex-1 font-body text-[15px] leading-6 text-text-secondary">{text}</Text>
+    </View>
+  );
+}
+
+function PremiumProtocolStep({ step }: { step: any }) {
+  const [open, setOpen] = useState(step.stepNumber === 1);
+  const subSteps = parseJsonArray(step.subStepsJson);
+  const table = parseJsonObject(step.tableJson);
+  const critical = step.severity === "critical" || step.severity === "danger";
+
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        triggerSelectionHaptic();
+        setOpen(!open);
+      }}
+      className={[
+        "mb-3 overflow-hidden rounded-clinical border",
+        critical ? "border-border-red bg-clinical-redSoft" : "border-border bg-ink-800",
+      ].join(" ")}
+      activeOpacity={0.82}
+    >
+      <View className="flex-row items-center p-4">
+        <View className={critical ? "mr-3 h-9 w-9 items-center justify-center rounded-2xl bg-clinical-red" : "mr-3 h-9 w-9 items-center justify-center rounded-2xl bg-mint-soft"}>
+          <Text className={critical ? "font-headingBold text-[13px] text-text-primary" : "font-headingBold text-[13px] text-mint"}>
+            {step.stepNumber}
+          </Text>
+        </View>
+        <Text className="flex-1 font-headingBold text-[16px] leading-6 text-text-primary">
+          {step.heading || `Step ${step.stepNumber}`}
+        </Text>
+        <Text className="font-heading text-[22px] text-text-muted">{open ? "−" : "+"}</Text>
+      </View>
+
+      {open ? (
+        <View className="border-t border-border-soft px-4 pb-4 pt-3">
+          <Text className="mb-3 font-body text-[15px] leading-6 text-text-secondary">{step.body}</Text>
+          {subSteps.map((item, index) => <ClinicalBullet key={`${step.id}-${index}`} text={item} warn={critical} />)}
+          {table ? <PremiumTable table={table} /> : null}
+        </View>
+      ) : null}
     </TouchableOpacity>
   );
 }
 
-function TableCard({ table }: { table: any }) {
+function PremiumTable({ table }: { table: any }) {
+  const headers: string[] = Array.isArray(table.headers) ? table.headers : [];
+  const rows: string[][] = Array.isArray(table.rows) ? table.rows : [];
+
   return (
-    <View className="mt-3 bg-muted rounded-xl overflow-hidden border border-border">
-      {table.title && (
-        <View className="bg-secondary px-3 py-2">
-          <Text className="text-foreground text-xs font-semibold">{table.title}</Text>
+    <View className="mt-4 overflow-hidden rounded-2xl border border-border bg-ink-950">
+      {table.title ? (
+        <View className="border-b border-border-soft bg-ink-700 px-3 py-2">
+          <Text className="font-bodySemi text-[12px] text-text-primary">{table.title}</Text>
         </View>
-      )}
-      <View className="flex-row bg-secondary/50 px-3 py-2">
-        {table.headers.map((h: string, i: number) => (
-          <Text key={i} className="text-muted-foreground text-xs font-medium flex-1">{h}</Text>
-        ))}
-      </View>
-      {table.rows.map((row: string[], ri: number) => (
-        <View key={ri} className={`flex-row px-3 py-2 ${ri % 2 === 0 ? "" : "bg-muted/50"}`}>
-          {row.map((cell, ci) => (
-            <Text key={ci} className="text-foreground text-xs flex-1">{cell}</Text>
+      ) : null}
+      {headers.length > 0 ? (
+        <View className="flex-row border-b border-border-soft bg-ink-700 px-3 py-2">
+          {headers.map((header, index) => (
+            <Text key={`${header}-${index}`} className="flex-1 font-bodySemi text-[11px] text-text-muted">{header}</Text>
+          ))}
+        </View>
+      ) : null}
+      {rows.map((row, rowIndex) => (
+        <View key={`row-${rowIndex}`} className="flex-row border-b border-border-soft px-3 py-2 last:border-b-0">
+          {row.map((cell, cellIndex) => (
+            <Text key={`cell-${cellIndex}`} className="flex-1 font-body text-[12px] leading-5 text-text-secondary">{cell}</Text>
           ))}
         </View>
       ))}
@@ -281,29 +352,59 @@ function TableCard({ table }: { table: any }) {
   );
 }
 
-function OSCECard({ card }: { card: any }) {
-  const [revealed, setRevealed] = useState(false);
+function LabReferenceCard({ lab }: { lab: any }) {
+  const range = [lab.normalMin, lab.normalMax].filter((value) => value != null).join("–");
   return (
-    <View className="bg-card rounded-2xl border border-border mb-3 overflow-hidden">
-      <View className="p-4">
-        <View className="flex-row items-center mb-2">
-          <View className="bg-primary/10 rounded-lg px-2 py-0.5 mr-2">
-            <Text className="text-primary text-xs capitalize">{card.stationType}</Text>
-          </View>
+    <View className="mb-3 rounded-2xl border border-border bg-ink-950 p-3">
+      <View className="flex-row items-start justify-between gap-3">
+        <Text className="flex-1 font-bodySemi text-[14px] leading-5 text-text-primary">{lab.name}</Text>
+        {range ? <Text className="font-headingBold text-[14px] text-mint">{range} {lab.unit}</Text> : null}
+      </View>
+      {lab.criticalLow != null || lab.criticalHigh != null ? (
+        <View className="mt-3 rounded-xl border border-border-red bg-clinical-redSoft px-3 py-2">
+          <Text className="font-bodySemi text-[12px] leading-5 text-clinical-red">
+            {[lab.criticalLow != null ? `Critical low <${lab.criticalLow}` : null, lab.criticalHigh != null ? `Critical high >${lab.criticalHigh}` : null].filter(Boolean).join(" · ")}
+          </Text>
         </View>
-        <Text className="text-foreground text-sm font-medium leading-relaxed">{card.question}</Text>
+      ) : null}
+      {lab.notes ? <Text className="mt-2 font-body text-[12px] leading-5 text-text-muted">{lab.notes}</Text> : null}
+    </View>
+  );
+}
+
+function PremiumOSCECard({ card }: { card: any }) {
+  const [revealed, setRevealed] = useState(false);
+
+  return (
+    <View className="mb-3 overflow-hidden rounded-clinical border border-border bg-ink-800">
+      <View className="p-4">
+        <View className="mb-3 self-start rounded-pill border border-border-mint bg-mint-soft px-3 py-1">
+          <Text className="font-bodySemi text-[11px] uppercase tracking-[1.4px] text-mint">{card.stationType || "OSCE"}</Text>
+        </View>
+        <Text className="font-bodySemi text-[15px] leading-6 text-text-primary">{card.question}</Text>
       </View>
       <TouchableOpacity
-        onPress={() => setRevealed(!revealed)}
-        className="border-t border-border px-4 py-3"
-        activeOpacity={0.7}
+        onPress={() => {
+          triggerSelectionHaptic();
+          setRevealed(!revealed);
+        }}
+        className="border-t border-border-soft px-4 py-3"
+        activeOpacity={0.78}
       >
         {revealed ? (
-          <Text className="text-foreground text-sm leading-relaxed">{card.answer}</Text>
+          <Text className="font-body text-[14px] leading-6 text-text-secondary">{card.answer}</Text>
         ) : (
-          <Text className="text-primary text-sm font-medium text-center">Tap to reveal answer</Text>
+          <Text className="text-center font-bodySemi text-[14px] text-mint">Tap to reveal answer</Text>
         )}
       </TouchableOpacity>
+    </View>
+  );
+}
+
+function EmptyBlock({ message }: { message: string }) {
+  return (
+    <View className="mb-4 rounded-clinical border border-border bg-ink-800 p-4">
+      <Text className="font-body text-[14px] leading-6 text-text-muted">{message}</Text>
     </View>
   );
 }
@@ -312,16 +413,37 @@ function IPPAPlaceholder() {
   const items = [
     { cat: "Inspection", steps: ["General appearance, nutrition, hydration", "Skin: rash, jaundice, pallor, cyanosis", "Body habitus, posture, gait"] },
     { cat: "Palpation", steps: ["Temperature, skin turgor", "Lymph nodes: cervical, axillary, inguinal", "Abdomen: tenderness, organomegaly"] },
-    { cat: "Percussion", steps: ["Lung fields: dullness vs resonance", "Liver span", "Shifting dullness (ascites)"] },
-    { cat: "Auscultation", steps: ["Heart: S1, S2, murmurs", "Lungs: air entry, added sounds", "Bowel sounds"] },
+    { cat: "Percussion", steps: ["Lung fields: dullness vs resonance", "Liver span", "Shifting dullness for ascites"] },
+    { cat: "Auscultation", steps: ["Heart: S1, S2, murmurs", "Lungs: air entry and added sounds", "Bowel sounds"] },
   ];
+
   return (
     <View>
       {items.map(({ cat, steps }) => (
-        <Section key={cat} title={cat}>
-          {steps.map((s, i) => <BulletRow key={i} text={s} />)}
-        </Section>
+        <ReaderSection key={cat} title={cat} accent="mint">
+          {steps.map((step) => <ClinicalBullet key={step} text={step} />)}
+        </ReaderSection>
       ))}
     </View>
   );
+}
+
+function parseJsonArray(value?: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+function parseJsonObject(value?: string | null): any | null {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
 }
