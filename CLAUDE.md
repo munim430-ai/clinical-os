@@ -8,11 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 bun install                  # install dependencies
 bun run dev                  # start Expo dev server
 bun run dev:android          # start Expo dev server, clear cache, Android
-bun run build:web            # export static web build to dist/
+bun run build:db             # build public/database.sqlite (Node >= 22 required, run before build:web)
+bun run build:web            # export static web build to dist/ (uses bunx expo)
 bun run format               # lint + format with Biome (auto-fix)
 bun run db:generate          # generate Drizzle migration files from schema
 
 # Build the pre-seeded SQLite file used by the web version (Node >= 22 required)
+# This is also called automatically by bun run build:db
 node --experimental-sqlite scripts/build-web-db.mjs
 ```
 
