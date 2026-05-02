@@ -1,32 +1,44 @@
-import { MMKV } from "react-native-mmkv";
-
-const store = new MMKV({ id: "clinical-os" });
+import { eq, sql } from "drizzle-orm";
+import { db } from "@/db/drizzle";
+import { caseLogs } from "@/db/schema";
 
 export type Disease = "dengue" | "typhoid" | "malaria" | "cholera";
 
-interface CaseLog {
-  disease: Disease;
-  ts: string;
-  synced: boolean;
+export type CaseCounts = Record<Disease, number>;
+
+export async function logCase(disease: Disease, district?: string) {
+  await db.insert(caseLogs).values({
+    diseaseType: disease,
+    district: district?.trim() || null,
+    synced: false,
+  });
 }
 
-export function logCase(disease: Disease) {
-  const raw = store.getString("case_logs");
-  const logs: CaseLog[] = raw ? JSON.parse(raw) : [];
-  logs.push({ disease, ts: new Date().toISOString(), synced: false });
-  store.set("case_logs", JSON.stringify(logs));
-}
+export async function getCaseCounts(): Promise<CaseCounts> {
+  const rows = await db
+    .select({ diseaseType: caseLogs.diseaseType, count: sql<number>`count(*)` })
+    .from(caseLogs)
+    .groupBy(caseLogs.diseaseType);
 
-export function getCaseCounts(): Record<Disease, number> {
-  const raw = store.getString("case_logs");
-  const logs: CaseLog[] = raw ? JSON.parse(raw) : [];
-  return logs.reduce((acc, l) => {
-    acc[l.disease] = (acc[l.disease] ?? 0) + 1;
+  return rows.reduce((acc, row) => {
+    const disease = row.diseaseType as Disease;
+    acc[disease] = Number(row.count) || 0;
     return acc;
-  }, {} as Record<Disease, number>);
+  }, {} as CaseCounts);
 }
 
-export function getTotalCases(): number {
-  const raw = store.getString("case_logs");
-  return raw ? JSON.parse(raw).length : 0;
+export async function getTotalCases(): Promise<number> {
+  const rows = await db.select({ count: sql<number>`count(*)` }).from(caseLogs);
+  return Number(rows[0]?.count ?? 0);
+}
+
+export async function getUnsyncedCaseLogs() {
+  return db.select().from(caseLogs).where(eq(caseLogs.synced, false));
+}
+
+export async function markCaseLogsSynced(ids: number[]) {
+  if (ids.length === 0) return;
+  for (const id of ids) {
+    await db.update(caseLogs).set({ synced: true }).where(eq(caseLogs.id, id));
+  }
 }
