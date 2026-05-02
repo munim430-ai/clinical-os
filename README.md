@@ -1,70 +1,63 @@
-# Expo Local-first Template  [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40expostarter)](https://twitter.com/expostarter)
+# Clinical OS
 
-[![Open in Bolt.new](https://www.expostarter.com/images/open-in-bolt.svg)](https://bolt.new/~/github.com/expo-starter/expo-local-first-template)
+Offline-first clinical reference app for Bangladeshi doctors.
 
-<p align="center">
-  <a href="https://expostarter.com/"><img src="assets/github-banner.png?raw=true" alt="Expo Starter Kit"></a>
-</p>
+Clinical OS combines:
 
-The `Expo Local-First Template` is a free project model with up-to-date frameworks and configurations for your new local-first Expo project.
+- clinical workflows: systems, conditions, symptoms, warning signs, protocols, examination steps, lab interpretation, and OSCE cards
+- drug lookup: brands, generics, manufacturers, dosage forms, strengths, packages, pharmacology, interactions, precautions, pregnancy notes, and more
+- ER panic mode: weight-based emergency drug dose support
+- anonymous case logging: local-first disease surveillance without patient-identifying data
+- free content infrastructure: import owned, public, or licensed datasets without locking doctors behind subscriptions
 
-If you're searching for a more production-ready template, consider purchasing the [Expo Starter Kit](https://expostarter.com). Your support will help us maintaining our free templates as well.
+## Stack
 
-For local-first example with remote sync please check our [article](https://www.expostarter.com/blog/expo-libsql-improve-app-performance)
+- Expo 54
+- React Native 0.81
+- Expo Router
+- Expo SQLite
+- Drizzle ORM
+- NativeWind
+- MMKV for lightweight preferences
 
-## 📚 What's inside
+## Content model
 
-- ⚡ [Expo v54](https://expo.dev) - Built with Expo for cross-platform support
-- ⚛️ [React Native v0.81.4](https://reactnative.dev) for building native apps using React
-- 💽 Local-first based on [Expo SQLite for](https://docs.expo.dev/versions/latest/sdk/sqlite/) for native and [Sqlite.js](https://github.com/sql-js/sql.js) for Web
-- 💽 Full integrated with [DrizzleORM](https://drizzle.dev) including live query
-- 💎 Integrate with [NativeWind v4](https://www.nativewind.dev), Tailwind CSS for React Native
-- 📦 [zustand](docs.pmnd.rs/zustand)
-- 🎨 Common components from the [rn-reusables](https://github.com/mrzachnugent/react-native-reusables)
-- 🌗 Dark and light mode - Android Navigation Bar matches mode and Persistant mode
-- 📏 Linter and Code Formatter with [biome](https://biomejs.dev/)
-- 🗂 VSCode recommended extensions, settings, and snippets to enhance the developer experience.
+Clinical OS is designed to stay free while respecting content rights.
 
+Use only:
 
+- original curated medical content
+- public-domain content
+- government or regulator datasets that permit reuse
+- licensed datasets with redistribution rights
+- medical-reviewer-approved summaries
 
-### Requirements
+Do not import copied subscription databases, scraped proprietary app content, or reverse-engineered protected datasets.
 
-- Node.js 20+ and bun
-- [iOS Simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Android Studio Emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- For Windows users: [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist) is required
+See `docs/content-import.md` for the import contract.
 
-
-### Getting started
-
-Run the following command on your local environment:
-
-```shell
-bunx create-expo-app --template https://github.com/expo-starter/expo-local-first-template
-```
-
-Then, you can run locally in development mode with live reload:
+## Development
 
 ```shell
-bun run dev:ios
-# Or
+bun install
 bun run dev:android
 ```
 
-<p align="center">
-  <a href="https://expostarter.dev/"><img src="assets/preview-banner.png?raw=true" alt="React Native Expo Starter Kit"></a>
-</p>
+## Database
 
-This will open the app in the iOS simulator or Android emulator.
+The local database is `clinical_os.db` and is managed through Expo SQLite and Drizzle migrations.
 
-### Contributions
+Core modules:
 
-Everyone is welcome to contribute to this project. Feel free to open an issue if you have question or found a bug. Totally open to any suggestions and improvements.
+- drug data
+- clinical protocol data
+- ER drug dose data
+- anonymous case logs
+- content version registry
+- remote sync manifest
+- offline media asset registry
+- app alerts
 
-### License
+## Disclaimer
 
-See [LICENSE](LICENSE) for more information.
-
----
-
-[Expo starter](expostarter.com) [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40y0x53)](https://twitter.com/expostarter)
+Clinical OS is for clinical reference only. All content must be reviewed by qualified medical professionals before clinical application.
