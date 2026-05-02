@@ -1,9 +1,9 @@
 {
-  "name": "@expo-starter/template",
+  "name": "clinical-os",
   "main": "expo-router/entry",
   "version": "1.1.1",
-  "homepage": "https://expostarter.com",
-  "repository": "git@github.com:expo-starter/expo-template.git",
+  "homepage": "https://github.com/munim430-ai/clinical-os",
+  "repository": "git@github.com:munim430-ai/clinical-os.git",
   "license": "Apache-2.0",
   "scripts": {
     "dev": "expo start",
@@ -13,6 +13,7 @@
     "build:web": "expo export --platform web",
     "format": "biome check --no-errors-on-unmatched --apply .",
     "db:generate": "bun drizzle-kit generate",
+    "import:bd-medicine-scraper": "node scripts/import-bd-medicine-scraper.mjs",
     "expo-check": "bun expo install --check"
   },
   "dependencies": {
