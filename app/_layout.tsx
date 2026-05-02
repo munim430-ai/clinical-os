@@ -10,7 +10,13 @@ import { PortalHost } from "@/components/primitives/portal";
 import { DatabaseProvider } from "@/db/provider";
 import { setAndroidNavigationBar } from "@/lib/android-navigation-bar";
 import { DARK_THEME } from "@/lib/constants";
-import { Inter_400Regular, Inter_600SemiBold, useFonts } from "@expo-google-fonts/inter";
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  useFonts,
+} from "@expo-google-fonts/inter";
 import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { isOnboarded } from "@/lib/persona";
 
@@ -23,7 +29,12 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded] = useFonts({ Inter_400Regular, Inter_600SemiBold });
+  const [loaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
   useFrameworkReady();
 
   useEffect(() => {
