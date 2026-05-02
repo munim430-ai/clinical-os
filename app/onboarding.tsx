@@ -1,7 +1,10 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { router } from "expo-router";
 import { GraduationCap, Stethoscope, UserCheck } from "lucide-react-native";
 import { setPersona, markOnboarded, type Persona } from "@/lib/persona";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 const OPTIONS = [
   {
@@ -9,61 +12,67 @@ const OPTIONS = [
     label: "Medical Student",
     sub: "OSCE prep, flashcards, quiz mode",
     icon: GraduationCap,
-    color: "#4499FF",
+    color: "#64D2FF",
   },
   {
     id: "intern" as Persona,
     label: "Intern / House Officer",
     sub: "Clinical protocols, drug doses, ward reference",
     icon: Stethoscope,
-    color: "#FFCC44",
+    color: "#FFD60A",
   },
   {
     id: "gp" as Persona,
     label: "General Practitioner",
     sub: "Full clinical access, prescribing tools, ER mode",
     icon: UserCheck,
-    color: "#00C896",
+    color: "#B8FFD2",
   },
 ];
 
 export default function OnboardingScreen() {
   function handleSelect(p: Persona) {
+    triggerSelectionHaptic();
     setPersona(p);
     markOnboarded();
     router.replace("/(tabs)/gp/index");
   }
 
   return (
-    <View className="flex-1 bg-background px-6 pt-20">
-      <Text className="text-primary text-sm font-semibold tracking-widest mb-2">CLINICAL OS</Text>
-      <Text className="text-foreground text-3xl font-bold mb-2">Who are you?</Text>
-      <Text className="text-muted-foreground text-base mb-10">
-        We'll tailor your experience to your role.
-      </Text>
+    <ClinicalShell padded={false}>
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 36 }}>
+        <ClinicalHumorHero
+          title="Clinical OS"
+          subtitle="DIMS, GP protocols, ER tools, and AI support — built for doctors on rounds."
+        />
 
-      {OPTIONS.map((opt) => {
-        const Icon = opt.icon;
-        return (
-          <TouchableOpacity
-            key={opt.id}
-            onPress={() => handleSelect(opt.id)}
-            className="bg-card rounded-2xl p-5 mb-4 border border-border flex-row items-center"
-            activeOpacity={0.7}
-          >
-            <View
-              className="w-14 h-14 rounded-2xl items-center justify-center mr-4"
-              style={{ backgroundColor: opt.color + "22" }}
+        <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.7px] text-text-muted">
+          Choose clinical mode
+        </Text>
+
+        {OPTIONS.map((opt) => {
+          const Icon = opt.icon;
+          return (
+            <TouchableOpacity
+              key={opt.id}
+              onPress={() => handleSelect(opt.id)}
+              className="mb-4 flex-row items-center rounded-clinical border border-border bg-ink-800 p-4"
+              activeOpacity={0.78}
             >
-              <Icon size={26} color={opt.color} />
-            </View>
-            <View className="flex-1">
-              <Text className="text-foreground text-base font-semibold">{opt.label}</Text>
-              <Text className="text-muted-foreground text-xs mt-1">{opt.sub}</Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+              <View
+                className="mr-4 h-14 w-14 items-center justify-center rounded-2xl border border-border-soft"
+                style={{ backgroundColor: `${opt.color}22` }}
+              >
+                <Icon size={26} color={opt.color} strokeWidth={1.6} />
+              </View>
+              <View className="flex-1">
+                <Text className="font-headingBold text-[16px] text-text-primary">{opt.label}</Text>
+                <Text className="mt-1 font-body text-[12px] leading-5 text-text-muted">{opt.sub}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </ClinicalShell>
   );
 }
