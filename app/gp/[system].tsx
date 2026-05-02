@@ -7,6 +7,7 @@ import { useDatabase } from "@/db/provider";
 import { conditions } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { ProtocolChecklistCard } from "@/components/cards/ProtocolChecklistCard";
+import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 const SYSTEM_LABELS: Record<string, string> = {
@@ -70,13 +71,12 @@ export default function SystemScreen() {
           <ActivityIndicator color="#B8FFD2" />
         </View>
       ) : items.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-8 pb-24">
-          <View className="h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-ink-800">
-            <AlertCircle size={38} color="#2A2A2D" strokeWidth={1.5} />
-          </View>
-          <Text className="mt-4 text-center font-bodySemi text-[14px] leading-5 text-text-muted">
-            Content coming soon. Medical review is pending for this system.
-          </Text>
+        <View className="flex-1 items-center justify-center px-2 pb-20">
+          <ClinicalHumorHero
+            compact
+            title="No protocols loaded yet"
+            subtitle="The tiny doctor is ready. The database is still catching up."
+          />
         </View>
       ) : (
         <FlatList
