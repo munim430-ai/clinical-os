@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1777670343067,
+      "tag": "0000_quick_psynapse",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1777670343068,
+      "tag": "0001_seed_drugs",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1777670343069,
+      "tag": "0002_seed_clinical",
+      "breakpoints": true
+    }
+  ]
+}
