@@ -40,6 +40,10 @@ jobs:
         run: cp public/database.sqlite dist/database.sqlite
         shell: bash
 
+      - name: 📋 Copy 404 fallback for SPA routing
+        run: cp dist/index.html dist/404.html
+        shell: bash
+
       - name: 📱 Publish web app
         uses: peaceiris/actions-gh-pages@v4
         with:
