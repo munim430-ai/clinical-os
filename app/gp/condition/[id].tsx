@@ -16,7 +16,7 @@ import {
 import { useDatabase } from "@/db/provider";
 import { conditions, symptoms, protocols, protocolSteps, examSteps, osceCards, labReferences } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
-import { ClinicalReaderFrame, ReaderDoseBlock } from "@/components/reader/ClinicalReaderFrame";
+import { ClinicalReaderFrame } from "@/components/reader/ClinicalReaderFrame";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { logCase } from "@/lib/surveillance";
 import { triggerSelectionHaptic, triggerSuccessHaptic } from "@/lib/clinical-haptics";
