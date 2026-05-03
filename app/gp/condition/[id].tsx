@@ -96,7 +96,7 @@ export default function ConditionScreen() {
     return (
       <ClinicalShell>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#B8FFD2" />
+          <ActivityIndicator color="#C8F53C" />
           <Text className="mt-3 font-body text-[13px] text-text-muted">Loading clinical reader</Text>
         </View>
       </ClinicalShell>
@@ -142,7 +142,7 @@ export default function ConditionScreen() {
                     triggerSuccessHaptic();
                   }
                 }}
-                className="rounded-2xl border border-border-mint bg-mint-soft px-4 py-3"
+                className="rounded-2xl border border-border-accent bg-mint-soft px-4 py-3"
               >
                 <Text className="font-bodySemi text-[12px] text-mint">Log Case</Text>
               </TouchableOpacity>
@@ -163,11 +163,11 @@ export default function ConditionScreen() {
                   }}
                   className={[
                     "flex-row items-center gap-2 rounded-pill border px-4 py-2.5",
-                    active ? "border-border-mint bg-mint-soft" : "border-border bg-ink-800",
+                    active ? "border-transparent bg-mint" : "border-border bg-ink-800",
                   ].join(" ")}
                 >
-                  <Icon size={15} color={active ? "#B8FFD2" : "#7A7A80"} strokeWidth={1.6} />
-                  <Text className={active ? "font-bodySemi text-[13px] text-mint" : "font-bodySemi text-[13px] text-text-muted"}>
+                  <Icon size={15} color={active ? "#0C0C0E" : "#7A7A80"} strokeWidth={1.6} />
+                  <Text className={active ? "font-bodySemi text-[13px] text-text-inverse" : "font-bodySemi text-[13px] text-text-muted"}>
                     {label}
                   </Text>
                 </TouchableOpacity>
@@ -255,7 +255,7 @@ export default function ConditionScreen() {
           {tab === "protocol" ? (
             <View>
               {activeProtocol ? (
-                <View className="mb-4 rounded-clinical border border-border-mint bg-mint-soft p-4">
+                <View className="mb-4 rounded-clinical border border-border-accent bg-mint-soft p-4">
                   <Text className="font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Protocol Source</Text>
                   <Text className="mt-2 font-headingBold text-[18px] text-mint">
                     {[activeProtocol.source, activeProtocol.version, activeProtocol.year].filter(Boolean).join(" · ")}
@@ -322,8 +322,8 @@ type RxTier = "first" | "second" | "alt";
 function RxCard({ rx, tier }: { rx: any; tier: RxTier }) {
   const [expanded, setExpanded] = useState(false);
 
-  const tierColor = tier === "first" ? "#B8FFD2" : tier === "second" ? "#FFD60A" : "#64D2FF";
-  const tierBg = tier === "first" ? "bg-mint-soft border-border-mint" : tier === "second" ? "border-[#3D3010]" : "border-[#0D2A3D]";
+  const tierColor = tier === "first" ? "#C8F53C" : tier === "second" ? "#FFD60A" : "#64D2FF";
+  const tierBg = tier === "first" ? "bg-mint-soft border-border-accent" : tier === "second" ? "border-[#3D3010]" : "border-[#0D2A3D]";
   const tierBgStyle = tier === "second" ? { backgroundColor: "#1A1500" } : tier === "alt" ? { backgroundColor: "#001525" } : undefined;
 
   return (
@@ -515,7 +515,7 @@ function PremiumOSCECard({ card }: { card: any }) {
   return (
     <View className="mb-3 overflow-hidden rounded-clinical border border-border bg-ink-800">
       <View className="p-4">
-        <View className="mb-3 self-start rounded-pill border border-border-mint bg-mint-soft px-3 py-1">
+        <View className="mb-3 self-start rounded-pill border border-border-accent bg-mint-soft px-3 py-1">
           <Text className="font-bodySemi text-[11px] uppercase tracking-[1.4px] text-mint">{card.stationType || "OSCE"}</Text>
         </View>
         <Text className="font-bodySemi text-[15px] leading-6 text-text-primary">{card.question}</Text>

@@ -39,7 +39,7 @@ export function PremiumMedicineCard({
             <View className="flex-1 pr-3">
               <View className="mb-3 flex-row items-center gap-2">
                 <View className="h-9 w-9 items-center justify-center rounded-2xl border border-border-soft bg-ink-700">
-                  <Pill size={18} color="#B8FFD2" strokeWidth={1.6} />
+                  <Pill size={18} color="#C8F53C" strokeWidth={1.6} />
                 </View>
 
                 <View className="rounded-pill border border-border-soft bg-ink-700 px-3 py-1">

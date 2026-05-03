@@ -53,7 +53,7 @@ export default function GenericDetailScreen() {
     return (
       <ClinicalShell>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#B8FFD2" />
+          <ActivityIndicator color="#C8F53C" />
         </View>
       </ClinicalShell>
     );

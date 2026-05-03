@@ -115,7 +115,7 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
   };
 
   const getCategoryColor = (category: string) => {
-    return category === 'medicine' ? '#B8FFD2' : '#00D7B5';
+    return category === 'medicine' ? '#C8F53C' : '#00D7B5';
   };
 
   const getCategoryIcon = (category: string) => {
@@ -185,7 +185,7 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
                     // Handle AI search
                   }}
                 >
-                  <Sparkles size={16} color="#B8FFD2" />
+                  <Sparkles size={16} color="#C8F53C" />
                 </TouchableOpacity>
               </View>
 

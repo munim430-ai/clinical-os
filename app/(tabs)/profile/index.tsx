@@ -35,7 +35,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 16, paddingBottom: 104 }}>
-      <Text className="font-heading text-[28px] leading-9 text-text-primary">Profile</Text>
+      <Text className="font-heading text-[32px] leading-10 text-text-primary">Profile</Text>
       <Text className="mb-6 mt-1 font-body text-[13px] text-text-muted">
         Manage your role, content, and local activity
       </Text>
@@ -83,8 +83,8 @@ export default function ProfileScreen() {
           <InfoRow label="Content versions" value={contentSummary.versions} />
           <InfoRow label="Configured sync feeds" value={contentSummary.syncFeeds} />
           <InfoRow label="Offline media assets" value={contentSummary.mediaAssets} last />
-          <View className="mt-3 flex-row items-start gap-2 rounded-xl border border-border-mint bg-mint-soft px-3 py-2">
-            <RefreshCcw size={13} color="#B8FFD2" style={{ marginTop: 1 }} />
+          <View className="mt-3 flex-row items-start gap-2 rounded-xl border border-border-accent bg-mint-soft px-3 py-2">
+            <RefreshCcw size={13} color="#C8F53C" style={{ marginTop: 1 }} />
             <Text className="flex-1 font-body text-[12px] leading-5 text-text-secondary">
               Built to import owned, public, or licensed GP/DIMS data and keep it free for doctors.
             </Text>

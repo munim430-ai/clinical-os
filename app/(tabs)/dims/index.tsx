@@ -64,13 +64,13 @@ export default function DIMSScreen() {
   return (
     <ClinicalShell>
       <View className="pb-3 pt-2">
-        <Text className="font-heading text-[28px] leading-9 text-text-primary">DIMS</Text>
+        <Text className="font-heading text-[32px] leading-10 text-text-primary">DIMS</Text>
         <Text className="mt-1 font-body text-[13px] text-text-muted">Search 21,700+ Bangladesh drug brands</Text>
       </View>
 
       <View className="mb-4 overflow-hidden rounded-[28px] border border-border bg-ink-800/80 px-4">
         <View className="flex-row items-center gap-3">
-          <Search size={18} color={query ? "#B8FFD2" : "#7A7A80"} strokeWidth={1.6} />
+          <Search size={18} color={query ? "#C8F53C" : "#7A7A80"} strokeWidth={1.6} />
           <TextInput
             className="min-h-[52px] flex-1 font-bodySemi text-[16px] text-text-primary"
             placeholder="Search brands or generics..."
@@ -80,10 +80,10 @@ export default function DIMSScreen() {
             autoCorrect={false}
             autoCapitalize="none"
             returnKeyType="search"
-            selectionColor="#B8FFD2"
+            selectionColor="#C8F53C"
           />
           {loading ? (
-            <ActivityIndicator size="small" color="#B8FFD2" />
+            <ActivityIndicator size="small" color="#C8F53C" />
           ) : query.length > 0 ? (
             <TouchableOpacity onPress={() => setQuery("")} hitSlop={10}>
               <X size={18} color="#7A7A80" strokeWidth={1.6} />
@@ -95,7 +95,7 @@ export default function DIMSScreen() {
       {query.length < 2 ? (
         <View className="flex-1 items-center justify-center pb-24">
           <View className="h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-ink-800">
-            <Pill size={36} color="#B8FFD2" strokeWidth={1.4} />
+            <Pill size={36} color="#C8F53C" strokeWidth={1.4} />
           </View>
           <Text className="mt-4 font-bodySemi text-[15px] text-text-secondary">Start with a brand or generic name</Text>
           <Text className="mt-1 font-body text-[12px] text-text-muted">High-contrast DIMS cards will appear here</Text>

@@ -30,7 +30,7 @@ export function ClinicalReaderFrame({ title, subtitle, toc = [], children }: Cli
         {toc.length > 0 ? (
           <View className="absolute bottom-6 right-4 max-w-[210px] rounded-clinical border border-border bg-ink-800/95 p-3">
             <View className="mb-2 flex-row items-center gap-2">
-              <ListTree size={15} color="#B8FFD2" strokeWidth={1.6} />
+              <ListTree size={15} color="#C8F53C" strokeWidth={1.6} />
               <Text className="font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-muted">Contents</Text>
             </View>
             {toc.slice(0, 6).map((item) => (

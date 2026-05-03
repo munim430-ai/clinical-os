@@ -4,19 +4,19 @@ const NAV_FONT_FAMILY = "Inter_400Regular";
 
 export const NAV_THEME = {
   light: {
-    background: "#000000",
-    border: "#2A2A2A",
-    card: "#1A1A1A",
-    notification: "#FF4444",
-    primary: "#00C896",
+    background: "#0C0C0E",
+    border: "#1F1F23",
+    card: "#1E1E21",
+    notification: "#FF453A",
+    primary: "#C8F53C",
     text: "#F2F2F2",
   },
   dark: {
-    background: "#000000",
-    border: "#2A2A2A",
-    card: "#1A1A1A",
-    notification: "#FF4444",
-    primary: "#00C896",
+    background: "#0C0C0E",
+    border: "#1F1F23",
+    card: "#1E1E21",
+    notification: "#FF453A",
+    primary: "#C8F53C",
     text: "#F2F2F2",
   },
 };

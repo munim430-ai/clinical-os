@@ -52,7 +52,7 @@ export function ProtocolChecklistCard({
                   {critical ? (
                     <AlertOctagon size={18} color="#FF453A" strokeWidth={1.6} />
                   ) : (
-                    <ClipboardCheck size={18} color="#B8FFD2" strokeWidth={1.6} />
+                    <ClipboardCheck size={18} color="#C8F53C" strokeWidth={1.6} />
                   )}
                 </View>
 

@@ -39,7 +39,7 @@ export default function BrandDetailScreen() {
     return (
       <ClinicalShell>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#B8FFD2" />
+          <ActivityIndicator color="#C8F53C" />
         </View>
       </ClinicalShell>
     );
@@ -66,14 +66,14 @@ export default function BrandDetailScreen() {
 
           <View className="rounded-[32px] border border-border bg-ink-800 p-5">
             <View className="mb-4 h-14 w-14 items-center justify-center rounded-[22px] border border-border-soft bg-ink-700">
-              <Pill size={28} color="#B8FFD2" strokeWidth={1.5} />
+              <Pill size={28} color="#C8F53C" strokeWidth={1.5} />
             </View>
             <Text className="font-heading text-[34px] leading-[40px] text-text-primary">{data.brandName}</Text>
             {data.genericName ? (
               <Text className="mt-2 font-bodySemi text-[16px] leading-6 text-text-secondary">{data.genericName}</Text>
             ) : null}
             {data.strength ? (
-              <View className="mt-5 self-start rounded-2xl border border-border-mint bg-mint-soft px-4 py-2">
+              <View className="mt-5 self-start rounded-2xl border border-border-accent bg-mint-soft px-4 py-2">
                 <Text className="font-headingBold text-[16px] text-mint">{data.strength}</Text>
               </View>
             ) : null}
@@ -92,7 +92,7 @@ export default function BrandDetailScreen() {
                 triggerSelectionHaptic();
                 router.push(`/dims/generic/${data.genericId}` as any);
               }}
-              className="mt-4 flex-row items-center justify-between rounded-clinical border border-border-mint bg-mint-soft p-4"
+              className="mt-4 flex-row items-center justify-between rounded-clinical border border-border-accent bg-mint-soft p-4"
             >
               <View className="flex-1 pr-3">
                 <Text className="font-headingBold text-[16px] text-mint">View Generic Details</Text>
@@ -100,7 +100,7 @@ export default function BrandDetailScreen() {
                   Pharmacology, dosage, interactions, and related brands
                 </Text>
               </View>
-              <ChevronRight size={19} color="#B8FFD2" strokeWidth={1.6} />
+              <ChevronRight size={19} color="#C8F53C" strokeWidth={1.6} />
             </TouchableOpacity>
           ) : null}
         </View>

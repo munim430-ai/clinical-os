@@ -34,7 +34,7 @@ function DrugCard({ drug, kg }: { drug: Drug; kg: number }) {
           "mr-3 h-10 w-10 items-center justify-center rounded-2xl",
           isCritical ? "bg-clinical-red" : "bg-mint-soft",
         ].join(" ")}>
-          <Zap size={18} color={isCritical ? "#fff" : "#B8FFD2"} strokeWidth={1.8} />
+          <Zap size={18} color={isCritical ? "#fff" : "#C8F53C"} strokeWidth={1.8} />
         </View>
 
         <View className="flex-1">
@@ -127,7 +127,7 @@ export default function ERScreen() {
             <Zap size={20} color="#FF453A" strokeWidth={1.8} />
           </View>
           <View>
-            <Text className="font-heading text-[28px] leading-9 text-text-primary">ER Mode</Text>
+            <Text className="font-heading text-[32px] leading-10 text-text-primary">ER Mode</Text>
             <Text className="font-body text-[12px] text-text-muted">Weight-based emergency dosing</Text>
           </View>
         </View>

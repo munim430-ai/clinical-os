@@ -317,7 +317,7 @@ export function ERModeDashboard({ navigation }: any) {
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.quickActionButton}>
-              <AlertTriangle size={24} color="#B8FFD2" />
+              <AlertTriangle size={24} color="#C8F53C" />
               <Text style={styles.quickActionText}>ALERTS</Text>
             </TouchableOpacity>
           </View>

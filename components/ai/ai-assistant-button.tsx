@@ -183,7 +183,7 @@ export function AIAssistantButton({
                 {isExpanded ? (
                   <X size={24} color="#FFFFFF" />
                 ) : (
-                  <Sparkles size={24} color="#B8FFD2" />
+                  <Sparkles size={24} color="#C8F53C" />
                 )}
               </MotiView>
             </View>
@@ -221,8 +221,8 @@ export function AIAssistantButton({
                 style={styles.quickAction}
                 onPress={() => handleQuickAction('drug')}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: '#B8FFD2' + '20' }]}>
-                  <Sparkles size={20} color="#B8FFD2" />
+                <View style={[styles.quickActionIcon, { backgroundColor: '#C8F53C' + '20' }]}>
+                  <Sparkles size={20} color="#C8F53C" />
                 </View>
                 <Text style={styles.quickActionText}>Drug Interactions</Text>
               </TouchableOpacity>
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     right: -10,
     bottom: -10,
     borderRadius: 42,
-    backgroundColor: '#B8FFD2',
+    backgroundColor: '#C8F53C',
     opacity: 0.3,
   },
   buttonBlur: {

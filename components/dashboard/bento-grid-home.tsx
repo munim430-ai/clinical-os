@@ -200,7 +200,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
     return (
       <AmbientMeshGradient>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#B8FFD2" />
+          <ActivityIndicator size="large" color="#C8F53C" />
           <Text style={styles.loadingText}>Loading Clinical OS...</Text>
         </View>
       </AmbientMeshGradient>
@@ -227,7 +227,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
                 onPress={() => { triggerSelectionHaptic(); onSearchPress(); }}
                 activeOpacity={0.7}
               >
-                <Search size={20} color="#B8FFD2" />
+                <Search size={20} color="#C8F53C" />
               </TouchableOpacity>
             )}
           </View>
@@ -239,8 +239,8 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
           <BentoCard
             title="Total Cases Logged"
             subtitle="Clinical activity tracking"
-            icon={<Activity size={24} color="#B8FFD2" />}
-            color="#B8FFD2"
+            icon={<Activity size={24} color="#C8F53C" />}
+            color="#C8F53C"
             size="large"
             onPress={() => {}}
             value={totalCases}
@@ -259,8 +259,8 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
                   key={system.id}
                   title={system.name}
                   subtitle={`${system.conditionCount ?? 0} conditions`}
-                  icon={<IconComponent size={20} color={system.color || "#B8FFD2"} />}
-                  color={system.color || "#B8FFD2"}
+                  icon={<IconComponent size={20} color={system.color || "#C8F53C"} />}
+                  color={system.color || "#C8F53C"}
                   size="medium"
                   onPress={() => handleSystemPress(system)}
                 />
@@ -376,9 +376,9 @@ const styles = {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(184,255,210,0.1)',
+    backgroundColor: 'rgba(200,245,60,0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(184,255,210,0.3)',
+    borderColor: 'rgba(200,245,60,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
