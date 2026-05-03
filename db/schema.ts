@@ -154,6 +154,23 @@ export const osceCards = sqliteTable("osce_cards", {
   stationType: text("station_type"), // history | examination | management | data-interpretation
 });
 
+// ─── GP Master Rx ────────────────────────────────────────────────────────────
+
+export const rxEntries = sqliteTable("rx_entries", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  conditionId: text("condition_id").references(() => conditions.id),
+  drugName: text("drug_name").notNull(),
+  drugClass: text("drug_class"),
+  indication: text("indication"),
+  dosage: text("dosage"),
+  frequency: text("frequency"),
+  route: text("route"),
+  duration: text("duration"),
+  notes: text("notes"),
+  priority: integer("priority").default(1), // 1=first-line, 2=second-line, 3=alternative
+  source: text("source"),
+});
+
 // ─── ER Module ───────────────────────────────────────────────────────────────
 
 export const erDrugs = sqliteTable("er_drugs", {
