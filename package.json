@@ -5,6 +5,9 @@
   "homepage": "https://github.com/munim430-ai/clinical-os",
   "repository": "git@github.com:munim430-ai/clinical-os.git",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "expo start",
     "dev:android": "expo start -c --android",

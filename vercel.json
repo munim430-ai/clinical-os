@@ -1,6 +1,6 @@
 {
+  "buildCommand": "node --experimental-sqlite scripts/build-web-db.mjs && bunx expo export --platform web",
   "outputDirectory": "dist",
-  "devCommand": "expo",
   "cleanUrls": true,
   "framework": null,
   "rewrites": [
