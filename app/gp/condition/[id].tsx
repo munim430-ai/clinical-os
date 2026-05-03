@@ -61,7 +61,7 @@ export default function ConditionScreen() {
       db.select().from(protocols).where(eq(protocols.conditionId, id)),
       db.select().from(examSteps).where(eq(examSteps.conditionId, id)),
       db.select().from(osceCards).where(eq(osceCards.conditionId, id)),
-      db.select().from(labReferences).limit(20),
+      db.select().from(labReferences).where(eq(labReferences.conditionId, id)).limit(20),
       db.select().from(rxEntries).where(eq(rxEntries.conditionId, id)),
     ]).then(([cond, symp, prot, exam, osce, labsData, rx]) => {
       setCondition(cond[0] ?? null);

@@ -129,6 +129,7 @@ export const labReferences = sqliteTable("lab_references", {
   criticalLow: real("critical_low"),
   criticalHigh: real("critical_high"),
   notes: text("notes"),
+  conditionId: text("condition_id").references(() => conditions.id),
 });
 
 export const ecgPatterns = sqliteTable("ecg_patterns", {
