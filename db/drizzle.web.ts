@@ -6,9 +6,12 @@ let _db: SQLJsDatabase<typeof schema> | null = null;
 
 export const initialize = async (): Promise<SQLJsDatabase<typeof schema>> => {
   if (_db) return _db;
+  // Resolve relative to the page base so it works on localhost and on
+  // GitHub Pages where the app is served from /clinical-os/.
+  const dbUrl = new URL("database.sqlite", document.baseURI).href;
   const [SQL, buf] = await Promise.all([
     initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` }),
-    fetch("/database.sqlite").then((res) => res.arrayBuffer()),
+    fetch(dbUrl).then((res) => res.arrayBuffer()),
   ]);
   const sqldb = new SQL.Database(new Uint8Array(buf));
   _db = drizzle(sqldb, { schema });
