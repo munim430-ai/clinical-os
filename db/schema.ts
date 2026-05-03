@@ -58,6 +58,9 @@ export const medicines = sqliteTable("medicines", {
   manufacturerId: integer("manufacturer_id").references(() => manufacturers.id),
   packageContainer: text("package_container"),
   packageSize: text("package_size"),
+  unitPriceBdt: real("unit_price_bdt"),
+  packPriceBdt: real("pack_price_bdt"),
+  priceUpdatedAt: text("price_updated_at"),
 });
 
 export const genericIndications = sqliteTable("generic_indications", {

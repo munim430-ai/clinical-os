@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from "react-native";
 import { Search, X, Pill, Building2, FlaskConical } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 import { useDatabase } from "@/db/provider";
 import { sql, like, or } from "drizzle-orm";
@@ -20,7 +20,8 @@ type DrugResult = {
 
 export default function DIMSScreen() {
   const { db } = useDatabase();
-  const [query, setQuery] = useState("");
+  const params = useLocalSearchParams<{ q?: string }>();
+  const [query, setQuery] = useState(params.q ?? "");
   const [results, setResults] = useState<DrugResult[]>([]);
   const [loading, setLoading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);

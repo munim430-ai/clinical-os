@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Stethoscope,
   Pill,
+  ExternalLink,
 } from "lucide-react";
 import { useDatabase } from "@/db/provider";
 import { conditions, symptoms, protocols, protocolSteps, examSteps, osceCards, labReferences, rxEntries } from "@/db/schema";
@@ -376,6 +377,18 @@ function RxCard({ rx, tier }: { rx: any; tier: RxTier }) {
           {rx.source ? (
             <Text className="mt-2 font-body text-[11px] text-text-muted">Source: {rx.source}</Text>
           ) : null}
+
+          <TouchableOpacity
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push(`/(tabs)/dims?q=${encodeURIComponent(rx.drugName)}` as any);
+            }}
+            className="mt-3 flex-row items-center gap-2 self-start rounded-pill border border-border bg-ink-950 px-3 py-2"
+            activeOpacity={0.78}
+          >
+            <ExternalLink size={13} color="#C8F53C" strokeWidth={1.7} />
+            <Text className="font-bodySemi text-[12px] text-mint">Find in DIMS</Text>
+          </TouchableOpacity>
         </View>
       ) : null}
     </TouchableOpacity>
