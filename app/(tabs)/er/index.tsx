@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Keyboard, Pressable } from "react-native";
 import { Zap, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { triggerSelectionHaptic, triggerEmergencyHaptic } from "@/lib/clinical-haptics";
@@ -149,6 +149,8 @@ export default function ERScreen() {
             returnKeyType="done"
             selectionColor="#FF453A"
             onFocus={triggerEmergencyHaptic}
+            onSubmitEditing={Keyboard.dismiss}
+            accessibilityLabel="Patient weight in kilograms"
           />
           <Text className="font-headingBold text-[22px] text-clinical-red">kg</Text>
         </View>
@@ -168,6 +170,13 @@ export default function ERScreen() {
           data={drugs}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{ paddingBottom: 104 }}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={kg > 0 ? (
+            <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-muted">
+              {drugs.length} drugs · {kg} kg patient
+            </Text>
+          ) : null}
           renderItem={({ item }) => <DrugCard drug={item} kg={kg} />}
         />
       )}
