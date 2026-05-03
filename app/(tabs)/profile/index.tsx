@@ -1,8 +1,9 @@
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import {
   GraduationCap, Stethoscope, UserCheck, Activity,
-  AlertTriangle, Database, RefreshCcw, Upload, CheckCircle2, XCircle,
+  AlertTriangle, Database, RefreshCcw, Upload, CheckCircle2, XCircle, ShieldCheck,
 } from "lucide-react";
+import { router } from "expo-router";
 import { getPersona, setPersona, type Persona } from "@/lib/persona";
 import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
 import { getContentSummary } from "@/lib/content-sync";
@@ -228,7 +229,19 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <Text className="mt-6 text-center font-body text-[12px] text-text-muted">
+      {/* Legal links */}
+      <TouchableOpacity
+        onPress={() => router.push("/legal/privacy" as any)}
+        className="mt-5 flex-row items-center justify-center gap-2"
+        activeOpacity={0.7}
+        accessibilityRole="link"
+        accessibilityLabel="Privacy policy"
+      >
+        <ShieldCheck size={13} color="#505058" strokeWidth={1.6} />
+        <Text className="font-body text-[12px] text-text-muted">Privacy Policy</Text>
+      </TouchableOpacity>
+
+      <Text className="mt-3 text-center font-body text-[12px] text-text-muted">
         Version 1.1.1 · Free Clinical OS
       </Text>
     </ScrollView>
