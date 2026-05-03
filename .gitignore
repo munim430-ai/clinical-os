@@ -44,3 +44,4 @@ android
 ios
 notes.txtpublic/database.sqlite-shm
 public/database.sqlite-wal
+public/database.sqlite-shm
