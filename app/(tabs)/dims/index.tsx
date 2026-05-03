@@ -1,7 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
-import { Search, X, Pill } from "lucide-react";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from "react-native";
+import { Search, X, Pill, Building2, FlaskConical } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { router } from "expo-router";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 import { useDatabase } from "@/db/provider";
 import { sql, like, or } from "drizzle-orm";
 import { medicines, generics, manufacturers, dosageForms } from "@/db/schema";
@@ -93,13 +94,48 @@ export default function DIMSScreen() {
       </View>
 
       {query.length < 2 ? (
-        <View className="flex-1 items-center justify-center pb-24">
-          <View className="h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-ink-800">
-            <Pill size={36} color="#C8F53C" strokeWidth={1.4} />
+        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 104 }} showsVerticalScrollIndicator={false}>
+          {/* Browse shortcuts */}
+          <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Browse by</Text>
+          <View className="flex-row gap-3 mb-6">
+            <TouchableOpacity
+              onPress={() => { triggerSelectionHaptic(); router.push("/dims/companies" as any); }}
+              activeOpacity={0.78}
+              className="flex-1 flex-row items-center gap-3 rounded-2xl border border-border bg-ink-800 px-4 py-3"
+            >
+              <View className="h-9 w-9 items-center justify-center rounded-xl border border-border-soft bg-ink-700">
+                <Building2 size={18} color="#C8F53C" strokeWidth={1.6} />
+              </View>
+              <View>
+                <Text className="font-bodySemi text-[14px] text-text-primary">Company</Text>
+                <Text className="font-body text-[11px] text-text-muted">By manufacturer</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => { triggerSelectionHaptic(); router.push("/dims/generic" as any); }}
+              activeOpacity={0.78}
+              className="flex-1 flex-row items-center gap-3 rounded-2xl border border-border bg-ink-800 px-4 py-3"
+            >
+              <View className="h-9 w-9 items-center justify-center rounded-xl border border-border-soft bg-ink-700">
+                <FlaskConical size={18} color="#00D7B5" strokeWidth={1.6} />
+              </View>
+              <View>
+                <Text className="font-bodySemi text-[14px] text-text-primary">Generic</Text>
+                <Text className="font-body text-[11px] text-text-muted">By molecule</Text>
+              </View>
+            </TouchableOpacity>
           </View>
-          <Text className="mt-4 font-bodySemi text-[15px] text-text-secondary">Start with a brand or generic name</Text>
-          <Text className="mt-1 font-body text-[12px] text-text-muted">High-contrast DIMS cards will appear here</Text>
-        </View>
+
+          {/* Search prompt */}
+          <View className="items-center py-6">
+            <View className="h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-ink-800">
+              <Pill size={36} color="#C8F53C" strokeWidth={1.4} />
+            </View>
+            <Text className="mt-4 font-bodySemi text-[15px] text-text-secondary">Search 21,700+ brands</Text>
+            <Text className="mt-1 font-body text-[12px] text-text-muted">Type a brand or generic name above</Text>
+          </View>
+        </ScrollView>
       ) : results.length === 0 && !loading ? (
         <View className="flex-1 items-center justify-center pb-24">
           <Text className="font-bodySemi text-[14px] text-text-muted">No results for “{query}”</Text>
