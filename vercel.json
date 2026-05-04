@@ -1,12 +1,16 @@
 {
-  "buildCommand": "node --experimental-sqlite scripts/build-web-db.mjs && bunx expo export --platform web",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "framework": null,
+  "redirects": [
+    { "source": "/", "destination": "/gp", "permanent": false }
+  ],
   "rewrites": [
-    {
-      "source": "/:path*",
-      "destination": "/"
-    }
+    { "source": "/dims/brand/:id", "destination": "/dims/brand/[id]" },
+    { "source": "/dims/generic/:id", "destination": "/dims/generic/[id]" },
+    { "source": "/gp/:system", "destination": "/gp/[system]" },
+    { "source": "/gp/condition/:id", "destination": "/gp/condition/[id]" },
+    { "source": "/gp/ecg/:id", "destination": "/gp/ecg/[id]" },
+    { "source": "/gp/cxr/:id", "destination": "/gp/cxr/[id]" }
   ]
 }
