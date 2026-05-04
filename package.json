@@ -15,6 +15,7 @@
     "ios": "expo run:ios",
     "build:web": "bunx expo export --platform web",
     "build:db": "node --experimental-sqlite scripts/build-web-db.mjs",
+    "vercel-build": "node --experimental-sqlite scripts/build-web-db.mjs && bunx expo export --platform web",
     "format": "biome check --no-errors-on-unmatched --apply .",
     "db:generate": "bun drizzle-kit generate",
     "import:bd-medicine-scraper": "node scripts/import-bd-medicine-scraper.mjs",
