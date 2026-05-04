@@ -6,8 +6,9 @@ import {
 import { router } from "expo-router";
 import { getPersona, setPersona, type Persona } from "@/lib/persona";
 import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
-import { getContentSummary } from "@/lib/content-sync";
+import { getContentSummary, pullSyncFeeds, type PullResult } from "@/lib/content-sync";
 import { syncSurveillanceData, getLastSyncMs, canSyncNow } from "@/lib/surveillance-sync";
+import { useDatabase } from "@/db/provider";
 import { triggerSelectionHaptic, triggerSuccessHaptic } from "@/lib/clinical-haptics";
 import { useEffect, useState } from "react";
 
@@ -33,6 +34,7 @@ function formatLastSync(ms: number | undefined): string {
 }
 
 export default function ProfileScreen() {
+  const { db } = useDatabase();
   const [current, setCurrent] = useState<Persona>(getPersona());
   const [caseCounts, setCaseCounts] = useState<CaseCounts>({} as CaseCounts);
   const [contentSummary, setContentSummary] = useState({ versions: 0, syncFeeds: 0, mediaAssets: 0 });
@@ -40,6 +42,9 @@ export default function ProfileScreen() {
   const [syncStatus, setSyncStatus] = useState<"idle" | "ok" | "error" | "skipped">("idle");
   const [syncMsg, setSyncMsg] = useState("");
   const [lastSyncMs, setLastSyncMs] = useState<number | undefined>(getLastSyncMs());
+  const [pulling, setPulling] = useState(false);
+  const [pullStatus, setPullStatus] = useState<"idle" | "ok" | "error" | "skipped">("idle");
+  const [pullMsg, setPullMsg] = useState("");
   const totalCases = Object.values(caseCounts).reduce((a, b) => a + b, 0);
   const syncEnabled = canSyncNow();
 
@@ -73,6 +78,30 @@ export default function ProfileScreen() {
       setSyncMsg(result.message);
     }
     setTimeout(() => setSyncStatus("idle"), 4000);
+  }
+
+  async function handlePullContent() {
+    if (pulling || !db) return;
+    triggerSelectionHaptic();
+    setPulling(true);
+    setPullStatus("idle");
+    const result: PullResult = await pullSyncFeeds(db as any);
+    setPulling(false);
+    setPullStatus(result.status);
+    if (result.status === "ok") {
+      triggerSuccessHaptic();
+      setPullMsg(
+        result.updated === 0
+          ? "All feeds up to date"
+          : `Updated ${result.updated} feed${result.updated !== 1 ? "s" : ""}${result.alerts ? ` · ${result.alerts} new alert${result.alerts !== 1 ? "s" : ""}` : ""}`
+      );
+      getContentSummary().then(setContentSummary);
+    } else if (result.status === "skipped") {
+      setPullMsg(result.reason);
+    } else {
+      setPullMsg(result.message);
+    }
+    setTimeout(() => setPullStatus("idle"), 4000);
   }
 
   return (
@@ -209,9 +238,50 @@ export default function ProfileScreen() {
           <View className="mt-3 flex-row items-start gap-2 rounded-xl border border-border-accent bg-mint-soft px-3 py-2">
             <RefreshCcw size={13} color="#C8F53C" style={{ marginTop: 1 }} />
             <Text className="flex-1 font-body text-[12px] leading-5 text-text-secondary">
-              Built to import owned, public, or licensed GP/DIMS data and keep it free for doctors.
+              Pull updates from configured remote feeds without re-installing the app.
             </Text>
           </View>
+
+          <TouchableOpacity
+            onPress={handlePullContent}
+            disabled={pulling || contentSummary.syncFeeds === 0}
+            className={[
+              "mt-3 flex-row items-center justify-center gap-2 rounded-2xl px-4 py-3",
+              contentSummary.syncFeeds > 0 ? "bg-mint" : "bg-ink-700 border border-border",
+            ].join(" ")}
+            activeOpacity={0.78}
+            accessibilityRole="button"
+            accessibilityLabel="Pull latest content from remote feeds"
+            accessibilityState={{ disabled: pulling || contentSummary.syncFeeds === 0 }}
+          >
+            {pulling ? (
+              <ActivityIndicator size="small" color="#0C0C0E" />
+            ) : pullStatus === "ok" ? (
+              <CheckCircle2 size={15} color="#0C0C0E" strokeWidth={2} />
+            ) : pullStatus === "error" ? (
+              <XCircle size={15} color="#FF453A" strokeWidth={2} />
+            ) : (
+              <RefreshCcw size={15} color={contentSummary.syncFeeds > 0 ? "#0C0C0E" : "#505058"} strokeWidth={1.8} />
+            )}
+            <Text className={[
+              "font-bodySemi text-[13px]",
+              contentSummary.syncFeeds > 0 ? "text-text-inverse" : "text-text-muted",
+            ].join(" ")}>
+              {pulling ? "Pulling…" : pullStatus === "ok" ? "Up to date" : "Pull latest content"}
+            </Text>
+          </TouchableOpacity>
+
+          {pullMsg && pullStatus !== "idle" ? (
+            <Text className={`mt-2 text-center font-body text-[11px] ${pullStatus === "error" ? "text-clinical-red" : "text-text-muted"}`}>
+              {pullMsg}
+            </Text>
+          ) : null}
+
+          {contentSummary.syncFeeds === 0 && !pulling ? (
+            <Text className="mt-2 text-center font-body text-[11px] text-text-muted">
+              No feeds configured yet
+            </Text>
+          ) : null}
         </View>
       </View>
 

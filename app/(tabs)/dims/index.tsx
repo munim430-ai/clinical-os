@@ -2,7 +2,7 @@ import {
   View, Text, TextInput, TouchableOpacity,
   FlatList, ActivityIndicator, ScrollView, Keyboard,
 } from "react-native";
-import { Search, X, Pill, Building2, FlaskConical, Leaf } from "lucide-react";
+import { Search, X, Pill, Building2, FlaskConical, Leaf, ShieldAlert } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
@@ -186,6 +186,15 @@ export default function DIMSScreen() {
             onPress={() => { triggerSelectionHaptic(); setQuery("a"); setTypeFilter("herbal"); }}
             wide
           />
+          <View className="mt-3">
+            <BrowseCard
+              icon={<ShieldAlert size={18} color="#FF453A" strokeWidth={1.6} />}
+              label="Interaction Checker"
+              sub="Screen multiple drugs for class-based interactions"
+              onPress={() => { triggerSelectionHaptic(); router.push("/dims/interactions" as any); }}
+              wide
+            />
+          </View>
           <View className="mt-8 items-center py-4">
             <View className="h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-ink-800">
               <Pill size={36} color="#C8F53C" strokeWidth={1.4} />

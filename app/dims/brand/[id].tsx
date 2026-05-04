@@ -2,9 +2,9 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "rea
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState } from "react";
 import { eq, sql, and, ne } from "drizzle-orm";
-import { ArrowLeft, ChevronRight, Pill, TrendingDown } from "lucide-react";
+import { ArrowLeft, ChevronRight, Pill, TrendingDown, ShieldAlert } from "lucide-react";
 import { useDatabase } from "@/db/provider";
-import { medicines, generics, manufacturers, dosageForms } from "@/db/schema";
+import { medicines, generics, manufacturers, dosageForms, drugClasses } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
@@ -37,11 +37,13 @@ export default function BrandDetailScreen() {
       manufacturerName: manufacturers.name,
       unitPriceBdt: medicines.unitPriceBdt,
       packPriceBdt: medicines.packPriceBdt,
+      drugClass: drugClasses.name,
     })
       .from(medicines)
       .leftJoin(generics, sql`${medicines.genericId} = ${generics.id}`)
       .leftJoin(manufacturers, sql`${medicines.manufacturerId} = ${manufacturers.id}`)
       .leftJoin(dosageForms, sql`${medicines.dosageFormId} = ${dosageForms.id}`)
+      .leftJoin(drugClasses, sql`${generics.drugClassId} = ${drugClasses.id}`)
       .where(eq(medicines.id, Number(id)))
       .then((rows) => {
         const brand = rows[0] ?? null;
@@ -104,12 +106,38 @@ export default function BrandDetailScreen() {
             {data.genericName ? (
               <Text className="mt-2 font-bodySemi text-[16px] leading-6 text-text-secondary">{data.genericName}</Text>
             ) : null}
-            {data.strength ? (
-              <View className="mt-5 self-start rounded-2xl border border-border-accent bg-mint-soft px-4 py-2">
-                <Text className="font-headingBold text-[16px] text-mint">{data.strength}</Text>
-              </View>
-            ) : null}
+            <View className="mt-5 flex-row flex-wrap gap-2">
+              {data.strength ? (
+                <View className="rounded-2xl border border-border-accent bg-mint-soft px-4 py-2">
+                  <Text className="font-headingBold text-[16px] text-mint">{data.strength}</Text>
+                </View>
+              ) : null}
+              {data.drugClass ? (
+                <View className="self-center rounded-pill border border-border-soft bg-ink-700 px-3 py-2">
+                  <Text className="font-bodySemi text-[12px] text-text-secondary">{data.drugClass}</Text>
+                </View>
+              ) : null}
+            </View>
           </View>
+
+          <TouchableOpacity
+            onPress={() => { triggerSelectionHaptic(); router.push("/dims/interactions" as any); }}
+            className="mt-4 flex-row items-center justify-between rounded-clinical border border-border bg-ink-800 p-4"
+            activeOpacity={0.78}
+            accessibilityRole="button"
+            accessibilityLabel="Open interaction checker"
+          >
+            <View className="flex-1 flex-row items-center gap-3">
+              <View className="h-9 w-9 items-center justify-center rounded-2xl bg-clinical-redSoft border border-border-red">
+                <ShieldAlert size={16} color="#FF453A" strokeWidth={1.7} />
+              </View>
+              <View className="flex-1">
+                <Text className="font-bodySemi text-[14px] text-text-primary">Check interactions</Text>
+                <Text className="mt-0.5 font-body text-[11px] text-text-muted">Compare against other prescribed drugs</Text>
+              </View>
+            </View>
+            <ChevronRight size={17} color="#7A7A80" strokeWidth={1.6} />
+          </TouchableOpacity>
 
           <View className="mt-4 rounded-clinical border border-border bg-ink-800 p-4">
             <Row label="Form" value={data.dosageForm} />

@@ -23,6 +23,7 @@ import {
   Pill,
   FileText,
   Search,
+  FileImage,
 } from 'lucide-react';
 import { MotiView } from 'moti';
 import { GlassCard, FrostedGlass } from '@/components/ui/glassmorphism';
@@ -313,27 +314,25 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
               onPress={handleQuizPress}
               badge="OSCE"
             />
-            
+
             <BentoCard
-              title="Recent Activity"
-              subtitle="Last 7 days"
-              icon={<Clock size={20} color="#7A7A80" />}
-              color="#7A7A80"
+              title="ECG Reader"
+              subtitle="Rhythm patterns"
+              icon={<Activity size={20} color="#FF453A" />}
+              color="#FF453A"
               size="small"
-              onPress={() => {}}
+              onPress={() => { triggerSelectionHaptic(); router.push('/gp/ecg' as any); }}
             />
           </View>
 
-          {/* Tall Card for Additional Info */}
+          {/* CXR Card */}
           <BentoCard
-            title="Protocol Updates"
-            subtitle="Latest clinical guidelines"
-            icon={<FileText size={24} color="#00D7B5" />}
-            color="#00D7B5"
-            size="tall"
-            onPress={() => {}
-            }
-            badge="NEW"
+            title="CXR Reader"
+            subtitle="Chest X-ray patterns & findings"
+            icon={<FileImage size={24} color="#C8F53C" />}
+            color="#C8F53C"
+            size="wide"
+            onPress={() => { triggerSelectionHaptic(); router.push('/gp/cxr' as any); }}
           />
         </View>
 
