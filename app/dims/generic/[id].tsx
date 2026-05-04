@@ -7,6 +7,7 @@ import { useDatabase } from "@/db/provider";
 import { generics, medicines, dosageForms, manufacturers } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { toBlocks } from "@/lib/html-strip";
 
 const SECTIONS = [
   { key: "pharmacology", label: "Pharmacology" },
@@ -112,8 +113,8 @@ export default function GenericDetailScreen() {
           <View className="mb-4 rounded-[28px] border border-border bg-ink-800 p-5">
             <Text className="font-heading text-[28px] leading-9 text-text-primary">{generic.name}</Text>
             {generic.indicationText ? (
-              <Text className="mt-2 font-body text-[14px] leading-5 text-text-muted" numberOfLines={2}>
-                {generic.indicationText}
+              <Text className="mt-2 font-body text-[14px] leading-5 text-text-muted" numberOfLines={3}>
+                {toBlocks(generic.indicationText).map(b => b.text).join(" ")}
               </Text>
             ) : null}
           </View>
@@ -150,7 +151,20 @@ export default function GenericDetailScreen() {
                 </View>
                 {open ? (
                   <View className="border-t border-border-soft px-4 pb-4 pt-3">
-                    <Text className="font-body text-[14px] leading-6 text-text-secondary">{content}</Text>
+                    {toBlocks(content as string).map((block, i) =>
+                      block.type === "bullet" ? (
+                        <View key={i} className="mb-1.5 flex-row gap-2">
+                          <Text className="font-body text-[14px] leading-6 text-mint">•</Text>
+                          <Text className="flex-1 font-body text-[14px] leading-6 text-text-secondary">
+                            {block.text}
+                          </Text>
+                        </View>
+                      ) : (
+                        <Text key={i} className="mb-2 font-body text-[14px] leading-6 text-text-secondary">
+                          {block.text}
+                        </Text>
+                      )
+                    )}
                   </View>
                 ) : null}
               </TouchableOpacity>
