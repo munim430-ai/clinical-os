@@ -45,3 +45,4 @@ ios
 notes.txt
 public/database.sqlite-shm
 public/database.sqlite-wal
+.vercel
