@@ -49,11 +49,11 @@ export function ClinicalHumorHero({
         </FloatingIcon>
 
         <FloatingIcon className="right-8 top-16" delay={200}>
-          <ClipboardCheck size={22} color="#B8FFD2" strokeWidth={1.5} />
+          <ClipboardCheck size={22} color="#C8F53C" strokeWidth={1.5} />
         </FloatingIcon>
 
         <FloatingIcon className="bottom-10 left-10" delay={400}>
-          <Pill size={22} color="#B8FFD2" strokeWidth={1.5} />
+          <Pill size={22} color="#C8F53C" strokeWidth={1.5} />
         </FloatingIcon>
 
         <FloatingIcon className="bottom-8 right-10" delay={600}>

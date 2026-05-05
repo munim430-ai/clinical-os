@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Keyboard, Pressable } from "react-native";
 import { Zap, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { triggerSelectionHaptic, triggerEmergencyHaptic } from "@/lib/clinical-haptics";
@@ -34,7 +34,7 @@ function DrugCard({ drug, kg }: { drug: Drug; kg: number }) {
           "mr-3 h-10 w-10 items-center justify-center rounded-2xl",
           isCritical ? "bg-clinical-red" : "bg-mint-soft",
         ].join(" ")}>
-          <Zap size={18} color={isCritical ? "#fff" : "#B8FFD2"} strokeWidth={1.8} />
+          <Zap size={18} color={isCritical ? "#fff" : "#C8F53C"} strokeWidth={1.8} />
         </View>
 
         <View className="flex-1">
@@ -127,7 +127,7 @@ export default function ERScreen() {
             <Zap size={20} color="#FF453A" strokeWidth={1.8} />
           </View>
           <View>
-            <Text className="font-heading text-[28px] leading-9 text-text-primary">ER Mode</Text>
+            <Text className="font-heading text-[32px] leading-10 text-text-primary">ER Mode</Text>
             <Text className="font-body text-[12px] text-text-muted">Weight-based emergency dosing</Text>
           </View>
         </View>
@@ -149,6 +149,8 @@ export default function ERScreen() {
             returnKeyType="done"
             selectionColor="#FF453A"
             onFocus={triggerEmergencyHaptic}
+            onSubmitEditing={Keyboard.dismiss}
+            accessibilityLabel="Patient weight in kilograms"
           />
           <Text className="font-headingBold text-[22px] text-clinical-red">kg</Text>
         </View>
@@ -168,6 +170,13 @@ export default function ERScreen() {
           data={drugs}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{ paddingBottom: 104 }}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={kg > 0 ? (
+            <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-muted">
+              {drugs.length} drugs · {kg} kg patient
+            </Text>
+          ) : null}
           renderItem={({ item }) => <DrugCard drug={item} kg={kg} />}
         />
       )}

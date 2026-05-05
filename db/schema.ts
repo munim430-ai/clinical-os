@@ -58,6 +58,9 @@ export const medicines = sqliteTable("medicines", {
   manufacturerId: integer("manufacturer_id").references(() => manufacturers.id),
   packageContainer: text("package_container"),
   packageSize: text("package_size"),
+  unitPriceBdt: real("unit_price_bdt"),
+  packPriceBdt: real("pack_price_bdt"),
+  priceUpdatedAt: text("price_updated_at"),
 });
 
 export const genericIndications = sqliteTable("generic_indications", {
@@ -129,6 +132,7 @@ export const labReferences = sqliteTable("lab_references", {
   criticalLow: real("critical_low"),
   criticalHigh: real("critical_high"),
   notes: text("notes"),
+  conditionId: text("condition_id").references(() => conditions.id),
 });
 
 export const ecgPatterns = sqliteTable("ecg_patterns", {
@@ -152,6 +156,23 @@ export const osceCards = sqliteTable("osce_cards", {
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   stationType: text("station_type"), // history | examination | management | data-interpretation
+});
+
+// ─── GP Master Rx ────────────────────────────────────────────────────────────
+
+export const rxEntries = sqliteTable("rx_entries", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  conditionId: text("condition_id").references(() => conditions.id),
+  drugName: text("drug_name").notNull(),
+  drugClass: text("drug_class"),
+  indication: text("indication"),
+  dosage: text("dosage"),
+  frequency: text("frequency"),
+  route: text("route"),
+  duration: text("duration"),
+  notes: text("notes"),
+  priority: integer("priority").default(1), // 1=first-line, 2=second-line, 3=alternative
+  source: text("source"),
 });
 
 // ─── ER Module ───────────────────────────────────────────────────────────────

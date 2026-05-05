@@ -127,3 +127,105 @@ export async function registerContentManifest(manifest: RemoteManifest) {
 export async function listEnabledSyncFeeds() {
   return db.select().from(syncManifest);
 }
+
+// ─── Pull mechanism (Sprint E) ───────────────────────────────────────────────
+
+export type PullResult =
+  | { status: "ok"; updated: number; alerts: number; skipped: number }
+  | { status: "skipped"; reason: string }
+  | { status: "error"; message: string };
+
+const FETCH_TIMEOUT_MS = 15_000;
+
+/**
+ * Pull all enabled remote feeds defined in sync_manifest.
+ * For each feed:
+ *   1. GET the remote_url
+ *   2. Validate it's a RemoteManifest shape
+ *   3. Compare remote version vs local_version — skip if equal
+ *   4. registerContentManifest() to upsert the version + assets + alerts
+ *   5. Update sync_manifest.last_checked_at / last_synced_at / local_version
+ *
+ * Network failures and bad payloads are caught per-feed; one bad feed
+ * doesn't block the others.
+ */
+export async function pullSyncFeeds(
+  dbInstance: typeof db = db
+): Promise<PullResult> {
+  try {
+    const feeds = await dbInstance.select().from(syncManifest);
+    const enabled = feeds.filter((f) => f.enabled);
+
+    if (enabled.length === 0) {
+      return { status: "skipped", reason: "No enabled sync feeds" };
+    }
+
+    let updated = 0;
+    let alertCount = 0;
+    let skipped = 0;
+    const now = new Date().toISOString();
+
+    for (const feed of enabled) {
+      try {
+        await dbInstance.update(syncManifest)
+          .set({ lastCheckedAt: now })
+          .where(sql`${syncManifest.id} = ${feed.id}`);
+
+        const res = await fetch(feed.remoteUrl, {
+          headers: { Accept: "application/json" },
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        });
+        if (!res.ok) { skipped++; continue; }
+
+        const manifest = (await res.json()) as RemoteManifest;
+        if (!manifest?.id || !manifest?.version) { skipped++; continue; }
+
+        // Skip if version matches what we already have
+        if (feed.localVersion && feed.localVersion === manifest.version) {
+          skipped++;
+          continue;
+        }
+
+        await registerContentManifest(manifest);
+
+        await dbInstance.update(syncManifest)
+          .set({
+            localVersion: manifest.version,
+            remoteVersion: manifest.version,
+            checksum: manifest.checksum ?? null,
+            lastSyncedAt: now,
+          })
+          .where(sql`${syncManifest.id} = ${feed.id}`);
+
+        updated++;
+        alertCount += manifest.alerts?.length ?? 0;
+      } catch {
+        skipped++;
+      }
+    }
+
+    return { status: "ok", updated, alerts: alertCount, skipped };
+  } catch (err) {
+    return {
+      status: "error",
+      message: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+export async function getActiveAlerts(dbInstance: typeof db = db) {
+  const now = new Date().toISOString();
+  const rows = await dbInstance.select().from(appAlerts);
+  return rows.filter((a) => {
+    if (a.dismissed) return false;
+    if (a.startsAt && a.startsAt > now) return false;
+    if (a.endsAt && a.endsAt < now) return false;
+    return true;
+  });
+}
+
+export async function dismissAlert(id: string, dbInstance: typeof db = db) {
+  await dbInstance.update(appAlerts)
+    .set({ dismissed: true })
+    .where(sql`${appAlerts.id} = ${id}`);
+}

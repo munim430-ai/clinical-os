@@ -12,7 +12,7 @@ type ClinicalShellProps = {
 export function ClinicalShell({ children, padded = true }: ClinicalShellProps) {
   return (
     <View className="flex-1 bg-ink-950">
-      <StatusBar style="light" backgroundColor="#000000" />
+      <StatusBar style="light" backgroundColor="#0C0C0E" />
 
       <Canvas
         pointerEvents="none"
@@ -24,14 +24,17 @@ export function ClinicalShell({ children, padded = true }: ClinicalShellProps) {
           left: 0,
         }}
       >
-        <Group opacity={0.42}>
-          <Circle cx={80} cy={110} r={190} color="#053D32">
-            <BlurMask blur={80} style="normal" />
+        <Group opacity={0.5}>
+          {/* Purple ambient — top right */}
+          <Circle cx={340} cy={80} r={200} color="#7B2FBE">
+            <BlurMask blur={100} style="normal" />
           </Circle>
-          <Circle cx={360} cy={260} r={240} color="#111827">
-            <BlurMask blur={110} style="normal" />
+          {/* Lime ambient — bottom left */}
+          <Circle cx={60} cy={820} r={220} color="#C8F53C">
+            <BlurMask blur={130} style="normal" />
           </Circle>
-          <Circle cx={180} cy={820} r={260} color="#041F1A">
+          {/* Magenta mid — center */}
+          <Circle cx={200} cy={420} r={160} color="#E91E8C">
             <BlurMask blur={120} style="normal" />
           </Circle>
         </Group>

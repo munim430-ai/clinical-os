@@ -323,7 +323,7 @@ Hypertension is one of the most common medical conditions affecting approximatel
               <Minus size={16} color="#FFFFFF" />
             </TouchableOpacity>
             <View style={styles.fontSizeIndicator}>
-              <Type size={16} color="#B8FFD2" />
+              <Type size={16} color="#C8F53C" />
               <Text style={styles.fontSizeText}>{fontSize}</Text>
             </View>
             <TouchableOpacity onPress={() => handleFontSizeChange(1)} style={styles.fontSizeButton}>
@@ -340,7 +340,7 @@ Hypertension is one of the most common medical conditions affecting approximatel
             }}
           >
             <GlassCard style={styles.tocButton}>
-              <BookOpen size={20} color="#B8FFD2" />
+              <BookOpen size={20} color="#C8F53C" />
               <Text style={styles.tocButtonText}>TOC</Text>
             </GlassCard>
           </TouchableOpacity>
@@ -388,7 +388,7 @@ Hypertension is one of the most common medical conditions affecting approximatel
                           animate={{ scale: [1, 1.2, 1] }}
                           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         >
-                          <ChevronRight size={16} color="#B8FFD2" />
+                          <ChevronRight size={16} color="#C8F53C" />
                         </MotiView>
                       )}
                     </View>
@@ -527,7 +527,7 @@ const styles = {
     marginLeft: 8,
     fontSize: 14,
     fontFamily: 'Inter_600SemiBold',
-    color: '#B8FFD2',
+    color: '#C8F53C',
   },
   tocOverlay: {
     position: 'absolute',
@@ -590,7 +590,7 @@ const styles = {
     flex: 1,
   },
   tocItemTextActive: {
-    color: '#B8FFD2',
+    color: '#C8F53C',
     fontFamily: 'Inter_600SemiBold',
   },
 };

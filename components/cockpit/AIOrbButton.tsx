@@ -21,17 +21,17 @@ export function AIOrbButton({ label = "Ask Clinical AI", active, onPress }: AIOr
           <View
             className={[
               "h-[54px] min-w-[176px] flex-row items-center justify-center gap-2 rounded-pill border px-5",
-              active ? "border-border-mint bg-mint" : "border-border-mint bg-mint-soft",
+              active ? "border-border-accent bg-mint" : "border-border-accent bg-mint-soft",
             ].join(" ")}
             style={{
-              shadowColor: "#B8FFD2",
+              shadowColor: "#C8F53C",
               shadowOffset: { width: 0, height: 0 },
               shadowOpacity: active ? 0.36 : 0.24,
               shadowRadius: active ? 26 : 20,
               elevation: 10,
             }}
           >
-            <Sparkles size={17} color={active ? "#050505" : "#B8FFD2"} strokeWidth={1.7} />
+            <Sparkles size={17} color={active ? "#050505" : "#C8F53C"} strokeWidth={1.7} />
             <Text className={active ? "font-bodySemi text-[14px] text-text-inverse" : "font-bodySemi text-[14px] text-mint"}>
               {label}
             </Text>

@@ -23,6 +23,7 @@ import {
   Pill,
   FileText,
   Search,
+  FileImage,
 } from 'lucide-react';
 import { MotiView } from 'moti';
 import { GlassCard, FrostedGlass } from '@/components/ui/glassmorphism';
@@ -200,7 +201,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
     return (
       <AmbientMeshGradient>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#B8FFD2" />
+          <ActivityIndicator size="large" color="#C8F53C" />
           <Text style={styles.loadingText}>Loading Clinical OS...</Text>
         </View>
       </AmbientMeshGradient>
@@ -227,7 +228,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
                 onPress={() => { triggerSelectionHaptic(); onSearchPress(); }}
                 activeOpacity={0.7}
               >
-                <Search size={20} color="#B8FFD2" />
+                <Search size={20} color="#C8F53C" />
               </TouchableOpacity>
             )}
           </View>
@@ -239,8 +240,8 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
           <BentoCard
             title="Total Cases Logged"
             subtitle="Clinical activity tracking"
-            icon={<Activity size={24} color="#B8FFD2" />}
-            color="#B8FFD2"
+            icon={<Activity size={24} color="#C8F53C" />}
+            color="#C8F53C"
             size="large"
             onPress={() => {}}
             value={totalCases}
@@ -259,8 +260,8 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
                   key={system.id}
                   title={system.name}
                   subtitle={`${system.conditionCount ?? 0} conditions`}
-                  icon={<IconComponent size={20} color={system.color || "#B8FFD2"} />}
-                  color={system.color || "#B8FFD2"}
+                  icon={<IconComponent size={20} color={system.color || "#C8F53C"} />}
+                  color={system.color || "#C8F53C"}
                   size="medium"
                   onPress={() => handleSystemPress(system)}
                 />
@@ -313,27 +314,25 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
               onPress={handleQuizPress}
               badge="OSCE"
             />
-            
+
             <BentoCard
-              title="Recent Activity"
-              subtitle="Last 7 days"
-              icon={<Clock size={20} color="#7A7A80" />}
-              color="#7A7A80"
+              title="ECG Reader"
+              subtitle="Rhythm patterns"
+              icon={<Activity size={20} color="#FF453A" />}
+              color="#FF453A"
               size="small"
-              onPress={() => {}}
+              onPress={() => { triggerSelectionHaptic(); router.push('/gp/ecg' as any); }}
             />
           </View>
 
-          {/* Tall Card for Additional Info */}
+          {/* CXR Card */}
           <BentoCard
-            title="Protocol Updates"
-            subtitle="Latest clinical guidelines"
-            icon={<FileText size={24} color="#00D7B5" />}
-            color="#00D7B5"
-            size="tall"
-            onPress={() => {}
-            }
-            badge="NEW"
+            title="CXR Reader"
+            subtitle="Chest X-ray patterns & findings"
+            icon={<FileImage size={24} color="#C8F53C" />}
+            color="#C8F53C"
+            size="wide"
+            onPress={() => { triggerSelectionHaptic(); router.push('/gp/cxr' as any); }}
           />
         </View>
 
@@ -376,9 +375,9 @@ const styles = {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(184,255,210,0.1)',
+    backgroundColor: 'rgba(200,245,60,0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(184,255,210,0.3)',
+    borderColor: 'rgba(200,245,60,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },

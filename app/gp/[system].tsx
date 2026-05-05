@@ -56,10 +56,10 @@ export default function SystemScreen() {
           }}
           className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
         >
-          <ArrowLeft size={21} color="#F5F5F7" strokeWidth={1.7} />
+          <ArrowLeft size={21} color="#C8F53C" strokeWidth={1.7} />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="font-heading text-[25px] leading-8 text-text-primary" numberOfLines={1}>
+          <Text className="font-heading text-[28px] leading-9 text-text-primary" numberOfLines={1}>
             {SYSTEM_LABELS[system] ?? system}
           </Text>
           <Text className="mt-1 font-body text-[12px] text-text-muted">GP Master protocol library</Text>
@@ -68,7 +68,7 @@ export default function SystemScreen() {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#B8FFD2" />
+          <ActivityIndicator color="#C8F53C" />
         </View>
       ) : items.length === 0 ? (
         <View className="flex-1 items-center justify-center px-2 pb-20">

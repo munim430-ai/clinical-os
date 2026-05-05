@@ -9,61 +9,67 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Premium 8k Matte Black Design System
+        // Premium Dark Design System — Music Player Aesthetic
         background: {
-          DEFAULT: "#000000", // Pure Matte Black
-          surface: "#121212", // Dark Grey for cards/modals
-          overlay: "rgba(0,0,0,0.8)", // Glassmorphism base
+          DEFAULT: "#0C0C0E",
+          surface: "#161618",
+          overlay: "rgba(12,12,14,0.85)",
         },
         accent: {
-          primary: "#B8FFD2", // Luminous Mint
-          primarySoft: "rgba(184,255,210,0.16)",
-          primaryGlow: "rgba(184,255,210,0.34)",
-          success: "#00D7B5", // Surgical Teal
+          primary: "#C8F53C", // Vivid Lime
+          primarySoft: "rgba(200,245,60,0.14)",
+          primaryGlow: "rgba(200,245,60,0.28)",
+          success: "#00D7B5", // Surgical Teal (preserved)
           successSoft: "rgba(0,215,181,0.16)",
-          critical: "#FF453A", // Emergency Red
+          critical: "#FF453A", // Emergency Red (preserved)
           criticalSoft: "rgba(255,69,58,0.16)",
-          warning: "#FFD60A", // Amber for alerts
-          info: "#64D2FF", // Clinical Blue
+          warning: "#FFD60A", // Amber (preserved)
+          info: "#64D2FF", // Clinical Blue (preserved)
         },
         surface: {
-          DEFAULT: "#121212", // Dark Grey surfaces
-          elevated: "#1A1A1A", // Elevated surfaces
-          glass: "rgba(18,18,18,0.7)", // Glassmorphism
-          glassBorder: "rgba(255,255,255,0.1)", // Glass border
+          DEFAULT: "#161618",
+          elevated: "#1E1E21",
+          glass: "rgba(22,22,24,0.75)",
+          glassBorder: "rgba(255,255,255,0.08)",
         },
         border: {
-          DEFAULT: "#1C1C1E", // Strict 1px border color
-          soft: "rgba(255,255,255,0.05)",
+          DEFAULT: "#1F1F23",
+          soft: "rgba(255,255,255,0.06)",
           medium: "rgba(255,255,255,0.1)",
           strong: "rgba(255,255,255,0.2)",
-          accent: "#B8FFD2",
+          accent: "#C8F53C",
           critical: "#FF453A",
         },
         text: {
-          primary: "#FFFFFF", // High contrast
-          secondary: "#B8B8BE", // Medium contrast
-          tertiary: "#7A7A80", // Muted text
-          disabled: "#4A4A4F", // Disabled state
-          inverse: "#000000", // Inverse text
-          accent: "#B8FFD2", // Accent text
-          critical: "#FF453A", // Critical text
+          primary: "#FFFFFF",
+          secondary: "#B8B8BE",
+          tertiary: "#7A7A80",
+          disabled: "#4A4A4F",
+          inverse: "#0C0C0E",
+          accent: "#C8F53C",
+          critical: "#FF453A",
         },
         // Legacy color compatibility
         ink: {
-          950: "#000000",
-          900: "#080808",
-          850: "#0B0B0C",
-          800: "#121212",
-          750: "#161616",
-          700: "#1A1A1A",
-          650: "#1C1C1E",
-          500: "#2A2A2D",
+          950: "#0C0C0E",
+          900: "#0F0F11",
+          850: "#131315",
+          800: "#161618",
+          750: "#1A1A1D",
+          700: "#1E1E21",
+          650: "#1F1F23",
+          500: "#2C2C30",
         },
         mint: {
-          DEFAULT: "#B8FFD2",
-          soft: "rgba(184,255,210,0.16)",
-          glow: "rgba(184,255,210,0.34)",
+          DEFAULT: "#C8F53C", // Repointed to lime for backward compat
+          soft: "rgba(200,245,60,0.14)",
+          glow: "rgba(200,245,60,0.28)",
+        },
+        // Hero gradient palette
+        hero: {
+          purple: "#7B2FBE",
+          magenta: "#E91E8C",
+          lime: "#C8F53C",
         },
         clinical: {
           teal: "#00D7B5",
@@ -129,8 +135,11 @@ export default {
         hairline: hairlineWidth(),
       },
       boxShadow: {
-        mintGlow: "0 0 32px rgba(184,255,210,0.22)",
+        mintGlow: "0 0 32px rgba(200,245,60,0.22)",
+        limeGlow: "0 0 32px rgba(200,245,60,0.22)",
         redGlow: "0 0 32px rgba(255,69,58,0.28)",
+        heroGlow: "0 8px 40px rgba(123,47,190,0.35)",
+        cardShadow: "0 2px 12px rgba(0,0,0,0.5)",
       },
       keyframes: {
         "accordion-down": {

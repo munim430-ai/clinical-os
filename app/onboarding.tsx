@@ -26,7 +26,7 @@ const OPTIONS = [
     label: "General Practitioner",
     sub: "Full clinical access, prescribing tools, ER mode",
     icon: UserCheck,
-    color: "#B8FFD2",
+    color: "#C8F53C",
   },
 ];
 

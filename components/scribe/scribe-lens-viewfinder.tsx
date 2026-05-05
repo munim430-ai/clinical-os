@@ -151,7 +151,7 @@ export function ScribeLensViewfinder({ onClose, onCapture, mode = 'document' }: 
   const getModeInfo = () => {
     switch (mode) {
       case 'document':
-        return { title: 'Document Scanner', icon: <FileText size={20} color="#B8FFD2" />, color: '#B8FFD2' };
+        return { title: 'Document Scanner', icon: <FileText size={20} color="#C8F53C" />, color: '#C8F53C' };
       case 'prescription':
         return { title: 'Prescription Reader', icon: <FileText size={20} color="#00D7B5" />, color: '#00D7B5' };
       case 'lab':
@@ -159,7 +159,7 @@ export function ScribeLensViewfinder({ onClose, onCapture, mode = 'document' }: 
       case 'vitals':
         return { title: 'Vitals Monitor', icon: <AlertTriangle size={20} color="#FFD60A" />, color: '#FFD60A' };
       default:
-        return { title: 'Document Scanner', icon: <FileText size={20} color="#B8FFD2" />, color: '#B8FFD2' };
+        return { title: 'Document Scanner', icon: <FileText size={20} color="#C8F53C" />, color: '#C8F53C' };
     }
   };
 
@@ -297,7 +297,7 @@ export function ScribeLensViewfinder({ onClose, onCapture, mode = 'document' }: 
                     animate={{ rotate: '360deg' }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30, repeat: Infinity }}
                   >
-                    <Camera size={40} color="#B8FFD2" />
+                    <Camera size={40} color="#C8F53C" />
                   </MotiView>
                   <Text style={styles.processingText}>Processing document...</Text>
                 </View>
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   scanningText: {
     fontSize: 14,
     fontFamily: 'Inter_600SemiBold',
-    color: '#B8FFD2',
+    color: '#C8F53C',
   },
   viewfinderContainer: {
     flex: 1,
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   scanButtonActive: {
-    borderColor: '#B8FFD2',
+    borderColor: '#C8F53C',
   },
   scanButtonText: {
     marginLeft: 8,
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 16,
-    backgroundColor: '#B8FFD2',
+    backgroundColor: '#C8F53C',
   },
   permissionButtonText: {
     fontSize: 16,

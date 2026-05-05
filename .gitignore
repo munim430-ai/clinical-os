@@ -43,3 +43,5 @@ expo-env.d.ts
 android
 ios
 notes.txt
+public/database.sqlite-shm
+public/database.sqlite-wal

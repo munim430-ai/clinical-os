@@ -35,6 +35,29 @@ for (const mig of migrations) {
   console.log(`  ✓ done`);
 }
 
+// Normalize prices from embedded package_size values
+console.log("\nNormalizing medicine prices…");
+const PACK_PATTERN = /\((\d+)'s\s+pack:\s+৳\s*([\d.]+)\)/i;
+const pricedRows = db.prepare(`
+  SELECT id, package_size FROM medicines
+  WHERE unit_price_bdt IS NULL AND package_size IS NOT NULL
+`).all();
+const priceUpdate = db.prepare(`UPDATE medicines SET unit_price_bdt=?, pack_price_bdt=? WHERE id=?`);
+let priceUpdated = 0;
+db.exec("BEGIN");
+for (const row of pricedRows) {
+  const m = PACK_PATTERN.exec(row.package_size);
+  if (!m) continue;
+  const packCount = parseInt(m[1], 10);
+  const packPrice = parseFloat(m[2]);
+  if (!packCount || !packPrice) continue;
+  const unitPrice = Math.round((packPrice / packCount) * 100) / 100;
+  priceUpdate.run(unitPrice, packPrice, row.id);
+  priceUpdated++;
+}
+db.exec("COMMIT");
+console.log(`  ✓ Prices normalized: ${priceUpdated} medicines`);
+
 db.close();
 const size = fs.statSync(OUT).size;
 console.log(`\n✓ Written: ${OUT}`);

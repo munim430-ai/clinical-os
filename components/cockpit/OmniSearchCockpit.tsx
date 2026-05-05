@@ -19,12 +19,12 @@ type OmniSearchCockpitProps = {
 };
 
 const categoryMeta = {
-  medicine: { label: "Medicines", icon: Pill, color: "#B8FFD2" },
+  medicine: { label: "Medicines", icon: Pill, color: "#C8F53C" },
   protocol: { label: "Protocols", icon: ClipboardList, color: "#00D7B5" },
   er: { label: "ER", icon: Siren, color: "#FF453A" },
   calculator: { label: "Calculators", icon: Calculator, color: "#64D2FF" },
   saved: { label: "Saved", icon: Bookmark, color: "#B8B8BE" },
-  ai: { label: "AI Suggestions", icon: Sparkles, color: "#B8FFD2" },
+  ai: { label: "AI Suggestions", icon: Sparkles, color: "#C8F53C" },
 };
 
 export function OmniSearchCockpit({ value, results = [], onChangeText, onResultPress }: OmniSearchCockpitProps) {
@@ -47,7 +47,7 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
       >
         <BlurView intensity={28} tint="dark" className="px-4 py-3">
           <View className="flex-row items-center gap-3">
-            <Search size={19} color={focused ? "#B8FFD2" : "#7A7A80"} strokeWidth={1.6} />
+            <Search size={19} color={focused ? "#C8F53C" : "#7A7A80"} strokeWidth={1.6} />
             <TextInput
               value={value}
               onChangeText={onChangeText}
@@ -59,7 +59,7 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
               placeholder="Search drugs, protocols, ER doses"
               placeholderTextColor="#7A7A80"
               className="min-h-[44px] flex-1 font-bodySemi text-[16px] text-text-primary"
-              selectionColor="#B8FFD2"
+              selectionColor="#C8F53C"
             />
           </View>
 

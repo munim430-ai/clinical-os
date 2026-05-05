@@ -12,9 +12,11 @@ import {
   FlaskConical,
   GraduationCap,
   Stethoscope,
+  Pill,
+  ExternalLink,
 } from "lucide-react";
 import { useDatabase } from "@/db/provider";
-import { conditions, symptoms, protocols, protocolSteps, examSteps, osceCards, labReferences } from "@/db/schema";
+import { conditions, symptoms, protocols, protocolSteps, examSteps, osceCards, labReferences, rxEntries } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { ClinicalReaderFrame } from "@/components/reader/ClinicalReaderFrame";
 import { Disclaimer } from "@/components/ui/Disclaimer";
@@ -24,10 +26,11 @@ import { triggerSelectionHaptic, triggerSuccessHaptic } from "@/lib/clinical-hap
 const LOGGABLE = ["dengue", "typhoid", "malaria", "cholera"];
 const EXAM_CATS = ["inspection", "palpation", "percussion", "auscultation"];
 
-type ReaderTab = "overview" | "protocol" | "exam" | "interpret" | "osce";
+type ReaderTab = "overview" | "rx" | "protocol" | "exam" | "interpret" | "osce";
 
 const TABS: { key: ReaderTab; label: string; Icon: any }[] = [
   { key: "overview", label: "Overview", Icon: BookOpen },
+  { key: "rx", label: "Rx", Icon: Pill },
   { key: "protocol", label: "Protocol", Icon: ClipboardList },
   { key: "exam", label: "Exam", Icon: Stethoscope },
   { key: "interpret", label: "Labs", Icon: FlaskConical },
@@ -45,6 +48,7 @@ export default function ConditionScreen() {
   const [examList, setExamList] = useState<any[]>([]);
   const [osceList, setOsceList] = useState<any[]>([]);
   const [labs, setLabs] = useState<any[]>([]);
+  const [rxList, setRxList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const loggedRef = useRef(false);
 
@@ -58,14 +62,16 @@ export default function ConditionScreen() {
       db.select().from(protocols).where(eq(protocols.conditionId, id)),
       db.select().from(examSteps).where(eq(examSteps.conditionId, id)),
       db.select().from(osceCards).where(eq(osceCards.conditionId, id)),
-      db.select().from(labReferences).limit(20),
-    ]).then(([cond, symp, prot, exam, osce, labsData]) => {
+      db.select().from(labReferences).where(eq(labReferences.conditionId, id)).limit(20),
+      db.select().from(rxEntries).where(eq(rxEntries.conditionId, id)),
+    ]).then(([cond, symp, prot, exam, osce, labsData, rx]) => {
       setCondition(cond[0] ?? null);
       setSymptomList(symp);
       setProtocolList(prot);
       setExamList(exam);
       setOsceList(osce);
       setLabs(labsData);
+      setRxList(rx.sort((a, b) => (a.priority ?? 1) - (b.priority ?? 1)));
 
       if (prot[0]) {
         db.select().from(protocolSteps)
@@ -83,12 +89,15 @@ export default function ConditionScreen() {
   const warningSigns = symptomList.filter((symptom) => symptom.isWarnSign);
   const regularSymptoms = symptomList.filter((symptom) => !symptom.isWarnSign);
   const activeProtocol = protocolList[0];
+  const firstLineRx = rxList.filter((r) => (r.priority ?? 1) === 1);
+  const secondLineRx = rxList.filter((r) => (r.priority ?? 1) === 2);
+  const altRx = rxList.filter((r) => (r.priority ?? 1) === 3);
 
   if (loading) {
     return (
       <ClinicalShell>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#B8FFD2" />
+          <ActivityIndicator color="#C8F53C" />
           <Text className="mt-3 font-body text-[13px] text-text-muted">Loading clinical reader</Text>
         </View>
       </ClinicalShell>
@@ -134,7 +143,7 @@ export default function ConditionScreen() {
                     triggerSuccessHaptic();
                   }
                 }}
-                className="rounded-2xl border border-border-mint bg-mint-soft px-4 py-3"
+                className="rounded-2xl border border-border-accent bg-mint-soft px-4 py-3"
               >
                 <Text className="font-bodySemi text-[12px] text-mint">Log Case</Text>
               </TouchableOpacity>
@@ -155,11 +164,11 @@ export default function ConditionScreen() {
                   }}
                   className={[
                     "flex-row items-center gap-2 rounded-pill border px-4 py-2.5",
-                    active ? "border-border-mint bg-mint-soft" : "border-border bg-ink-800",
+                    active ? "border-transparent bg-mint" : "border-border bg-ink-800",
                   ].join(" ")}
                 >
-                  <Icon size={15} color={active ? "#B8FFD2" : "#7A7A80"} strokeWidth={1.6} />
-                  <Text className={active ? "font-bodySemi text-[13px] text-mint" : "font-bodySemi text-[13px] text-text-muted"}>
+                  <Icon size={15} color={active ? "#0C0C0E" : "#7A7A80"} strokeWidth={1.6} />
+                  <Text className={active ? "font-bodySemi text-[13px] text-text-inverse" : "font-bodySemi text-[13px] text-text-muted"}>
                     {label}
                   </Text>
                 </TouchableOpacity>
@@ -193,10 +202,61 @@ export default function ConditionScreen() {
             </View>
           ) : null}
 
+          {tab === "rx" ? (
+            <View>
+              {rxList.length === 0 ? (
+                <EmptyBlock message="Prescription guidelines coming soon for this condition." />
+              ) : (
+                <View>
+                  {firstLineRx.length > 0 ? (
+                    <View className="mb-2">
+                      <View className="mb-3 flex-row items-center gap-2">
+                        <View className="h-2 w-2 rounded-full bg-mint" />
+                        <Text className="font-bodySemi text-[11px] uppercase tracking-[1.7px] text-mint">First-line Treatment</Text>
+                      </View>
+                      {firstLineRx.map((rx) => <RxCard key={rx.id} rx={rx} tier="first" />)}
+                    </View>
+                  ) : null}
+
+                  {secondLineRx.length > 0 ? (
+                    <View className="mb-2 mt-4">
+                      <View className="mb-3 flex-row items-center gap-2">
+                        <View className="h-2 w-2 rounded-full bg-[#FFD60A]" />
+                        <Text className="font-bodySemi text-[11px] uppercase tracking-[1.7px] text-[#FFD60A]">Second-line / Add-on</Text>
+                      </View>
+                      {secondLineRx.map((rx) => <RxCard key={rx.id} rx={rx} tier="second" />)}
+                    </View>
+                  ) : null}
+
+                  {altRx.length > 0 ? (
+                    <View className="mb-2 mt-4">
+                      <View className="mb-3 flex-row items-center gap-2">
+                        <View className="h-2 w-2 rounded-full bg-[#64D2FF]" />
+                        <Text className="font-bodySemi text-[11px] uppercase tracking-[1.7px] text-[#64D2FF]">Alternative</Text>
+                      </View>
+                      {altRx.map((rx) => <RxCard key={rx.id} rx={rx} tier="alt" />)}
+                    </View>
+                  ) : null}
+
+                  {activeProtocol?.source ? (
+                    <View className="mt-4 rounded-2xl border border-border bg-ink-800 px-4 py-3">
+                      <Text className="font-body text-[11px] leading-5 text-text-muted">
+                        Source: {activeProtocol.source}{activeProtocol.year ? ` (${activeProtocol.year})` : ""}
+                      </Text>
+                      <Text className="mt-1 font-body text-[11px] leading-5 text-text-muted">
+                        Always verify doses against current formulary. These are guidelines only — see Disclaimer.
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+              )}
+            </View>
+          ) : null}
+
           {tab === "protocol" ? (
             <View>
               {activeProtocol ? (
-                <View className="mb-4 rounded-clinical border border-border-mint bg-mint-soft p-4">
+                <View className="mb-4 rounded-clinical border border-border-accent bg-mint-soft p-4">
                   <Text className="font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Protocol Source</Text>
                   <Text className="mt-2 font-headingBold text-[18px] text-mint">
                     {[activeProtocol.source, activeProtocol.version, activeProtocol.year].filter(Boolean).join(" · ")}
@@ -255,6 +315,96 @@ export default function ConditionScreen() {
     </ClinicalShell>
   );
 }
+
+// ─── Rx Card ─────────────────────────────────────────────────────────────────
+
+type RxTier = "first" | "second" | "alt";
+
+function RxCard({ rx, tier }: { rx: any; tier: RxTier }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const tierColor = tier === "first" ? "#C8F53C" : tier === "second" ? "#FFD60A" : "#64D2FF";
+  const tierBg = tier === "first" ? "bg-mint-soft border-border-accent" : tier === "second" ? "border-[#3D3010]" : "border-[#0D2A3D]";
+  const tierBgStyle = tier === "second" ? { backgroundColor: "#1A1500" } : tier === "alt" ? { backgroundColor: "#001525" } : undefined;
+
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        triggerSelectionHaptic();
+        setExpanded(!expanded);
+      }}
+      activeOpacity={0.82}
+      className={`mb-3 overflow-hidden rounded-clinical border ${tierBg}`}
+      style={tierBgStyle}
+    >
+      <View className="flex-row items-start p-4">
+        <View
+          className="mr-3 mt-0.5 h-9 w-9 shrink-0 items-center justify-center rounded-2xl"
+          style={{ backgroundColor: `${tierColor}20` }}
+        >
+          <Pill size={18} color={tierColor} strokeWidth={1.6} />
+        </View>
+        <View className="flex-1">
+          <View className="flex-row items-start justify-between gap-2">
+            <Text className="flex-1 font-headingBold text-[16px] leading-6 text-text-primary">{rx.drugName}</Text>
+            <Text className="font-heading text-[20px] text-text-muted">{expanded ? "−" : "+"}</Text>
+          </View>
+          {rx.drugClass ? (
+            <Text className="mt-0.5 font-body text-[12px] text-text-muted">{rx.drugClass}</Text>
+          ) : null}
+          {rx.indication ? (
+            <Text className="mt-1 font-body text-[13px] leading-5 text-text-secondary">{rx.indication}</Text>
+          ) : null}
+        </View>
+      </View>
+
+      {expanded ? (
+        <View className="border-t border-border-soft px-4 pb-4 pt-3">
+          <View className="flex-row flex-wrap gap-2">
+            {rx.dosage ? <RxPill label="Dose" value={rx.dosage} color={tierColor} /> : null}
+            {rx.frequency ? <RxPill label="Frequency" value={rx.frequency} color={tierColor} /> : null}
+            {rx.route ? <RxPill label="Route" value={rx.route} color={tierColor} /> : null}
+            {rx.duration ? <RxPill label="Duration" value={rx.duration} color={tierColor} /> : null}
+          </View>
+
+          {rx.notes ? (
+            <View className="mt-3 rounded-2xl border border-border bg-ink-950 px-3 py-2.5">
+              <Text className="mb-1 font-bodySemi text-[10px] uppercase tracking-[1.4px] text-text-muted">Clinical Notes</Text>
+              <Text className="font-body text-[13px] leading-5 text-text-secondary">{rx.notes}</Text>
+            </View>
+          ) : null}
+
+          {rx.source ? (
+            <Text className="mt-2 font-body text-[11px] text-text-muted">Source: {rx.source}</Text>
+          ) : null}
+
+          <TouchableOpacity
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push(`/(tabs)/dims?q=${encodeURIComponent(rx.drugName)}` as any);
+            }}
+            className="mt-3 flex-row items-center gap-2 self-start rounded-pill border border-border bg-ink-950 px-3 py-2"
+            activeOpacity={0.78}
+          >
+            <ExternalLink size={13} color="#C8F53C" strokeWidth={1.7} />
+            <Text className="font-bodySemi text-[12px] text-mint">Find in DIMS</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+    </TouchableOpacity>
+  );
+}
+
+function RxPill({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <View className="rounded-xl border border-border bg-ink-950 px-3 py-2">
+      <Text className="font-bodySemi text-[10px] uppercase tracking-[1.3px]" style={{ color: `${color}99` }}>{label}</Text>
+      <Text className="mt-0.5 font-bodySemi text-[13px] text-text-primary">{value}</Text>
+    </View>
+  );
+}
+
+// ─── Shared components ────────────────────────────────────────────────────────
 
 function ReaderSection({ title, children, accent = "mint" }: { title: string; children: ReactNode; accent?: "mint" | "teal" | "red" }) {
   const colorClass = accent === "red" ? "text-clinical-red" : accent === "teal" ? "text-clinical-teal" : "text-mint";
@@ -378,7 +528,7 @@ function PremiumOSCECard({ card }: { card: any }) {
   return (
     <View className="mb-3 overflow-hidden rounded-clinical border border-border bg-ink-800">
       <View className="p-4">
-        <View className="mb-3 self-start rounded-pill border border-border-mint bg-mint-soft px-3 py-1">
+        <View className="mb-3 self-start rounded-pill border border-border-accent bg-mint-soft px-3 py-1">
           <Text className="font-bodySemi text-[11px] uppercase tracking-[1.4px] text-mint">{card.stationType || "OSCE"}</Text>
         </View>
         <Text className="font-bodySemi text-[15px] leading-6 text-text-primary">{card.question}</Text>
@@ -432,7 +582,10 @@ function parseJsonArray(value?: string | null): string[] {
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.map(String) : [];
+    if (Array.isArray(parsed)) {
+      return parsed.map((item) => (typeof item === "object" && item.item ? item.item : String(item)));
+    }
+    return [];
   } catch {
     return [];
   }
