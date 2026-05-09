@@ -2,47 +2,31 @@
   "version": "7",
   "dialect": "sqlite",
   "entries": [
-    {
-      "idx": 0,
-      "version": "6",
-      "when": 1777670343067,
-      "tag": "0000_quick_psynapse",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1777670343068,
-      "tag": "0001_seed_drugs",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1777670343069,
-      "tag": "0002_seed_clinical",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1777670343070,
-      "tag": "0003_content_sync",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1777670343071,
-      "tag": "0004_seed_bd_medicine",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1777670343072,
-      "tag": "0005_seed_gp_master_interpretation",
-      "breakpoints": true
-    }
+    { "idx": 0,  "version": "6", "when": 1777670343067, "tag": "0000_quick_psynapse",             "breakpoints": true },
+    { "idx": 1,  "version": "6", "when": 1777670343068, "tag": "0001_seed_drugs",                 "breakpoints": true },
+    { "idx": 2,  "version": "6", "when": 1777670343069, "tag": "0002_seed_clinical",              "breakpoints": true },
+    { "idx": 3,  "version": "6", "when": 1777670343070, "tag": "0003_content_sync",               "breakpoints": true },
+    { "idx": 4,  "version": "6", "when": 1777670343071, "tag": "0004_seed_bd_medicine",           "breakpoints": true },
+    { "idx": 5,  "version": "6", "when": 1777670343072, "tag": "0005_seed_gp_master_interpretation", "breakpoints": true },
+    { "idx": 6,  "version": "6", "when": 1777670343073, "tag": "0003_seed_lab_values",            "breakpoints": true },
+    { "idx": 7,  "version": "6", "when": 1777670343074, "tag": "0004_seed_ecg_patterns",          "breakpoints": true },
+    { "idx": 8,  "version": "6", "when": 1777670343075, "tag": "0005_seed_cxr_findings",          "breakpoints": true },
+    { "idx": 9,  "version": "6", "when": 1777670343076, "tag": "0006_seed_dengue_protocol",       "breakpoints": true },
+    { "idx": 10, "version": "6", "when": 1777670343077, "tag": "0007_seed_typhoid_protocol",      "breakpoints": true },
+    { "idx": 11, "version": "6", "when": 1777670343078, "tag": "0008_seed_malaria_protocol",      "breakpoints": true },
+    { "idx": 12, "version": "6", "when": 1777670343079, "tag": "0009_add_drug_pricing",           "breakpoints": true },
+    { "idx": 13, "version": "6", "when": 1777670343080, "tag": "0010_seed_quiz_questions",        "breakpoints": true },
+    { "idx": 14, "version": "6", "when": 1777670343081, "tag": "0011_seed_osce_cases",            "breakpoints": true },
+    { "idx": 15, "version": "6", "when": 1777670343082, "tag": "0012_link_conditions_to_drugs",   "breakpoints": true },
+    { "idx": 16, "version": "6", "when": 1777670343083, "tag": "0013_gp_master_rx",               "breakpoints": true },
+    { "idx": 17, "version": "6", "when": 1777670343084, "tag": "0014_conditions_chunk1",          "breakpoints": true },
+    { "idx": 18, "version": "6", "when": 1777670343085, "tag": "0015_conditions_chunk2",          "breakpoints": true },
+    { "idx": 19, "version": "6", "when": 1777670343086, "tag": "0016_conditions_chunk3",          "breakpoints": true },
+    { "idx": 20, "version": "6", "when": 1777670343087, "tag": "0017_conditions_chunk4",          "breakpoints": true },
+    { "idx": 21, "version": "6", "when": 1777670343088, "tag": "0018_conditions_chunk5",          "breakpoints": true },
+    { "idx": 22, "version": "6", "when": 1777670343089, "tag": "0019_conditions_chunk6",          "breakpoints": true },
+    { "idx": 23, "version": "6", "when": 1777670343090, "tag": "0020_conditions_chunk7",          "breakpoints": true },
+    { "idx": 24, "version": "6", "when": 1777670343091, "tag": "0021_conditions_chunk8",          "breakpoints": true },
+    { "idx": 25, "version": "6", "when": 1777670343092, "tag": "0022_dengue_sprint_a",            "breakpoints": true }
   ]
 }

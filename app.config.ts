@@ -5,11 +5,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: "Clinical OS",
   slug: "clinical-os",
   newArchEnabled: true,
-  version: "1.0.0",
+  version: "1.1.1",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
   scheme: "clinicalos",
-  userInterfaceStyle: "dark",
+  userInterfaceStyle: "light",
   runtimeVersion: {
     policy: "appVersion",
   },

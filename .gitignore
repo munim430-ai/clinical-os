@@ -46,3 +46,17 @@ notes.txt
 public/database.sqlite-shm
 public/database.sqlite-wal
 .vercel
+
+# Local research assets
+Drug Data/
+guidelines/
+idea/
+*.zip
+clinical-os-preview.html
+er-preview.png
+Clinical\ OS_*.txt
+serve.js
+serve.out.log
+serve.err.log
+preview-storage.json
+temp_extract/

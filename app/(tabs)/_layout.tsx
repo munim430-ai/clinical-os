@@ -2,7 +2,7 @@ import { CureCurveTabBar } from "@/components/navigation/CureCurveTabBar";
 import { Tabs } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "home/index",
+  initialRouteName: "home",
 };
 
 export default function TabLayout() {
@@ -13,11 +13,11 @@ export default function TabLayout() {
         headerShown: false,
       }}
     >
-      <Tabs.Screen name="home/index" options={{ title: "Home" }} />
-      <Tabs.Screen name="dims/index" options={{ title: "DIMS" }} />
-      <Tabs.Screen name="gp/index" options={{ title: "GP Master" }} />
-      <Tabs.Screen name="lab/index" options={{ title: "Lab Report" }} />
-      <Tabs.Screen name="profile/index" options={{ title: "Profile" }} />
+      <Tabs.Screen name="home" options={{ title: "Home" }} />
+      <Tabs.Screen name="dims" options={{ title: "DIMS" }} />
+      <Tabs.Screen name="gp" options={{ title: "GP Master" }} />
+      <Tabs.Screen name="lab" options={{ title: "Lab Report" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
     </Tabs>
   );
 }
