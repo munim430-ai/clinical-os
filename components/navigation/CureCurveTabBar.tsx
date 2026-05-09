@@ -14,18 +14,12 @@ const PRIMARY = "#2470FF";
 const INACTIVE = "#B8C5E6";
 const INK = "#182456";
 
-const TAB_META: Record<
-  string,
-  {
-    label: string;
-    Icon: typeof Home;
-  }
-> = {
-  "home/index": { label: "Home", Icon: Home },
-  "dims/index": { label: "DIMS", Icon: Pill },
-  "gp/index": { label: "GP", Icon: Stethoscope },
-  "lab/index": { label: "Lab", Icon: FlaskConical },
-  "profile/index": { label: "Profile", Icon: User },
+const TAB_META: Record<string, { label: string; Icon: typeof Home }> = {
+  home:    { label: "Home",    Icon: Home },
+  dims:    { label: "DIMS",    Icon: Pill },
+  gp:      { label: "GP",      Icon: Stethoscope },
+  lab:     { label: "Lab",     Icon: FlaskConical },
+  profile: { label: "Profile", Icon: User },
 };
 
 export function CureCurveTabBar({
@@ -64,7 +58,7 @@ export function CureCurveTabBar({
             if (!meta) return null;
 
             const focused = state.index === index;
-            const isFab = route.name === "gp/index";
+            const isFab = route.name === "gp";
             const Icon = meta.Icon;
 
             const onPress = () => {
