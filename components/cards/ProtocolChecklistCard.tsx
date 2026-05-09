@@ -1,6 +1,12 @@
-import { Pressable, Text, View } from "react-native";
-import { AlertOctagon, CheckCircle2, ClipboardCheck, Clock3, Stethoscope } from "lucide-react";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import {
+  AlertOctagon,
+  CheckCircle2,
+  ClipboardCheck,
+  Clock3,
+  Stethoscope,
+} from "lucide-react-native";
+import { Pressable, Text, View } from "react-native";
 
 type ProtocolChecklistCardProps = {
   title: string;
@@ -23,7 +29,8 @@ export function ProtocolChecklistCard({
   lastUpdated,
   onPress,
 }: ProtocolChecklistCardProps) {
-  const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+  const progress =
+    totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
   const handlePress = () => {
     triggerSelectionHaptic();
@@ -35,10 +42,18 @@ export function ProtocolChecklistCard({
       {({ pressed }) => (
         <View
           className={[
-            "rounded-clinical border bg-ink-800 p-4",
+            "rounded-[22px] border bg-surface p-4",
             critical ? "border-border-red" : "border-border",
           ].join(" ")}
-          style={{ opacity: 1, transform: [{ scale: pressed ? 0.985 : 1 }] }}
+          style={{
+            opacity: 1,
+            transform: [{ scale: pressed ? 0.985 : 1 }],
+            shadowColor: "#182456",
+            shadowOffset: { width: 0, height: 14 },
+            shadowOpacity: 0.08,
+            shadowRadius: 34,
+            elevation: 2,
+          }}
         >
           <View className="flex-row items-start justify-between">
             <View className="flex-1 pr-4">
@@ -46,13 +61,19 @@ export function ProtocolChecklistCard({
                 <View
                   className={[
                     "h-9 w-9 items-center justify-center rounded-2xl border",
-                    critical ? "border-border-red bg-clinical-redSoft" : "border-border-soft bg-ink-700",
+                    critical
+                      ? "border-border-red bg-clinical-redSoft"
+                      : "border-transparent bg-accent-primarySoft",
                   ].join(" ")}
                 >
                   {critical ? (
-                    <AlertOctagon size={18} color="#FF453A" strokeWidth={1.6} />
+                    <AlertOctagon size={18} color="#FF3B30" strokeWidth={1.6} />
                   ) : (
-                    <ClipboardCheck size={18} color="#C8F53C" strokeWidth={1.6} />
+                    <ClipboardCheck
+                      size={18}
+                      color="#2470FF"
+                      strokeWidth={1.6}
+                    />
                   )}
                 </View>
 
@@ -61,42 +82,63 @@ export function ProtocolChecklistCard({
                 </Text>
               </View>
 
-              <Text className="font-headingBold text-[19px] leading-6 text-text-primary">{title}</Text>
+              <Text className="font-headingBold text-[19px] leading-6 text-text-primary">
+                {title}
+              </Text>
 
               <View className="mt-4 flex-row items-center gap-4">
                 <View className="flex-row items-center gap-1.5">
-                  <Clock3 size={14} color="#7A7A80" strokeWidth={1.6} />
-                  <Text className="font-body text-[12px] text-text-muted">{estimatedTime}</Text>
+                  <Clock3 size={14} color="#8A91A8" strokeWidth={1.6} />
+                  <Text className="font-body text-[12px] text-text-muted">
+                    {estimatedTime}
+                  </Text>
                 </View>
 
                 <View className="flex-row items-center gap-1.5">
-                  <Stethoscope size={14} color="#7A7A80" strokeWidth={1.6} />
-                  <Text className="font-body text-[12px] text-text-muted">GP Master</Text>
+                  <Stethoscope size={14} color="#8A91A8" strokeWidth={1.6} />
+                  <Text className="font-body text-[12px] text-text-muted">
+                    GP Master
+                  </Text>
                 </View>
               </View>
             </View>
 
             <View className="items-end">
-              <Text className={critical ? "font-heading text-[24px] text-clinical-red" : "font-heading text-[24px] text-mint"}>
+              <Text
+                className={
+                  critical
+                    ? "font-heading text-[24px] text-clinical-red"
+                    : "font-heading text-[24px] text-accent-primary"
+                }
+              >
                 {progress}%
               </Text>
-              <Text className="font-body text-[11px] text-text-muted">complete</Text>
+              <Text className="font-body text-[11px] text-text-muted">
+                complete
+              </Text>
             </View>
           </View>
 
-          <View className="mt-5 h-2 overflow-hidden rounded-pill bg-ink-950">
-            <View className={critical ? "h-full bg-clinical-red" : "h-full bg-mint"} style={{ width: `${progress}%` }} />
+          <View className="mt-5 h-2 overflow-hidden rounded-pill bg-surface-muted">
+            <View
+              className={critical ? "h-full bg-clinical-red" : "h-full bg-mint"}
+              style={{ width: `${progress}%` }}
+            />
           </View>
 
           <View className="mt-4 flex-row items-center justify-between">
             <View className="flex-row items-center gap-2">
-              <CheckCircle2 size={15} color="#00D7B5" strokeWidth={1.6} />
+              <CheckCircle2 size={15} color="#2BC97A" strokeWidth={1.6} />
               <Text className="font-bodySemi text-[12px] text-text-secondary">
                 {completedSteps}/{totalSteps} clinical steps
               </Text>
             </View>
 
-            {lastUpdated ? <Text className="font-body text-[11px] text-text-muted">Updated {lastUpdated}</Text> : null}
+            {lastUpdated ? (
+              <Text className="font-body text-[11px] text-text-muted">
+                Updated {lastUpdated}
+              </Text>
+            ) : null}
           </View>
         </View>
       )}

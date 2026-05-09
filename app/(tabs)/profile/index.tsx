@@ -1,57 +1,72 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
-import {
-  GraduationCap, Stethoscope, UserCheck, Activity,
-  AlertTriangle, Database, RefreshCcw, Upload, CheckCircle2, XCircle, ShieldCheck,
-} from "lucide-react";
-import { router } from "expo-router";
-import { getPersona, setPersona, type Persona } from "@/lib/persona";
-import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
-import { getContentSummary, pullSyncFeeds, type PullResult } from "@/lib/content-sync";
-import { syncSurveillanceData, getLastSyncMs, canSyncNow } from "@/lib/surveillance-sync";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { EmergencyPill } from "@/components/navigation/EmergencyPill";
 import { useDatabase } from "@/db/provider";
-import { triggerSelectionHaptic, triggerSuccessHaptic } from "@/lib/clinical-haptics";
+import {
+  triggerSelectionHaptic,
+  triggerSuccessHaptic,
+} from "@/lib/clinical-haptics";
+import {
+  type PullResult,
+  getContentSummary,
+  pullSyncFeeds,
+} from "@/lib/content-sync";
+import { type Persona, getPersona, setPersona } from "@/lib/persona";
+import { router } from "expo-router";
+import {
+  BookMarked,
+  Database,
+  GraduationCap,
+  RefreshCcw,
+  ShieldCheck,
+  Stethoscope,
+  UserCheck,
+  WalletCards,
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const PERSONAS = [
-  { id: "student" as Persona, label: "Medical Student",       sub: "OSCE prep & quiz mode",  icon: GraduationCap, color: "#4499FF" },
-  { id: "intern"  as Persona, label: "Intern / House Officer", sub: "Clinical rotations",      icon: Stethoscope,   color: "#FFD60A" },
-  { id: "gp"      as Persona, label: "General Practitioner",  sub: "Full clinical access",    icon: UserCheck,     color: "#00C896" },
+  {
+    id: "student" as Persona,
+    label: "Medical Student",
+    sub: "OSCE prep and quiz mode",
+    icon: GraduationCap,
+  },
+  {
+    id: "intern" as Persona,
+    label: "Intern / House Officer",
+    sub: "Clinical rotations and ward reference",
+    icon: Stethoscope,
+  },
+  {
+    id: "gp" as Persona,
+    label: "General Practitioner",
+    sub: "Full clinical access and ER tools",
+    icon: UserCheck,
+  },
 ];
-
-const DISEASE_LABELS: Record<string, string> = {
-  dengue: "Dengue", typhoid: "Typhoid", malaria: "Malaria", cholera: "Cholera",
-};
-
-function formatLastSync(ms: number | undefined): string {
-  if (!ms) return "Never";
-  const diff = Date.now() - ms;
-  const mins = Math.floor(diff / 60_000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
 
 export default function ProfileScreen() {
   const { db } = useDatabase();
   const [current, setCurrent] = useState<Persona>(getPersona());
-  const [caseCounts, setCaseCounts] = useState<CaseCounts>({} as CaseCounts);
-  const [contentSummary, setContentSummary] = useState({ versions: 0, syncFeeds: 0, mediaAssets: 0 });
-  const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<"idle" | "ok" | "error" | "skipped">("idle");
-  const [syncMsg, setSyncMsg] = useState("");
-  const [lastSyncMs, setLastSyncMs] = useState<number | undefined>(getLastSyncMs());
+  const [contentSummary, setContentSummary] = useState({
+    versions: 0,
+    syncFeeds: 0,
+    mediaAssets: 0,
+  });
   const [pulling, setPulling] = useState(false);
-  const [pullStatus, setPullStatus] = useState<"idle" | "ok" | "error" | "skipped">("idle");
   const [pullMsg, setPullMsg] = useState("");
-  const totalCases = Object.values(caseCounts).reduce((a, b) => a + b, 0);
-  const syncEnabled = canSyncNow();
 
   useEffect(() => {
-    getCaseCounts().then(setCaseCounts);
-    getContentSummary().then(setContentSummary);
-  }, []);
+    if (!db) return;
+    getContentSummary(db).then(setContentSummary);
+  }, [db]);
 
   function handleSelect(p: Persona) {
     triggerSelectionHaptic();
@@ -59,270 +74,262 @@ export default function ProfileScreen() {
     setCurrent(p);
   }
 
-  async function handleSync() {
-    if (syncing) return;
-    triggerSelectionHaptic();
-    setSyncing(true);
-    setSyncStatus("idle");
-    const result = await syncSurveillanceData();
-    setSyncing(false);
-    setSyncStatus(result.status);
-    setLastSyncMs(getLastSyncMs());
-    if (result.status === "ok") {
-      triggerSuccessHaptic();
-      setSyncMsg(`Synced ${result.synced} case${result.synced !== 1 ? "s" : ""}`);
-      getCaseCounts().then(setCaseCounts);
-    } else if (result.status === "skipped") {
-      setSyncMsg(result.reason);
-    } else {
-      setSyncMsg(result.message);
-    }
-    setTimeout(() => setSyncStatus("idle"), 4000);
-  }
-
   async function handlePullContent() {
     if (pulling || !db) return;
     triggerSelectionHaptic();
     setPulling(true);
-    setPullStatus("idle");
-    const result: PullResult = await pullSyncFeeds(db as any);
+    const result: PullResult = await pullSyncFeeds();
     setPulling(false);
-    setPullStatus(result.status);
     if (result.status === "ok") {
       triggerSuccessHaptic();
       setPullMsg(
         result.updated === 0
           ? "All feeds up to date"
-          : `Updated ${result.updated} feed${result.updated !== 1 ? "s" : ""}${result.alerts ? ` · ${result.alerts} new alert${result.alerts !== 1 ? "s" : ""}` : ""}`
+          : `Updated ${result.updated} feed(s)`,
       );
-      getContentSummary().then(setContentSummary);
+      getContentSummary(db).then(setContentSummary);
     } else if (result.status === "skipped") {
       setPullMsg(result.reason);
     } else {
       setPullMsg(result.message);
     }
-    setTimeout(() => setPullStatus("idle"), 4000);
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerStyle={{ padding: 16, paddingBottom: 104 }}
-      accessibilityLabel="Profile screen"
-    >
-      <Text className="font-heading text-[32px] leading-10 text-text-primary">Profile</Text>
-      <Text className="mb-6 mt-1 font-body text-[13px] text-text-muted">
-        Manage your role, content, and local activity
-      </Text>
+    <ClinicalShell>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 156 }}
+        showsVerticalScrollIndicator={false}
+        accessibilityLabel="Profile screen"
+      >
+        <View className="flex-row items-center justify-between gap-3 pb-5 pt-2">
+          <View className="flex-1">
+            <Text className="font-heading text-[30px] leading-10 text-text-primary">
+              Profile
+            </Text>
+            <Text className="mt-1 font-body text-[13px] text-text-tertiary">
+              Manage role, content, and privacy
+            </Text>
+          </View>
+          <EmergencyPill />
+        </View>
 
-      {/* Persona selector */}
-      <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Your Role</Text>
-      {PERSONAS.map((p) => {
-        const Icon = p.icon;
-        const active = current === p.id;
-        return (
-          <TouchableOpacity
-            key={p.id}
-            onPress={() => handleSelect(p.id)}
-            className="mb-3 flex-row items-center rounded-clinical border bg-ink-800 p-4"
-            style={{ borderColor: active ? p.color : "#1F1F23" }}
-            activeOpacity={0.7}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: active }}
-            accessibilityLabel={p.label}
-          >
-            <View
-              className="mr-4 h-12 w-12 items-center justify-center rounded-full"
-              style={{ backgroundColor: active ? `${p.color}22` : "#1E1E21" }}
-            >
-              <Icon size={22} color={active ? p.color : "#505058"} />
+        <View className="rounded-[28px] border border-surface-glassBorder bg-surface p-5">
+          <View className="flex-row items-center gap-4">
+            <View className="h-16 w-16 items-center justify-center rounded-full bg-accent-primarySoft">
+              <UserCheck color="#2470FF" size={32} strokeWidth={1.8} />
             </View>
             <View className="flex-1">
-              <Text className="font-bodySemi text-[15px] text-text-primary">{p.label}</Text>
-              <Text className="mt-0.5 font-body text-[12px] text-text-muted">{p.sub}</Text>
+              <Text className="font-headingSemi text-[22px] text-text-primary">
+                Clinical OS
+              </Text>
+              <Text className="mt-1 font-body text-[13px] text-text-tertiary">
+                {current.toUpperCase()} mode · Local-first reference
+              </Text>
             </View>
-            {active ? (
-              <View className="h-3 w-3 rounded-full" style={{ backgroundColor: p.color }} />
-            ) : null}
-          </TouchableOpacity>
-        );
-      })}
-
-      {/* Case log + Sync */}
-      {totalCases > 0 ? (
-        <View className="mt-6">
-          <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
-            Cases Logged (Anonymous)
-          </Text>
-          <View className="rounded-clinical border border-border bg-ink-800 p-4">
-            <View className="mb-3 flex-row items-center justify-between">
-              <View className="flex-row items-center gap-2">
-                <Activity size={16} color="#00C896" />
-                <Text className="font-bodySemi text-[15px] text-text-primary">{totalCases} Total Cases</Text>
-              </View>
-            </View>
-
-            {Object.entries(caseCounts).map(([disease, count]) => (
-              <View key={disease} className="flex-row items-center justify-between border-b border-border-soft py-2 last:border-b-0">
-                <Text className="font-body text-[14px] text-text-secondary">
-                  {DISEASE_LABELS[disease] ?? disease}
-                </Text>
-                <View className="rounded-lg bg-mint-soft px-3 py-0.5">
-                  <Text className="font-bodySemi text-[13px] text-mint">{count}</Text>
-                </View>
-              </View>
-            ))}
-
-            <Text className="mb-4 mt-3 font-body text-[12px] text-text-muted">
-              Stored locally. No patient-identifying data. Last sync: {formatLastSync(lastSyncMs)}
-            </Text>
-
-            {/* Sync button */}
-            <TouchableOpacity
-              onPress={handleSync}
-              disabled={syncing || !syncEnabled}
-              className={[
-                "flex-row items-center justify-center gap-2 rounded-2xl px-4 py-3",
-                syncEnabled ? "bg-mint" : "bg-ink-700 border border-border",
-              ].join(" ")}
-              activeOpacity={0.78}
-              accessibilityRole="button"
-              accessibilityLabel="Sync surveillance data"
-              accessibilityState={{ disabled: syncing || !syncEnabled }}
-            >
-              {syncing ? (
-                <ActivityIndicator size="small" color="#0C0C0E" />
-              ) : syncStatus === "ok" ? (
-                <CheckCircle2 size={15} color="#0C0C0E" strokeWidth={2} />
-              ) : syncStatus === "error" ? (
-                <XCircle size={15} color="#FF453A" strokeWidth={2} />
-              ) : (
-                <Upload size={15} color={syncEnabled ? "#0C0C0E" : "#505058"} strokeWidth={1.8} />
-              )}
-              <Text className={[
-                "font-bodySemi text-[13px]",
-                syncEnabled ? "text-text-inverse" : "text-text-muted",
-              ].join(" ")}>
-                {syncing ? "Syncing…" : syncStatus === "ok" ? "Synced!" : "Sync to National Registry"}
-              </Text>
-            </TouchableOpacity>
-
-            {syncMsg && syncStatus !== "idle" ? (
-              <Text className={`mt-2 text-center font-body text-[11px] ${syncStatus === "error" ? "text-clinical-red" : "text-text-muted"}`}>
-                {syncMsg}
-              </Text>
-            ) : null}
-
-            {!syncEnabled && !syncing ? (
-              <Text className="mt-2 text-center font-body text-[11px] text-text-muted">
-                Set EXPO_PUBLIC_SURVEILLANCE_ENDPOINT to enable
-              </Text>
-            ) : null}
           </View>
         </View>
-      ) : null}
 
-      {/* Content registry */}
-      <View className="mt-6">
-        <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
-          Free Content System
+        <Text className="mb-3 mt-6 font-headingSemi text-[18px] text-text-primary">
+          Your role
         </Text>
-        <View className="rounded-clinical border border-border bg-ink-800 p-4">
-          <View className="mb-3 flex-row items-center gap-2">
-            <Database size={16} color="#00D7B5" />
-            <Text className="font-bodySemi text-[15px] text-text-primary">Offline Content Registry</Text>
-          </View>
-          <InfoRow label="Content versions" value={contentSummary.versions} />
-          <InfoRow label="Configured sync feeds" value={contentSummary.syncFeeds} />
-          <InfoRow label="Offline media assets" value={contentSummary.mediaAssets} last />
-          <View className="mt-3 flex-row items-start gap-2 rounded-xl border border-border-accent bg-mint-soft px-3 py-2">
-            <RefreshCcw size={13} color="#C8F53C" style={{ marginTop: 1 }} />
-            <Text className="flex-1 font-body text-[12px] leading-5 text-text-secondary">
-              Pull updates from configured remote feeds without re-installing the app.
-            </Text>
-          </View>
+        {PERSONAS.map((p) => {
+          const Icon = p.icon;
+          const active = current === p.id;
+          return (
+            <TouchableOpacity
+              key={p.id}
+              onPress={() => handleSelect(p.id)}
+              className={[
+                "mb-3 flex-row items-center rounded-clinical border bg-surface p-4",
+                active ? "border-accent-primary" : "border-border",
+              ].join(" ")}
+              activeOpacity={0.78}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: active }}
+              accessibilityLabel={p.label}
+            >
+              <View
+                className={[
+                  "mr-4 h-12 w-12 items-center justify-center rounded-2xl",
+                  active ? "bg-accent-primarySoft" : "bg-surface-muted",
+                ].join(" ")}
+              >
+                <Icon
+                  size={24}
+                  color={active ? "#2470FF" : "#8A91A8"}
+                  strokeWidth={1.8}
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="font-headingSemi text-[15px] text-text-primary">
+                  {p.label}
+                </Text>
+                <Text className="mt-0.5 font-body text-[12px] text-text-tertiary">
+                  {p.sub}
+                </Text>
+              </View>
+              {active ? (
+                <View className="h-3 w-3 rounded-full bg-accent-primary" />
+              ) : null}
+            </TouchableOpacity>
+          );
+        })}
 
+        <StatsCard
+          title="Doctor Wallet"
+          icon={<WalletCards color="#2470FF" size={18} />}
+        >
+          <Text className="font-body text-[13px] leading-5 text-text-tertiary">
+            Track location-wise patient counts and earnings for each chamber,
+            clinic, or hospital.
+          </Text>
           <TouchableOpacity
-            onPress={handlePullContent}
-            disabled={pulling || contentSummary.syncFeeds === 0}
-            className={[
-              "mt-3 flex-row items-center justify-center gap-2 rounded-2xl px-4 py-3",
-              contentSummary.syncFeeds > 0 ? "bg-mint" : "bg-ink-700 border border-border",
-            ].join(" ")}
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push("/wallet" as never);
+            }}
+            className="mt-4 flex-row items-center justify-between rounded-2xl bg-accent-primary px-4 py-3"
             activeOpacity={0.78}
             accessibilityRole="button"
-            accessibilityLabel="Pull latest content from remote feeds"
-            accessibilityState={{ disabled: pulling || contentSummary.syncFeeds === 0 }}
+            accessibilityLabel="Open Doctor Wallet"
           >
-            {pulling ? (
-              <ActivityIndicator size="small" color="#0C0C0E" />
-            ) : pullStatus === "ok" ? (
-              <CheckCircle2 size={15} color="#0C0C0E" strokeWidth={2} />
-            ) : pullStatus === "error" ? (
-              <XCircle size={15} color="#FF453A" strokeWidth={2} />
-            ) : (
-              <RefreshCcw size={15} color={contentSummary.syncFeeds > 0 ? "#0C0C0E" : "#505058"} strokeWidth={1.8} />
-            )}
-            <Text className={[
-              "font-bodySemi text-[13px]",
-              contentSummary.syncFeeds > 0 ? "text-text-inverse" : "text-text-muted",
-            ].join(" ")}>
-              {pulling ? "Pulling…" : pullStatus === "ok" ? "Up to date" : "Pull latest content"}
+            <View className="flex-row items-center gap-2">
+              <WalletCards color="#FFFFFF" size={18} strokeWidth={1.8} />
+              <Text className="font-bodySemi text-[14px] text-text-inverse">
+                Open Wallet
+              </Text>
+            </View>
+            <Text className="font-body text-[12px] text-text-inverse">
+              Location cards
             </Text>
           </TouchableOpacity>
+        </StatsCard>
 
-          {pullMsg && pullStatus !== "idle" ? (
-            <Text className={`mt-2 text-center font-body text-[11px] ${pullStatus === "error" ? "text-clinical-red" : "text-text-muted"}`}>
+        <StatsCard
+          title="Content registry"
+          icon={<Database color="#2470FF" size={18} />}
+        >
+          <InfoRow label="Content versions" value={contentSummary.versions} />
+          <InfoRow label="Configured feeds" value={contentSummary.syncFeeds} />
+          <InfoRow label="Offline media" value={contentSummary.mediaAssets} />
+          <ActionButton
+            label={pulling ? "Pulling..." : "Pull latest content"}
+            disabled={pulling || contentSummary.syncFeeds === 0}
+            loading={pulling}
+            onPress={handlePullContent}
+          />
+          {pullMsg ? (
+            <Text className="mt-2 text-center font-body text-[12px] text-text-tertiary">
               {pullMsg}
             </Text>
           ) : null}
+        </StatsCard>
 
-          {contentSummary.syncFeeds === 0 && !pulling ? (
-            <Text className="mt-2 text-center font-body text-[11px] text-text-muted">
-              No feeds configured yet
+        <StatsCard
+          title="Settings"
+          icon={<BookMarked color="#FFA01D" size={18} />}
+        >
+          <TouchableOpacity
+            onPress={() => router.push("/legal/privacy")}
+            className="flex-row items-center justify-between rounded-2xl bg-surface-muted px-3 py-3"
+            activeOpacity={0.78}
+          >
+            <View className="flex-row items-center gap-2">
+              <ShieldCheck color="#2470FF" size={18} strokeWidth={1.8} />
+              <Text className="font-bodySemi text-[14px] text-text-primary">
+                Data & Privacy
+              </Text>
+            </View>
+            <Text className="font-body text-[12px] text-text-tertiary">
+              Open
             </Text>
-          ) : null}
-        </View>
-      </View>
-
-      {/* About */}
-      <View className="mt-6 rounded-clinical border border-border bg-ink-800 p-4">
-        <Text className="mb-2 font-bodySemi text-[15px] text-text-primary">Clinical OS</Text>
-        <Text className="mb-3 font-body text-[13px] leading-5 text-text-muted">
-          Offline-first clinical reference for Bangladeshi doctors. GP protocols, drug search, emergency dosing, and legally sourced free content.
-        </Text>
-        <View className="flex-row items-start gap-2 rounded-xl border border-border-red bg-clinical-redSoft px-3 py-2">
-          <AlertTriangle size={13} color="#FF453A" style={{ marginTop: 1 }} />
-          <Text className="flex-1 font-body text-[12px] leading-5 text-clinical-red">
-            For clinical reference only. All content must be reviewed by qualified medical professionals before clinical use.
+          </TouchableOpacity>
+          <Text className="mt-4 text-center font-body text-[12px] text-text-tertiary">
+            Version 1.1.1 · Free Clinical OS
           </Text>
-        </View>
-      </View>
-
-      {/* Legal links */}
-      <TouchableOpacity
-        onPress={() => router.push("/legal/privacy" as any)}
-        className="mt-5 flex-row items-center justify-center gap-2"
-        activeOpacity={0.7}
-        accessibilityRole="link"
-        accessibilityLabel="Privacy policy"
-      >
-        <ShieldCheck size={13} color="#505058" strokeWidth={1.6} />
-        <Text className="font-body text-[12px] text-text-muted">Privacy Policy</Text>
-      </TouchableOpacity>
-
-      <Text className="mt-3 text-center font-body text-[12px] text-text-muted">
-        Version 1.1.1 · Free Clinical OS
-      </Text>
-    </ScrollView>
+        </StatsCard>
+      </ScrollView>
+    </ClinicalShell>
   );
 }
 
-function InfoRow({ label, value, last = false }: { label: string; value: number; last?: boolean }) {
+function StatsCard({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <View className={`flex-row items-center justify-between py-2 ${last ? "" : "border-b border-border-soft"}`}>
-      <Text className="font-body text-[14px] text-text-secondary">{label}</Text>
-      <Text className="font-bodySemi text-[14px] text-mint">{value}</Text>
+    <View className="mt-6 rounded-[28px] border border-surface-glassBorder bg-surface p-4">
+      <View className="mb-3 flex-row items-center gap-2">
+        <View className="h-8 w-8 items-center justify-center rounded-xl bg-surface-muted">
+          {icon}
+        </View>
+        <Text className="font-headingSemi text-[17px] text-text-primary">
+          {title}
+        </Text>
+      </View>
+      {children}
     </View>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: number }) {
+  return (
+    <View className="flex-row items-center justify-between border-b border-border py-2">
+      <Text className="font-body text-[14px] text-text-secondary">{label}</Text>
+      <Text className="font-bodySemi text-[14px] text-accent-primary">
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+function ActionButton({
+  label,
+  disabled,
+  loading,
+  onPress,
+}: {
+  label: string;
+  disabled: boolean;
+  loading: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      className={[
+        "mt-4 min-h-[48px] flex-row items-center justify-center gap-2 rounded-2xl",
+        disabled ? "bg-surface-muted" : "bg-accent-primary",
+      ].join(" ")}
+      activeOpacity={0.78}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+    >
+      {loading ? (
+        <ActivityIndicator color="#FFFFFF" size="small" />
+      ) : (
+        <RefreshCcw
+          color={disabled ? "#8A91A8" : "#FFFFFF"}
+          size={16}
+        />
+      )}
+      <Text
+        className={
+          disabled
+            ? "font-bodySemi text-[13px] text-text-tertiary"
+            : "font-bodySemi text-[13px] text-text-inverse"
+        }
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
   );
 }

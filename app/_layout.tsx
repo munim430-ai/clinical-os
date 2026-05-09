@@ -1,15 +1,9 @@
-import "./global.css";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { ThemeProvider } from "@react-navigation/native";
-import { SplashScreen, Stack, router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import * as React from "react";
-import { useEffect } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PortalHost } from "@/components/primitives/portal";
 import { DatabaseProvider } from "@/db/provider";
+import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { setAndroidNavigationBar } from "@/lib/android-navigation-bar";
-import { DARK_THEME } from "@/lib/constants";
+import { LIGHT_THEME } from "@/lib/constants";
+import { isOnboarded } from "@/lib/persona";
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -17,8 +11,14 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { useFrameworkReady } from "@/hooks/useFrameworkReady";
-import { isOnboarded } from "@/lib/persona";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { ThemeProvider } from "@react-navigation/native";
+import { SplashScreen, Stack, router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import * as React from "react";
+import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "./global.css";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -38,7 +38,7 @@ export default function RootLayout() {
   useFrameworkReady();
 
   useEffect(() => {
-    setAndroidNavigationBar("dark");
+    setAndroidNavigationBar("light");
   }, []);
 
   useEffect(() => {
@@ -51,18 +51,57 @@ export default function RootLayout() {
 
   return (
     <DatabaseProvider>
-      <ThemeProvider value={DARK_THEME}>
-        <StatusBar style="light" backgroundColor="#000000" />
+      <ThemeProvider value={LIGHT_THEME}>
+        <StatusBar style="dark" backgroundColor="#EEF1F8" />
         <GestureHandlerRootView style={{ flex: 1 }}>
           <BottomSheetModalProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="onboarding" options={{ headerShown: false, animation: "fade" }} />
-              <Stack.Screen name="dims/brand/[id]" options={{ headerShown: false }} />
-              <Stack.Screen name="dims/generic/[id]" options={{ headerShown: false }} />
-              <Stack.Screen name="gp/[system]" options={{ headerShown: false }} />
-              <Stack.Screen name="gp/condition/[id]" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="onboarding"
+                options={{ headerShown: false, animation: "fade" }}
+              />
+              <Stack.Screen
+                name="dims/brand/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="dims/generic/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="gp/[system]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="gp/condition/[id]"
+                options={{ headerShown: false }}
+              />
               <Stack.Screen name="gp/quiz" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="er"
+                options={{
+                  headerShown: false,
+                  presentation: "fullScreenModal",
+                  animation: "slide_from_bottom",
+                }}
+              />
+              <Stack.Screen
+                name="wallet/index"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="wallet/location/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="drawer"
+                options={{
+                  headerShown: false,
+                  presentation: "transparentModal",
+                  animation: "fade",
+                }}
+              />
             </Stack>
           </BottomSheetModalProvider>
         </GestureHandlerRootView>

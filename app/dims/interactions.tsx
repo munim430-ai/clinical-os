@@ -1,13 +1,35 @@
-import { View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator, Pressable } from "react-native";
-import { router } from "expo-router";
-import { useEffect, useState, useCallback } from "react";
-import { eq, like, sql } from "drizzle-orm";
-import { ArrowLeft, Search, Plus, X, AlertTriangle, ShieldCheck } from "lucide-react";
-import { useDatabase } from "@/db/provider";
-import { medicines, generics, drugClasses } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
-import { triggerSelectionHaptic, triggerEmergencyHaptic } from "@/lib/clinical-haptics";
-import { checkInteractions, severityColor, type InteractionHit } from "@/lib/drug-interactions";
+import { useDatabase } from "@/db/provider";
+import { drugClasses, generics, medicines } from "@/db/schema";
+import {
+  triggerEmergencyHaptic,
+  triggerSelectionHaptic,
+} from "@/lib/clinical-haptics";
+import {
+  type InteractionHit,
+  checkInteractions,
+  severityColor,
+} from "@/lib/drug-interactions";
+import { eq, like, sql } from "drizzle-orm";
+import { router } from "expo-router";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Plus,
+  Search,
+  ShieldCheck,
+  X,
+} from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface SearchResult {
   id: number;
@@ -46,7 +68,7 @@ export default function InteractionsScreen() {
       setResults(rows as SearchResult[]);
       setSearching(false);
     },
-    [db]
+    [db],
   );
 
   useEffect(() => {
@@ -68,7 +90,7 @@ export default function InteractionsScreen() {
   }
 
   const hits: InteractionHit[] = checkInteractions(
-    selected.map((s) => ({ brandName: s.brandName, drugClass: s.drugClass }))
+    selected.map((s) => ({ brandName: s.brandName, drugClass: s.drugClass })),
   );
 
   useEffect(() => {
@@ -79,27 +101,38 @@ export default function InteractionsScreen() {
 
   return (
     <ClinicalShell padded={false}>
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 80 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 80 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <View className="px-4 pt-2">
           {/* Header */}
           <View className="mb-4 flex-row items-center">
             <TouchableOpacity
-              onPress={() => { triggerSelectionHaptic(); router.back(); }}
-              className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
+              onPress={() => {
+                triggerSelectionHaptic();
+                router.back();
+              }}
+              className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-surface"
               accessibilityRole="button"
               accessibilityLabel="Back"
             >
-              <ArrowLeft size={21} color="#F5F5F7" strokeWidth={1.7} />
+              <ArrowLeft size={21} color="#2470FF" strokeWidth={1.7} />
             </TouchableOpacity>
             <View className="flex-1">
-              <Text className="font-heading text-[24px] leading-7 text-text-primary">Interaction Checker</Text>
-              <Text className="font-body text-[12px] text-text-muted">Class-based screening · reference only</Text>
+              <Text className="font-heading text-[24px] leading-7 text-text-primary">
+                Interaction Checker
+              </Text>
+              <Text className="font-body text-[12px] text-text-tertiary">
+                Class-based screening · reference only
+              </Text>
             </View>
           </View>
 
           {/* Search */}
-          <View className="mb-3 flex-row items-center gap-2 rounded-clinical border border-border bg-ink-800 px-3 py-2">
-            <Search size={16} color="#7A7A80" />
+          <View className="mb-3 flex-row items-center gap-2 rounded-clinical border border-border bg-surface px-3 py-2">
+            <Search size={16} color="#8A91A8" />
             <TextInput
               value={query}
               onChangeText={setQuery}
@@ -110,12 +143,14 @@ export default function InteractionsScreen() {
               autoCapitalize="none"
               accessibilityLabel="Search medicines to add to interaction check"
             />
-            {searching ? <ActivityIndicator color="#C8F53C" size="small" /> : null}
+            {searching ? (
+              <ActivityIndicator color="#2470FF" size="small" />
+            ) : null}
           </View>
 
           {/* Search results */}
           {results.length > 0 ? (
-            <View className="mb-4 overflow-hidden rounded-clinical border border-border bg-ink-800">
+            <View className="mb-4 overflow-hidden rounded-clinical border border-border bg-surface">
               {results.map((r) => {
                 const alreadyAdded = selected.some((s) => s.id === r.id);
                 return (
@@ -126,15 +161,21 @@ export default function InteractionsScreen() {
                     className="flex-row items-center justify-between border-b border-border-soft px-4 py-3 last:border-b-0"
                   >
                     <View className="flex-1 pr-3">
-                      <Text className="font-bodySemi text-[14px] text-text-primary">{r.brandName}</Text>
-                      <Text className="mt-0.5 font-body text-[11px] text-text-muted">
-                        {[r.genericName, r.drugClass].filter(Boolean).join(" · ") || "Class unknown"}
+                      <Text className="font-bodySemi text-[14px] text-text-primary">
+                        {r.brandName}
+                      </Text>
+                      <Text className="mt-0.5 font-body text-[11px] text-text-tertiary">
+                        {[r.genericName, r.drugClass]
+                          .filter(Boolean)
+                          .join(" · ") || "Class unknown"}
                       </Text>
                     </View>
                     {alreadyAdded ? (
-                      <Text className="font-body text-[11px] text-mint">Added</Text>
+                      <Text className="font-body text-[11px] text-mint">
+                        Added
+                      </Text>
                     ) : (
-                      <Plus size={16} color="#C8F53C" strokeWidth={1.8} />
+                      <Plus size={16} color="#2470FF" strokeWidth={1.8} />
                     )}
                   </Pressable>
                 );
@@ -145,7 +186,7 @@ export default function InteractionsScreen() {
           {/* Selected chips */}
           {selected.length > 0 ? (
             <View className="mb-4">
-              <Text className="mb-2 font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-muted">
+              <Text className="mb-2 font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-tertiary">
                 Selected ({selected.length})
               </Text>
               <View className="flex-row flex-wrap gap-2">
@@ -154,19 +195,26 @@ export default function InteractionsScreen() {
                     key={s.id}
                     className="flex-row items-center gap-1.5 rounded-pill border border-border-accent bg-mint-soft px-3 py-1.5"
                   >
-                    <Text className="font-bodySemi text-[12px] text-mint">{s.brandName}</Text>
-                    <TouchableOpacity onPress={() => remove(s.id)} hitSlop={8} accessibilityLabel={`Remove ${s.brandName}`}>
-                      <X size={12} color="#C8F53C" strokeWidth={2} />
+                    <Text className="font-bodySemi text-[12px] text-mint">
+                      {s.brandName}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => remove(s.id)}
+                      hitSlop={8}
+                      accessibilityLabel={`Remove ${s.brandName}`}
+                    >
+                      <X size={12} color="#2470FF" strokeWidth={2} />
                     </TouchableOpacity>
                   </View>
                 ))}
               </View>
             </View>
           ) : (
-            <View className="mb-4 rounded-clinical border border-border-soft bg-ink-800 p-5 items-center">
+            <View className="mb-4 rounded-clinical border border-border-soft bg-surface p-5 items-center">
               <ShieldCheck size={32} color="#505058" strokeWidth={1.5} />
-              <Text className="mt-3 text-center font-body text-[13px] text-text-muted">
-                Add 2 or more medicines to screen for known class-based interactions.
+              <Text className="mt-3 text-center font-body text-[13px] text-text-tertiary">
+                Add 2 or more medicines to screen for known class-based
+                interactions.
               </Text>
             </View>
           )}
@@ -175,17 +223,25 @@ export default function InteractionsScreen() {
           {selected.length >= 2 ? (
             hits.length === 0 ? (
               <View className="rounded-clinical border border-border-accent bg-mint-soft p-4 flex-row items-start gap-2">
-                <ShieldCheck size={16} color="#C8F53C" strokeWidth={1.7} style={{ marginTop: 1 }} />
+                <ShieldCheck
+                  size={16}
+                  color="#2470FF"
+                  strokeWidth={1.7}
+                  style={{ marginTop: 1 }}
+                />
                 <View className="flex-1">
-                  <Text className="font-headingBold text-[14px] text-mint">No flagged interactions</Text>
+                  <Text className="font-headingBold text-[14px] text-mint">
+                    No flagged interactions
+                  </Text>
                   <Text className="mt-1 font-body text-[12px] leading-5 text-text-secondary">
-                    No major class-based interactions in our rule set. Always cross-check with BNF / Stockley's before prescribing.
+                    No major class-based interactions in our rule set. Always
+                    cross-check with BNF / Stockley's before prescribing.
                   </Text>
                 </View>
               </View>
             ) : (
               <View>
-                <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-muted">
+                <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.3px] text-text-tertiary">
                   {hits.length} interaction{hits.length !== 1 ? "s" : ""} found
                 </Text>
                 {hits.map((hit, idx) => {
@@ -196,15 +252,28 @@ export default function InteractionsScreen() {
                       className={`mb-3 rounded-clinical border ${c.border} ${c.bg} p-4`}
                     >
                       <View className="mb-2 flex-row items-center gap-2">
-                        <AlertTriangle size={14} className={c.text} color={hit.severity === "major" ? "#FF453A" : hit.severity === "moderate" ? "#FFD60A" : "#C8F53C"} strokeWidth={1.8} />
-                        <Text className={`font-bodySemi text-[10px] uppercase tracking-[1.3px] ${c.text}`}>
+                        <AlertTriangle
+                          size={14}
+                          className={c.text}
+                          color={
+                            hit.severity === "major"
+                              ? "#FF3B30"
+                              : hit.severity === "moderate"
+                                ? "#FFA01D"
+                                : "#2470FF"
+                          }
+                          strokeWidth={1.8}
+                        />
+                        <Text
+                          className={`font-bodySemi text-[10px] uppercase tracking-[1.3px] ${c.text}`}
+                        >
                           {hit.severity}
                         </Text>
                       </View>
                       <Text className="font-headingBold text-[14px] text-text-primary">
                         {hit.drugA} ↔ {hit.drugB}
                       </Text>
-                      <Text className="mt-0.5 font-body text-[11px] text-text-muted">
+                      <Text className="mt-0.5 font-body text-[11px] text-text-tertiary">
                         {hit.drugAClass} ↔ {hit.drugBClass}
                       </Text>
                       <Text className="mt-2 font-body text-[13px] leading-5 text-text-secondary">
@@ -219,18 +288,26 @@ export default function InteractionsScreen() {
 
           {/* Drugs without class warning */}
           {noClassDrugs.length > 0 ? (
-            <View className="mt-4 rounded-clinical border border-border-soft bg-ink-800 p-3">
-              <Text className="font-body text-[11px] leading-5 text-text-muted">
-                Class data unknown for: {noClassDrugs.map((d) => d.brandName).join(", ")}. These were skipped.
+            <View className="mt-4 rounded-clinical border border-border-soft bg-surface p-3">
+              <Text className="font-body text-[11px] leading-5 text-text-tertiary">
+                Class data unknown for:{" "}
+                {noClassDrugs.map((d) => d.brandName).join(", ")}. These were
+                skipped.
               </Text>
             </View>
           ) : null}
 
           {/* Disclaimer */}
           <View className="mt-5 rounded-clinical border border-border-red bg-clinical-redSoft p-3 flex-row items-start gap-2">
-            <AlertTriangle size={13} color="#FF453A" strokeWidth={1.7} style={{ marginTop: 1 }} />
+            <AlertTriangle
+              size={13}
+              color="#FF3B30"
+              strokeWidth={1.7}
+              style={{ marginTop: 1 }}
+            />
             <Text className="flex-1 font-body text-[11px] leading-5 text-clinical-red">
-              Class-based screening only. Not a substitute for full prescribing references. Always verify before clinical use.
+              Class-based screening only. Not a substitute for full prescribing
+              references. Always verify before clinical use.
             </Text>
           </View>
         </View>

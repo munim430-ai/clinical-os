@@ -4,41 +4,32 @@ const NAV_FONT_FAMILY = "Inter_400Regular";
 
 export const NAV_THEME = {
   light: {
-    background: "#0C0C0E",
-    border: "#1F1F23",
-    card: "#1E1E21",
-    notification: "#FF453A",
-    primary: "#C8F53C",
-    text: "#F2F2F2",
+    background: "#EEF1F8",
+    border: "#E5E9F2",
+    card: "#FFFFFF",
+    notification: "#FF3B30",
+    primary: "#2470FF",
+    text: "#182456",
   },
   dark: {
-    background: "#0C0C0E",
-    border: "#1F1F23",
-    card: "#1E1E21",
-    notification: "#FF453A",
-    primary: "#C8F53C",
-    text: "#F2F2F2",
+    background: "#EEF1F8",
+    border: "#E5E9F2",
+    card: "#FFFFFF",
+    notification: "#FF3B30",
+    primary: "#2470FF",
+    text: "#182456",
   },
 };
 
 export const LIGHT_THEME: Theme = {
-  dark: true,
+  dark: false,
   fonts: {
     regular: { fontFamily: NAV_FONT_FAMILY, fontWeight: "400" },
     medium: { fontFamily: NAV_FONT_FAMILY, fontWeight: "500" },
     bold: { fontFamily: NAV_FONT_FAMILY, fontWeight: "700" },
     heavy: { fontFamily: NAV_FONT_FAMILY, fontWeight: "800" },
   },
-  colors: NAV_THEME.dark,
+  colors: NAV_THEME.light,
 };
 
-export const DARK_THEME: Theme = {
-  dark: true,
-  fonts: {
-    regular: { fontFamily: NAV_FONT_FAMILY, fontWeight: "400" },
-    medium: { fontFamily: NAV_FONT_FAMILY, fontWeight: "500" },
-    bold: { fontFamily: NAV_FONT_FAMILY, fontWeight: "700" },
-    heavy: { fontFamily: NAV_FONT_FAMILY, fontWeight: "800" },
-  },
-  colors: NAV_THEME.dark,
-};
+export const DARK_THEME: Theme = LIGHT_THEME;

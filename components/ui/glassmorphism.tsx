@@ -15,7 +15,7 @@ export function Glassmorphism({
   children,
   className,
   intensity = 100,
-  tint = 'dark',
+  tint = 'light',
   style,
 }: GlassmorphismProps) {
   return (
@@ -52,7 +52,7 @@ export function FrostedGlass({
   return (
     <BlurView
       intensity={intensity}
-      tint="dark"
+      tint="light"
       style={[
         styles.frosted,
         style,
@@ -83,7 +83,7 @@ export function GlassCard({
   return (
     <BlurView
       intensity={elevated ? 120 : 100}
-      tint="dark"
+      tint="light"
       style={[
         styles.card,
         elevated && styles.cardElevated,
@@ -102,30 +102,30 @@ export function GlassCard({
 
 const styles = StyleSheet.create({
   glass: {
-    backgroundColor: 'rgba(18, 18, 18, 0.7)',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.78)',
   },
   frosted: {
-    backgroundColor: 'rgba(18, 18, 18, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.82)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.78)',
   },
   card: {
-    backgroundColor: 'rgba(18, 18, 18, 0.95)',
+    backgroundColor: 'rgba(255, 255, 255, 0.88)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.78)',
     borderRadius: 24,
   },
   cardElevated: {
-    backgroundColor: 'rgba(26, 26, 26, 0.95)',
-    shadowColor: '#000',
+    backgroundColor: 'rgba(255, 255, 255, 0.94)',
+    shadowColor: '#182456',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 4,
   },
 });

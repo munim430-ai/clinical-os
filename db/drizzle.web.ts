@@ -4,14 +4,33 @@ import * as schema from "./schema";
 
 let _db: SQLJsDatabase<typeof schema> | null = null;
 
+function resolveWebAsset(file: string) {
+  const isLocal =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "::1";
+  const base = isLocal ? `${window.location.origin}/` : document.baseURI;
+  return new URL(file, base).href;
+}
+
 export const initialize = async (): Promise<SQLJsDatabase<typeof schema>> => {
   if (_db) return _db;
   // Resolve relative to the page base so it works on localhost and on
   // GitHub Pages where the app is served from /clinical-os/.
-  const dbUrl = new URL("database.sqlite", document.baseURI).href;
+  const dbUrl = resolveWebAsset("database.sqlite");
   const [SQL, buf] = await Promise.all([
-    initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` }),
-    fetch(dbUrl).then((res) => res.arrayBuffer()),
+    initSqlJs({ locateFile: (file) => resolveWebAsset(file) }),
+    fetch(dbUrl, { cache: "no-store" }).then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`Unable to load database.sqlite (${res.status})`);
+      }
+      const buffer = await res.arrayBuffer();
+      const header = new TextDecoder("ascii").decode(buffer.slice(0, 16));
+      if (!header.startsWith("SQLite format 3")) {
+        throw new Error("Loaded database.sqlite is not a SQLite database");
+      }
+      return buffer;
+    }),
   ]);
   const sqldb = new SQL.Database(new Uint8Array(buf));
   _db = drizzle(sqldb, { schema });

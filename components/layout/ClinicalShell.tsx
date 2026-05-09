@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
-import { View } from "react-native";
-import { Canvas, Circle, Group, BlurMask } from "@shopify/react-native-skia";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import type { ReactNode } from "react";
+import { Platform, View, type ViewStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type ClinicalShellProps = {
   children: ReactNode;
@@ -10,39 +9,30 @@ type ClinicalShellProps = {
 };
 
 export function ClinicalShell({ children, padded = true }: ClinicalShellProps) {
+  const webFrame =
+    Platform.OS === "web"
+      ? ({
+          width: "100%" as const,
+          maxWidth: 430,
+          alignSelf: "center" as const,
+          minHeight: "100%" as const,
+          shadowColor: "#182456",
+          shadowOffset: { width: 0, height: 18 },
+          shadowOpacity: 0.08,
+          shadowRadius: 42,
+        } satisfies ViewStyle)
+      : undefined;
+
   return (
-    <View className="flex-1 bg-ink-950">
-      <StatusBar style="light" backgroundColor="#0C0C0E" />
-
-      <Canvas
-        pointerEvents="none"
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-        }}
-      >
-        <Group opacity={0.5}>
-          {/* Purple ambient — top right */}
-          <Circle cx={340} cy={80} r={200} color="#7B2FBE">
-            <BlurMask blur={100} style="normal" />
-          </Circle>
-          {/* Lime ambient — bottom left */}
-          <Circle cx={60} cy={820} r={220} color="#C8F53C">
-            <BlurMask blur={130} style="normal" />
-          </Circle>
-          {/* Magenta mid — center */}
-          <Circle cx={200} cy={420} r={160} color="#E91E8C">
-            <BlurMask blur={120} style="normal" />
-          </Circle>
-        </Group>
-      </Canvas>
-
-      <SafeAreaView className="flex-1">
-        <View className={padded ? "flex-1 px-4 pt-2" : "flex-1"}>{children}</View>
-      </SafeAreaView>
+    <View className="flex-1 overflow-hidden bg-background">
+      <StatusBar style="dark" backgroundColor="#EEF1F8" />
+      <View style={webFrame} className="flex-1 bg-background">
+        <SafeAreaView className="flex-1">
+          <View className={padded ? "flex-1 px-5 pt-2" : "flex-1"}>
+            {children}
+          </View>
+        </SafeAreaView>
+      </View>
     </View>
   );
 }

@@ -1,14 +1,20 @@
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
-import { useEffect, useState } from "react";
-import { eq } from "drizzle-orm";
-import { ArrowLeft, AlertCircle } from "lucide-react";
-import { useDatabase } from "@/db/provider";
-import { conditions } from "@/db/schema";
-import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { ProtocolChecklistCard } from "@/components/cards/ProtocolChecklistCard";
 import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { useDatabase } from "@/db/provider";
+import { conditions } from "@/db/schema";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { eq } from "drizzle-orm";
+import { router, useLocalSearchParams } from "expo-router";
+import { AlertCircle, ArrowLeft } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const SYSTEM_LABELS: Record<string, string> = {
   cardiology: "Cardiology",
@@ -23,7 +29,16 @@ const SYSTEM_LABELS: Record<string, string> = {
   paediatrics: "Paediatrics",
 };
 
-const CRITICAL_CONDITION_TERMS = ["shock", "sepsis", "dengue", "malaria", "cholera", "asthma", "mi", "stroke"];
+const CRITICAL_CONDITION_TERMS = [
+  "shock",
+  "sepsis",
+  "dengue",
+  "malaria",
+  "cholera",
+  "asthma",
+  "mi",
+  "stroke",
+];
 
 function isCriticalCondition(name: string) {
   const normalized = name.toLowerCase();
@@ -39,7 +54,9 @@ export default function SystemScreen() {
   useEffect(() => {
     if (!db || !system) return;
     setLoading(true);
-    db.select().from(conditions).where(eq(conditions.systemId, system))
+    db.select()
+      .from(conditions)
+      .where(eq(conditions.systemId, system))
       .then((rows) => {
         setItems(rows);
         setLoading(false);
@@ -54,21 +71,26 @@ export default function SystemScreen() {
             triggerSelectionHaptic();
             router.back();
           }}
-          className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
+          className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-surface"
         >
-          <ArrowLeft size={21} color="#C8F53C" strokeWidth={1.7} />
+          <ArrowLeft size={21} color="#2470FF" strokeWidth={1.7} />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text className="font-heading text-[28px] leading-9 text-text-primary" numberOfLines={1}>
+          <Text
+            className="font-heading text-[28px] leading-9 text-text-primary"
+            numberOfLines={1}
+          >
             {SYSTEM_LABELS[system] ?? system}
           </Text>
-          <Text className="mt-1 font-body text-[12px] text-text-muted">GP Master protocol library</Text>
+          <Text className="mt-1 font-body text-[12px] text-text-tertiary">
+            GP Master protocol library
+          </Text>
         </View>
       </View>
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#C8F53C" />
+          <ActivityIndicator color="#2470FF" />
         </View>
       ) : items.length === 0 ? (
         <View className="flex-1 items-center justify-center px-2 pb-20">
@@ -87,7 +109,11 @@ export default function SystemScreen() {
           renderItem={({ item }) => (
             <ProtocolChecklistCard
               title={item.name}
-              category={item.icd10Code ? `ICD-10 ${item.icd10Code}` : "Clinical condition"}
+              category={
+                item.icd10Code
+                  ? `ICD-10 ${item.icd10Code}`
+                  : "Clinical condition"
+              }
               estimatedTime="3–6 min read"
               completedSteps={0}
               totalSteps={4}
