@@ -1,5 +1,6 @@
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { router } from "expo-router";
 import {
   FlaskConical,
   Home,
@@ -14,12 +15,21 @@ const PRIMARY = "#2470FF";
 const INACTIVE = "#B8C5E6";
 const INK = "#182456";
 
-const TAB_META: Record<string, { label: string; Icon: typeof Home }> = {
-  home:    { label: "Home",    Icon: Home },
-  dims:    { label: "DIMS",    Icon: Pill },
-  gp:      { label: "GP",      Icon: Stethoscope },
-  lab:     { label: "Lab",     Icon: FlaskConical },
-  profile: { label: "Profile", Icon: User },
+type TabMeta = { label: string; Icon: typeof Home; href: string };
+
+// route.name in Expo Router 6 for app/(tabs)/home/index.tsx is "home".
+// href is the Expo Router path used for navigation.
+const TAB_META: Record<string, TabMeta> = {
+  home:         { label: "Home",    Icon: Home,        href: "/(tabs)/home" },
+  "home/index": { label: "Home",    Icon: Home,        href: "/(tabs)/home" },
+  dims:         { label: "DIMS",    Icon: Pill,        href: "/(tabs)/dims" },
+  "dims/index": { label: "DIMS",    Icon: Pill,        href: "/(tabs)/dims" },
+  gp:           { label: "GP",      Icon: Stethoscope, href: "/(tabs)/gp" },
+  "gp/index":   { label: "GP",      Icon: Stethoscope, href: "/(tabs)/gp" },
+  lab:          { label: "Lab",     Icon: FlaskConical, href: "/(tabs)/lab" },
+  "lab/index":  { label: "Lab",     Icon: FlaskConical, href: "/(tabs)/lab" },
+  profile:      { label: "Profile", Icon: User,        href: "/(tabs)/profile" },
+  "profile/index": { label: "Profile", Icon: User,     href: "/(tabs)/profile" },
 };
 
 export function CureCurveTabBar({
@@ -58,7 +68,7 @@ export function CureCurveTabBar({
             if (!meta) return null;
 
             const focused = state.index === index;
-            const isFab = route.name === "gp";
+            const isFab = route.name === "gp" || route.name === "gp/index";
             const Icon = meta.Icon;
 
             const onPress = () => {
@@ -69,7 +79,7 @@ export function CureCurveTabBar({
               });
               if (!focused && !event.defaultPrevented) {
                 triggerSelectionHaptic();
-                navigation.navigate(route.name, route.params);
+                router.navigate(meta.href as any);
               }
             };
 
