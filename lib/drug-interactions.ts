@@ -150,9 +150,7 @@ function normaliseClass(name: string | null | undefined): string {
 }
 
 function classMatches(className: string, ruleTerm: string): boolean {
-  const a = normaliseClass(className);
-  const b = ruleTerm.toLowerCase();
-  return a.includes(b) || b.includes(a);
+  return normaliseClass(className).includes(ruleTerm.toLowerCase());
 }
 
 export interface DrugInput {

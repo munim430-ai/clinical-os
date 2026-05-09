@@ -65,8 +65,11 @@ export async function getContentSummary(dbInstance: ContentDb = db) {
   }
 }
 
-export async function registerContentManifest(manifest: RemoteManifest) {
-  await db
+export async function registerContentManifest(
+  manifest: RemoteManifest,
+  dbInstance: ContentDb = db,
+) {
+  await dbInstance
     .insert(contentVersions)
     .values({
       id: manifest.id,
@@ -91,7 +94,7 @@ export async function registerContentManifest(manifest: RemoteManifest) {
     });
 
   for (const asset of manifest.assets ?? []) {
-    await db
+    await dbInstance
       .insert(mediaAssets)
       .values({
         id: asset.id,
@@ -118,7 +121,7 @@ export async function registerContentManifest(manifest: RemoteManifest) {
   }
 
   for (const alert of manifest.alerts ?? []) {
-    await db
+    await dbInstance
       .insert(appAlerts)
       .values({
         id: alert.id,
@@ -217,7 +220,7 @@ export async function pullSyncFeeds(
           continue;
         }
 
-        await registerContentManifest(manifest);
+        await registerContentManifest(manifest, dbInstance);
 
         await dbInstance
           .update(syncManifest)

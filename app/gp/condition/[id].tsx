@@ -95,11 +95,14 @@ export default function ConditionScreen() {
         db.select()
           .from(protocolSteps)
           .where(eq(protocolSteps.protocolId, prot[0].id))
-          .then(setStepList);
+          .then(setStepList)
+          .catch(() => setStepList([]));
       } else {
         setStepList([]);
       }
 
+      setLoading(false);
+    }).catch(() => {
       setLoading(false);
     });
   }, [db, id]);

@@ -39,3 +39,18 @@ export const initialize = async (): Promise<SQLJsDatabase<typeof schema>> => {
 
 // Stub — web provider uses initialize() directly, not this hook
 export const useMigrationHelper = () => ({ success: true, error: undefined });
+
+// Synchronous db accessor — only valid after initialize() resolves.
+// content-sync functions that default to `db` will get this; callers
+// should always pass the db instance from useDatabase() context instead.
+export const db: SQLJsDatabase<typeof schema> = new Proxy(
+  {} as SQLJsDatabase<typeof schema>,
+  {
+    get(_t, prop) {
+      if (_db) return (_db as any)[prop];
+      throw new Error(
+        `Web DB accessed before initialize() — pass db from useDatabase() context (prop: ${String(prop)})`,
+      );
+    },
+  },
+);

@@ -90,9 +90,11 @@ export default function BrandDetailScreen() {
             )
             .orderBy(sql`unit_price_bdt ASC NULLS LAST, brand_name ASC`)
             .limit(6)
-            .then((alts) => setAlternatives(alts as AltRow[]));
+            .then((alts) => setAlternatives(alts as AltRow[]))
+            .catch(() => {});
         }
-      });
+      })
+      .catch(() => setData(null));
   }, [db, id]);
 
   if (!data) {
