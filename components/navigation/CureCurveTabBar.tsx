@@ -1,6 +1,6 @@
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import {
   FlaskConical,
   Home,
@@ -15,29 +15,18 @@ const PRIMARY = "#2470FF";
 const INACTIVE = "#B8C5E6";
 const INK = "#182456";
 
-type TabMeta = { label: string; Icon: typeof Home; href: string };
+// Fixed order — independent of Expo Router's filesystem discovery order.
+const TABS = [
+  { key: "home",    label: "Home",    Icon: Home,         href: "/home",    isFab: false },
+  { key: "dims",    label: "DIMS",    Icon: Pill,         href: "/dims",    isFab: false },
+  { key: "gp",      label: "GP",      Icon: Stethoscope,  href: "/gp",      isFab: true  },
+  { key: "lab",     label: "Lab",     Icon: FlaskConical, href: "/lab",     isFab: false },
+  { key: "profile", label: "Profile", Icon: User,         href: "/profile", isFab: false },
+] as const;
 
-// route.name in Expo Router 6 for app/(tabs)/home/index.tsx is "home".
-// href is the Expo Router path used for navigation.
-const TAB_META: Record<string, TabMeta> = {
-  home:         { label: "Home",    Icon: Home,        href: "/(tabs)/home" },
-  "home/index": { label: "Home",    Icon: Home,        href: "/(tabs)/home" },
-  dims:         { label: "DIMS",    Icon: Pill,        href: "/(tabs)/dims" },
-  "dims/index": { label: "DIMS",    Icon: Pill,        href: "/(tabs)/dims" },
-  gp:           { label: "GP",      Icon: Stethoscope, href: "/(tabs)/gp" },
-  "gp/index":   { label: "GP",      Icon: Stethoscope, href: "/(tabs)/gp" },
-  lab:          { label: "Lab",     Icon: FlaskConical, href: "/(tabs)/lab" },
-  "lab/index":  { label: "Lab",     Icon: FlaskConical, href: "/(tabs)/lab" },
-  profile:      { label: "Profile", Icon: User,        href: "/(tabs)/profile" },
-  "profile/index": { label: "Profile", Icon: User,     href: "/(tabs)/profile" },
-};
-
-export function CureCurveTabBar({
-  state,
-  descriptors,
-  navigation,
-}: BottomTabBarProps) {
+export function CureCurveTabBar(_props: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const pathname = usePathname();
 
   return (
     <View
@@ -62,34 +51,19 @@ export function CureCurveTabBar({
         }}
       >
         <View className="h-[64px] flex-row items-center justify-between">
-          {state.routes.map((route, index) => {
-            const meta = TAB_META[route.name];
-            const options = descriptors[route.key]?.options ?? {};
-            if (!meta) return null;
-
-            const focused = state.index === index;
-            const isFab = route.name === "gp" || route.name === "gp/index";
-            const Icon = meta.Icon;
+          {TABS.map(({ key, label, Icon, href, isFab }) => {
+            const focused = pathname.startsWith(href) || pathname.includes(`/(tabs)${href}`);
 
             const onPress = () => {
-              const event = navigation.emit({
-                type: "tabPress",
-                target: route.key,
-                canPreventDefault: true,
-              });
-              if (!focused && !event.defaultPrevented) {
-                triggerSelectionHaptic();
-                router.navigate(meta.href as any);
-              }
+              triggerSelectionHaptic();
+              router.navigate(href as any);
             };
 
             if (isFab) {
               return (
                 <Pressable
-                  key={route.key}
-                  accessibilityLabel={
-                    options.tabBarAccessibilityLabel ?? "Open GP Master"
-                  }
+                  key={key}
+                  accessibilityLabel="Open GP Master"
                   accessibilityRole="button"
                   accessibilityState={focused ? { selected: true } : {}}
                   onPress={onPress}
@@ -109,10 +83,8 @@ export function CureCurveTabBar({
 
             return (
               <Pressable
-                key={route.key}
-                accessibilityLabel={
-                  options.tabBarAccessibilityLabel ?? meta.label
-                }
+                key={key}
+                accessibilityLabel={label}
                 accessibilityRole="button"
                 accessibilityState={focused ? { selected: true } : {}}
                 onPress={onPress}
@@ -127,7 +99,7 @@ export function CureCurveTabBar({
                   className="font-bodySemi text-[11px]"
                   style={{ color: focused ? INK : INACTIVE }}
                 >
-                  {meta.label}
+                  {label}
                 </Text>
               </Pressable>
             );
