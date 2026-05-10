@@ -52,7 +52,7 @@ export function CureCurveTabBar(_props: BottomTabBarProps) {
       >
         <View className="h-[64px] flex-row items-center justify-between">
           {TABS.map(({ key, label, Icon, href, isFab }) => {
-            const focused = pathname.startsWith(href) || pathname.includes(`/(tabs)${href}`);
+            const focused = pathname === href || pathname.startsWith(href + "/") || pathname.includes(`/(tabs)${href}`);
 
             const onPress = () => {
               triggerSelectionHaptic();

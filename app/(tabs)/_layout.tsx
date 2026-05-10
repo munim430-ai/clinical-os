@@ -2,7 +2,7 @@ import { CureCurveTabBar } from "@/components/navigation/CureCurveTabBar";
 import { Tabs } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "home",
+  initialRouteName: "home/index",
 };
 
 export default function TabLayout() {

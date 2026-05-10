@@ -5,6 +5,9 @@ const path = require("path");
 
 const config = getDefaultConfig(__dirname);
 
+// Windows EMFILE fix — cap parallel file handles
+config.maxWorkers = 2;
+
 config.resolver.sourceExts.push("sql");
 
 // Fix tslib import issues

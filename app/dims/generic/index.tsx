@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
-import { ArrowLeft, Pill, Search, X } from "lucide-react";
+import { ArrowLeft, Pill, Search, X } from "lucide-react-native";
 import { useState, useEffect, useMemo } from "react";
 import { router } from "expo-router";
 import { sql } from "drizzle-orm";
@@ -54,9 +54,9 @@ export default function GenericIndexScreen() {
       <View className="mb-4 flex-row items-center pt-2">
         <TouchableOpacity
           onPress={() => { triggerSelectionHaptic(); router.back(); }}
-          className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
+          className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-surface"
         >
-          <ArrowLeft size={21} color="#C8F53C" strokeWidth={1.7} />
+          <ArrowLeft size={21} color="#2470FF" strokeWidth={1.7} />
         </TouchableOpacity>
         <View className="flex-1">
           <Text className="font-heading text-[28px] leading-9 text-text-primary">By Molecule</Text>
@@ -64,9 +64,9 @@ export default function GenericIndexScreen() {
         </View>
       </View>
 
-      <View className="mb-4 overflow-hidden rounded-[28px] border border-border bg-ink-800/80 px-4">
+      <View className="mb-4 overflow-hidden rounded-[28px] border border-border bg-surface px-4">
         <View className="flex-row items-center gap-3">
-          <Search size={18} color={query ? "#C8F53C" : "#7A7A80"} strokeWidth={1.6} />
+          <Search size={18} color={query ? "#2470FF" : "#B8C5E6"} strokeWidth={1.6} />
           <TextInput
             className="min-h-[52px] flex-1 font-bodySemi text-[16px] text-text-primary"
             placeholder="Search generics or drug class..."
@@ -75,7 +75,7 @@ export default function GenericIndexScreen() {
             onChangeText={setQuery}
             autoCorrect={false}
             autoCapitalize="none"
-            selectionColor="#C8F53C"
+            selectionColor="#2470FF"
           />
           {query.length > 0 ? (
             <TouchableOpacity onPress={() => setQuery("")} hitSlop={10}>
@@ -86,7 +86,7 @@ export default function GenericIndexScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator color="#C8F53C" className="mt-8" />
+        <ActivityIndicator color="#2470FF" className="mt-8" />
       ) : (
         <FlatList
           data={filtered}
@@ -103,8 +103,8 @@ export default function GenericIndexScreen() {
               className="flex-row items-center gap-3 py-3"
               activeOpacity={0.7}
             >
-              <View className="h-10 w-10 items-center justify-center rounded-xl border border-border bg-ink-800">
-                <Pill size={18} color="#C8F53C" strokeWidth={1.6} />
+              <View className="h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface-muted">
+                <Pill size={18} color="#2470FF" strokeWidth={1.6} />
               </View>
               <View className="flex-1">
                 <Text className="font-bodySemi text-[15px] text-text-primary">{item.name}</Text>
@@ -119,7 +119,7 @@ export default function GenericIndexScreen() {
           )}
           ListEmptyComponent={
             <View className="mt-16 items-center gap-2">
-              <Pill size={32} color="#3A3A40" strokeWidth={1.4} />
+              <Pill size={32} color="#B8C5E6" strokeWidth={1.4} />
               <Text className="font-body text-[14px] text-text-muted">No generics found</Text>
             </View>
           }
