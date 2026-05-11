@@ -3,7 +3,7 @@
   "cleanUrls": true,
   "framework": null,
   "redirects": [
-    { "source": "/", "destination": "/(tabs)/home", "permanent": false }
+    { "source": "/", "destination": "/home", "permanent": false }
   ],
   "rewrites": [
     { "source": "/auth", "destination": "/auth/index" },
