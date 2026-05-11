@@ -46,3 +46,18 @@ notes.txt
 public/database.sqlite-shm
 public/database.sqlite-wal
 .vercel
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf

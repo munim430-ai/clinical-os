@@ -1,12 +1,35 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
-import { useEffect, useState } from "react";
-import { eq, sql, and, ne } from "drizzle-orm";
-import { ArrowLeft, ChevronRight, Pill, TrendingDown, ShieldAlert } from "lucide-react";
-import { useDatabase } from "@/db/provider";
-import { medicines, generics, manufacturers, dosageForms, drugClasses } from "@/db/schema";
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { useDatabase } from "@/db/provider";
+import {
+  dosageForms,
+  drugClasses,
+  generics,
+  manufacturers,
+  medicines,
+} from "@/db/schema";
+import { isBookmarked, toggleBookmark } from "@/lib/bookmarks";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { addDrugToDraft, getDrugCount } from "@/lib/prescription";
+import { useFocusEffect } from "@react-navigation/native";
+import { and, eq, ne, sql } from "drizzle-orm";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+  ArrowLeft,
+  ChevronRight,
+  ClipboardPlus,
+  Heart,
+  Pill,
+  ShieldAlert,
+  TrendingDown,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type AltRow = {
   id: number;
@@ -21,6 +44,15 @@ export default function BrandDetailScreen() {
   const { db } = useDatabase();
   const [data, setData] = useState<any>(null);
   const [alternatives, setAlternatives] = useState<AltRow[]>([]);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [rxCount, setRxCount] = useState(0);
+  const [addedToRx, setAddedToRx] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      setRxCount(getDrugCount());
+    }, []),
+  );
 
   useEffect(() => {
     if (!db || !id) return;
@@ -41,13 +73,17 @@ export default function BrandDetailScreen() {
     })
       .from(medicines)
       .leftJoin(generics, sql`${medicines.genericId} = ${generics.id}`)
-      .leftJoin(manufacturers, sql`${medicines.manufacturerId} = ${manufacturers.id}`)
+      .leftJoin(
+        manufacturers,
+        sql`${medicines.manufacturerId} = ${manufacturers.id}`,
+      )
       .leftJoin(dosageForms, sql`${medicines.dosageFormId} = ${dosageForms.id}`)
       .leftJoin(drugClasses, sql`${generics.drugClassId} = ${drugClasses.id}`)
       .where(eq(medicines.id, Number(id)))
       .then((rows) => {
         const brand = rows[0] ?? null;
         setData(brand);
+        if (brand) setBookmarked(isBookmarked(brand.id));
         if (brand?.genericId) {
           db.select({
             id: medicines.id,
@@ -57,11 +93,16 @@ export default function BrandDetailScreen() {
             unitPriceBdt: medicines.unitPriceBdt,
           })
             .from(medicines)
-            .leftJoin(manufacturers, sql`${medicines.manufacturerId} = ${manufacturers.id}`)
-            .where(and(
-              eq(medicines.genericId, brand.genericId),
-              ne(medicines.id, Number(id)),
-            ))
+            .leftJoin(
+              manufacturers,
+              sql`${medicines.manufacturerId} = ${manufacturers.id}`,
+            )
+            .where(
+              and(
+                eq(medicines.genericId, brand.genericId),
+                ne(medicines.id, Number(id)),
+              ),
+            )
             .orderBy(sql`unit_price_bdt ASC NULLS LAST, brand_name ASC`)
             .limit(6)
             .then((alts) => setAlternatives(alts as AltRow[]));
@@ -81,7 +122,10 @@ export default function BrandDetailScreen() {
 
   return (
     <ClinicalShell padded={false}>
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 36 }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 36 }}
+      >
         <View className="px-4 pt-2">
           <View className="mb-4 flex-row items-center">
             <TouchableOpacity
@@ -96,32 +140,137 @@ export default function BrandDetailScreen() {
             <Text className="flex-1 font-bodySemi text-[13px] uppercase tracking-[1.6px] text-text-muted">
               Medicine Detail
             </Text>
+            <TouchableOpacity
+              onPress={() => {
+                triggerSelectionHaptic();
+                const next = toggleBookmark({
+                  id: data.id,
+                  brandName: data.brandName,
+                  genericName: data.genericName ?? null,
+                  strength: data.strength ?? null,
+                });
+                setBookmarked(next);
+              }}
+              className="ml-2 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
+              accessibilityRole="button"
+              accessibilityLabel={
+                bookmarked ? "Remove bookmark" : "Bookmark this drug"
+              }
+            >
+              <Heart
+                size={18}
+                color={bookmarked ? "#FF453A" : "#505058"}
+                fill={bookmarked ? "#FF453A" : "transparent"}
+                strokeWidth={1.7}
+              />
+            </TouchableOpacity>
           </View>
 
           <View className="rounded-[32px] border border-border bg-ink-800 p-5">
             <View className="mb-4 h-14 w-14 items-center justify-center rounded-[22px] border border-border-soft bg-ink-700">
               <Pill size={28} color="#C8F53C" strokeWidth={1.5} />
             </View>
-            <Text className="font-heading text-[34px] leading-[40px] text-text-primary">{data.brandName}</Text>
+            <Text className="font-heading text-[34px] leading-[40px] text-text-primary">
+              {data.brandName}
+            </Text>
             {data.genericName ? (
-              <Text className="mt-2 font-bodySemi text-[16px] leading-6 text-text-secondary">{data.genericName}</Text>
+              <Text className="mt-2 font-bodySemi text-[16px] leading-6 text-text-secondary">
+                {data.genericName}
+              </Text>
             ) : null}
             <View className="mt-5 flex-row flex-wrap gap-2">
               {data.strength ? (
                 <View className="rounded-2xl border border-border-accent bg-mint-soft px-4 py-2">
-                  <Text className="font-headingBold text-[16px] text-mint">{data.strength}</Text>
+                  <Text className="font-headingBold text-[16px] text-mint">
+                    {data.strength}
+                  </Text>
                 </View>
               ) : null}
               {data.drugClass ? (
                 <View className="self-center rounded-pill border border-border-soft bg-ink-700 px-3 py-2">
-                  <Text className="font-bodySemi text-[12px] text-text-secondary">{data.drugClass}</Text>
+                  <Text className="font-bodySemi text-[12px] text-text-secondary">
+                    {data.drugClass}
+                  </Text>
                 </View>
               ) : null}
             </View>
           </View>
 
+          {/* Add to Prescription */}
           <TouchableOpacity
-            onPress={() => { triggerSelectionHaptic(); router.push("/dims/interactions" as any); }}
+            onPress={() => {
+              triggerSelectionHaptic();
+              addDrugToDraft({
+                id: data.id,
+                brandName: data.brandName,
+                genericName: data.genericName ?? null,
+                strength: data.strength ?? null,
+                dosageForm: data.dosageForm ?? null,
+              });
+              setAddedToRx(true);
+              setRxCount(getDrugCount());
+            }}
+            className={
+              addedToRx
+                ? "mt-4 flex-row items-center justify-between rounded-clinical border border-mint bg-mint-soft p-4"
+                : "mt-4 flex-row items-center justify-between rounded-clinical border border-border bg-ink-800 p-4"
+            }
+            activeOpacity={0.78}
+            accessibilityRole="button"
+            accessibilityLabel="Add to prescription"
+          >
+            <View className="flex-1 flex-row items-center gap-3">
+              <View
+                className={`h-9 w-9 items-center justify-center rounded-2xl border ${
+                  addedToRx
+                    ? "bg-mint-soft border-mint"
+                    : "bg-ink-700 border-border-soft"
+                }`}
+              >
+                <ClipboardPlus
+                  size={16}
+                  color={addedToRx ? "#C8F53C" : "#7A7A80"}
+                  strokeWidth={1.7}
+                />
+              </View>
+              <View className="flex-1">
+                <Text
+                  className={`font-bodySemi text-[14px] ${
+                    addedToRx ? "text-mint" : "text-text-primary"
+                  }`}
+                >
+                  {addedToRx ? "Added to prescription" : "Add to prescription"}
+                </Text>
+                <Text className="mt-0.5 font-body text-[11px] text-text-muted">
+                  {rxCount > 0
+                    ? `${rxCount} drug${rxCount !== 1 ? "s" : ""} in current Rx`
+                    : "Start a new prescription"}
+                </Text>
+              </View>
+            </View>
+            {addedToRx ? (
+              <TouchableOpacity
+                onPress={() => {
+                  triggerSelectionHaptic();
+                  router.push("/prescription" as any);
+                }}
+                className="rounded-pill bg-mint px-3 py-1.5"
+                activeOpacity={0.78}
+              >
+                <Text className="font-bodySemi text-[12px] text-text-inverse">
+                  View Rx
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <ChevronRight size={17} color="#7A7A80" strokeWidth={1.6} />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push("/dims/interactions" as any);
+            }}
             className="mt-4 flex-row items-center justify-between rounded-clinical border border-border bg-ink-800 p-4"
             activeOpacity={0.78}
             accessibilityRole="button"
@@ -132,8 +281,12 @@ export default function BrandDetailScreen() {
                 <ShieldAlert size={16} color="#FF453A" strokeWidth={1.7} />
               </View>
               <View className="flex-1">
-                <Text className="font-bodySemi text-[14px] text-text-primary">Check interactions</Text>
-                <Text className="mt-0.5 font-body text-[11px] text-text-muted">Compare against other prescribed drugs</Text>
+                <Text className="font-bodySemi text-[14px] text-text-primary">
+                  Check interactions
+                </Text>
+                <Text className="mt-0.5 font-body text-[11px] text-text-muted">
+                  Compare against other prescribed drugs
+                </Text>
               </View>
             </View>
             <ChevronRight size={17} color="#7A7A80" strokeWidth={1.6} />
@@ -143,13 +296,25 @@ export default function BrandDetailScreen() {
             <Row label="Form" value={data.dosageForm} />
             <Row label="Type" value={data.type} />
             <Row label="Manufacturer" value={data.manufacturerName} />
-            <Row label="Pack" value={[data.packageContainer, data.packageSize].filter(Boolean).join(" · ")} />
+            <Row
+              label="Pack"
+              value={[data.packageContainer, data.packageSize]
+                .filter(Boolean)
+                .join(" · ")}
+            />
             {data.unitPriceBdt != null ? (
-              <Row label="Unit price" value={`৳${data.unitPriceBdt.toFixed(2)} per unit`} />
+              <Row
+                label="Unit price"
+                value={`৳${data.unitPriceBdt.toFixed(2)} per unit`}
+              />
             ) : null}
             <Row
               label="Pack price"
-              value={data.packPriceBdt != null ? `৳${data.packPriceBdt.toFixed(2)}` : null}
+              value={
+                data.packPriceBdt != null
+                  ? `৳${data.packPriceBdt.toFixed(2)}`
+                  : null
+              }
               last
             />
           </View>
@@ -166,27 +331,40 @@ export default function BrandDetailScreen() {
               {alternatives.map((alt, idx) => (
                 <TouchableOpacity
                   key={alt.id}
-                  onPress={() => { triggerSelectionHaptic(); router.push(`/dims/brand/${alt.id}` as any); }}
+                  onPress={() => {
+                    triggerSelectionHaptic();
+                    router.push(`/dims/brand/${alt.id}` as any);
+                  }}
                   className="mb-2 flex-row items-center justify-between rounded-2xl border border-border bg-ink-800 px-4 py-3"
                   activeOpacity={0.78}
                 >
                   <View className="flex-1 pr-3">
                     <View className="flex-row items-center gap-2">
-                      <Text className="font-bodySemi text-[14px] text-text-primary">{alt.brandName}</Text>
+                      <Text className="font-bodySemi text-[14px] text-text-primary">
+                        {alt.brandName}
+                      </Text>
                       {alt.unitPriceBdt != null && idx === 0 ? (
                         <View className="rounded-pill bg-mint-soft px-2 py-0.5">
-                          <Text className="font-bodySemi text-[10px] text-mint">CHEAPEST</Text>
+                          <Text className="font-bodySemi text-[10px] text-mint">
+                            CHEAPEST
+                          </Text>
                         </View>
                       ) : null}
                     </View>
                     <Text className="mt-0.5 font-body text-[11px] text-text-muted">
-                      {[alt.strength, alt.manufacturerName].filter(Boolean).join(" · ")}
+                      {[alt.strength, alt.manufacturerName]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </Text>
                   </View>
                   {alt.unitPriceBdt != null ? (
-                    <Text className="font-bodySemi text-[13px] text-mint">৳{alt.unitPriceBdt.toFixed(2)}</Text>
+                    <Text className="font-bodySemi text-[13px] text-mint">
+                      ৳{alt.unitPriceBdt.toFixed(2)}
+                    </Text>
                   ) : (
-                    <Text className="font-body text-[11px] text-text-muted">No price</Text>
+                    <Text className="font-body text-[11px] text-text-muted">
+                      No price
+                    </Text>
                   )}
                 </TouchableOpacity>
               ))}
@@ -202,7 +380,9 @@ export default function BrandDetailScreen() {
               className="mt-4 flex-row items-center justify-between rounded-clinical border border-border-accent bg-mint-soft p-4"
             >
               <View className="flex-1 pr-3">
-                <Text className="font-headingBold text-[16px] text-mint">View Generic Details</Text>
+                <Text className="font-headingBold text-[16px] text-mint">
+                  View Generic Details
+                </Text>
                 <Text className="mt-1 font-body text-[12px] leading-5 text-text-secondary">
                   Pharmacology, dosage, interactions, and related brands
                 </Text>
@@ -216,12 +396,22 @@ export default function BrandDetailScreen() {
   );
 }
 
-function Row({ label, value, last = false }: { label: string; value?: string | null; last?: boolean }) {
+function Row({
+  label,
+  value,
+  last = false,
+}: { label: string; value?: string | null; last?: boolean }) {
   if (!value) return null;
   return (
-    <View className={`flex-row justify-between py-3 ${last ? "" : "border-b border-border-soft"}`}>
+    <View
+      className={`flex-row justify-between py-3 ${
+        last ? "" : "border-b border-border-soft"
+      }`}
+    >
       <Text className="font-body text-[14px] text-text-muted">{label}</Text>
-      <Text className="ml-4 flex-1 text-right font-bodySemi text-[14px] text-text-primary">{value}</Text>
+      <Text className="ml-4 flex-1 text-right font-bodySemi text-[14px] text-text-primary">
+        {value}
+      </Text>
     </View>
   );
 }

@@ -1,16 +1,35 @@
-import {
-  View, Text, TextInput, TouchableOpacity,
-  FlatList, ActivityIndicator, ScrollView, Keyboard,
-} from "react-native";
-import { Search, X, Pill, Building2, FlaskConical, Leaf, ShieldAlert } from "lucide-react";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { router, useLocalSearchParams } from "expo-router";
-import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
-import { useDatabase } from "@/db/provider";
-import { sql, like, or, and, eq } from "drizzle-orm";
-import { medicines, generics, manufacturers, dosageForms } from "@/db/schema";
-import { ClinicalShell } from "@/components/layout/ClinicalShell";
 import { PremiumMedicineCard } from "@/components/cards/PremiumMedicineCard";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { useDatabase } from "@/db/provider";
+import { dosageForms, generics, manufacturers, medicines } from "@/db/schema";
+import { type BookmarkEntry, getBookmarks } from "@/lib/bookmarks";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { getDrugCount } from "@/lib/prescription";
+import { useFocusEffect } from "@react-navigation/native";
+import { and, eq, like, or, sql } from "drizzle-orm";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+  Building2,
+  ClipboardList,
+  FlaskConical,
+  Heart,
+  Leaf,
+  Pill,
+  Search,
+  ShieldAlert,
+  X,
+} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Keyboard,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type DrugResult = {
   id: number;
@@ -24,10 +43,14 @@ type DrugResult = {
 
 type TypeFilter = "all" | "allopathic" | "herbal";
 
-const TYPE_FILTERS: { key: TypeFilter; label: string; icon?: React.ReactNode }[] = [
-  { key: "all",        label: "All" },
+const TYPE_FILTERS: {
+  key: TypeFilter;
+  label: string;
+  icon?: React.ReactNode;
+}[] = [
+  { key: "all", label: "All" },
   { key: "allopathic", label: "Allopathic" },
-  { key: "herbal",     label: "Herbal" },
+  { key: "herbal", label: "Herbal" },
 ];
 
 export default function DIMSScreen() {
@@ -39,60 +62,111 @@ export default function DIMSScreen() {
   const [loading, setLoading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const search = useCallback(async (q: string, filter: TypeFilter) => {
-    if (!db || q.trim().length < 2) {
-      setResults([]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const term = `%${q.trim()}%`;
-      const textCondition = or(like(medicines.brandName, term), like(generics.name, term));
-      const whereCondition = filter === "all"
-        ? textCondition
-        : and(textCondition, eq(medicines.type, filter));
+  const search = useCallback(
+    async (q: string, filter: TypeFilter) => {
+      if (!db || q.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+      setLoading(true);
+      try {
+        const term = `%${q.trim()}%`;
+        const textCondition = or(
+          like(medicines.brandName, term),
+          like(generics.name, term),
+        );
+        const whereCondition =
+          filter === "all"
+            ? textCondition
+            : and(textCondition, eq(medicines.type, filter));
 
-      const rows = await db
-        .select({
-          id: medicines.id,
-          brandName: medicines.brandName,
-          strength: medicines.strength,
-          dosageForm: dosageForms.name,
-          genericName: generics.name,
-          manufacturerName: manufacturers.name,
-          type: medicines.type,
-        })
-        .from(medicines)
-        .leftJoin(generics, sql`${medicines.genericId} = ${generics.id}`)
-        .leftJoin(manufacturers, sql`${medicines.manufacturerId} = ${manufacturers.id}`)
-        .leftJoin(dosageForms, sql`${medicines.dosageFormId} = ${dosageForms.id}`)
-        .where(whereCondition)
-        .limit(60);
-      setResults(rows as DrugResult[]);
-    } finally {
-      setLoading(false);
-    }
-  }, [db]);
+        const rows = await db
+          .select({
+            id: medicines.id,
+            brandName: medicines.brandName,
+            strength: medicines.strength,
+            dosageForm: dosageForms.name,
+            genericName: generics.name,
+            manufacturerName: manufacturers.name,
+            type: medicines.type,
+          })
+          .from(medicines)
+          .leftJoin(generics, sql`${medicines.genericId} = ${generics.id}`)
+          .leftJoin(
+            manufacturers,
+            sql`${medicines.manufacturerId} = ${manufacturers.id}`,
+          )
+          .leftJoin(
+            dosageForms,
+            sql`${medicines.dosageFormId} = ${dosageForms.id}`,
+          )
+          .where(whereCondition)
+          .limit(60);
+        setResults(rows as DrugResult[]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [db],
+  );
 
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => search(query, typeFilter), 300);
-    return () => { if (timer.current) clearTimeout(timer.current); };
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
   }, [query, typeFilter, search]);
+
+  const [bookmarks, setBookmarks] = useState<BookmarkEntry[]>([]);
+  const [rxCount, setRxCount] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      setBookmarks(getBookmarks());
+      setRxCount(getDrugCount());
+    }, []),
+  );
 
   const isSearching = query.length >= 2;
 
   return (
     <ClinicalShell>
-      <View className="pb-3 pt-2">
-        <Text className="font-heading text-[32px] leading-10 text-text-primary">DIMS</Text>
-        <Text className="mt-1 font-body text-[13px] text-text-muted">Search 21,700+ Bangladesh drug brands</Text>
+      <View className="pb-3 pt-2 flex-row items-start justify-between">
+        <View>
+          <Text className="font-heading text-[32px] leading-10 text-text-primary">
+            DIMS
+          </Text>
+          <Text className="mt-1 font-body text-[13px] text-text-muted">
+            Search 21,700+ Bangladesh drug brands
+          </Text>
+        </View>
+        {rxCount > 0 ? (
+          <TouchableOpacity
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push("/prescription" as any);
+            }}
+            className="mt-1 flex-row items-center gap-1.5 rounded-pill border border-mint bg-mint-soft px-3 py-2"
+            activeOpacity={0.78}
+            accessibilityLabel="View prescription"
+          >
+            <ClipboardList size={14} color="#C8F53C" strokeWidth={1.7} />
+            <Text className="font-bodySemi text-[12px] text-mint">
+              Rx · {rxCount}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {/* Search bar */}
       <View className="mb-3 overflow-hidden rounded-[28px] border border-border bg-ink-800/80 px-4">
         <View className="flex-row items-center gap-3">
-          <Search size={18} color={query ? "#C8F53C" : "#7A7A80"} strokeWidth={1.6} />
+          <Search
+            size={18}
+            color={query ? "#C8F53C" : "#7A7A80"}
+            strokeWidth={1.6}
+          />
           <TextInput
             className="min-h-[52px] flex-1 font-bodySemi text-[16px] text-text-primary"
             placeholder="Search brands or generics..."
@@ -110,7 +184,10 @@ export default function DIMSScreen() {
             <ActivityIndicator size="small" color="#C8F53C" />
           ) : query.length > 0 ? (
             <TouchableOpacity
-              onPress={() => { setQuery(""); setResults([]); }}
+              onPress={() => {
+                setQuery("");
+                setResults([]);
+              }}
               hitSlop={10}
               accessibilityLabel="Clear search"
             >
@@ -134,20 +211,33 @@ export default function DIMSScreen() {
             return (
               <TouchableOpacity
                 key={key}
-                onPress={() => { triggerSelectionHaptic(); setTypeFilter(key); }}
-                className={active
-                  ? "flex-row items-center gap-1.5 rounded-pill bg-mint px-4 py-2"
-                  : "flex-row items-center gap-1.5 rounded-pill border border-border bg-ink-800 px-4 py-2"}
+                onPress={() => {
+                  triggerSelectionHaptic();
+                  setTypeFilter(key);
+                }}
+                className={
+                  active
+                    ? "flex-row items-center gap-1.5 rounded-pill bg-mint px-4 py-2"
+                    : "flex-row items-center gap-1.5 rounded-pill border border-border bg-ink-800 px-4 py-2"
+                }
                 activeOpacity={0.78}
                 accessibilityRole="button"
                 accessibilityLabel={`Filter by ${label}`}
               >
                 {isHerbal ? (
-                  <Leaf size={12} color={active ? "#0C0C0E" : "#7A7A80"} strokeWidth={1.8} />
+                  <Leaf
+                    size={12}
+                    color={active ? "#0C0C0E" : "#7A7A80"}
+                    strokeWidth={1.8}
+                  />
                 ) : null}
-                <Text className={active
-                  ? "font-bodySemi text-[13px] text-text-inverse"
-                  : "font-bodySemi text-[13px] text-text-muted"}>
+                <Text
+                  className={
+                    active
+                      ? "font-bodySemi text-[13px] text-text-inverse"
+                      : "font-bodySemi text-[13px] text-text-muted"
+                  }
+                >
                   {label}
                 </Text>
               </TouchableOpacity>
@@ -164,26 +254,87 @@ export default function DIMSScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Browse by</Text>
+          {bookmarks.length > 0 ? (
+            <View className="mb-6">
+              <View className="mb-3 flex-row items-center gap-2">
+                <Heart size={12} color="#FF453A" fill="#FF453A" />
+                <Text className="font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
+                  Saved
+                </Text>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 8, paddingRight: 4 }}
+              >
+                {bookmarks.map((b) => (
+                  <TouchableOpacity
+                    key={b.id}
+                    onPress={() => {
+                      triggerSelectionHaptic();
+                      router.push(`/dims/brand/${b.id}` as any);
+                    }}
+                    className="rounded-2xl border border-border bg-ink-800 px-4 py-3"
+                    activeOpacity={0.78}
+                    style={{ maxWidth: 180 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={b.brandName}
+                  >
+                    <Text
+                      className="font-bodySemi text-[13px] text-text-primary"
+                      numberOfLines={1}
+                    >
+                      {b.brandName}
+                    </Text>
+                    {b.genericName ? (
+                      <Text
+                        className="mt-0.5 font-body text-[11px] text-text-muted"
+                        numberOfLines={1}
+                      >
+                        {b.genericName}
+                        {b.strength ? ` · ${b.strength}` : ""}
+                      </Text>
+                    ) : null}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          ) : null}
+
+          <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
+            Browse by
+          </Text>
           <View className="mb-6 flex-row gap-3">
             <BrowseCard
               icon={<Building2 size={18} color="#C8F53C" strokeWidth={1.6} />}
               label="Company"
               sub="By manufacturer"
-              onPress={() => { triggerSelectionHaptic(); router.push("/dims/companies" as any); }}
+              onPress={() => {
+                triggerSelectionHaptic();
+                router.push("/dims/companies" as any);
+              }}
             />
             <BrowseCard
-              icon={<FlaskConical size={18} color="#00D7B5" strokeWidth={1.6} />}
+              icon={
+                <FlaskConical size={18} color="#00D7B5" strokeWidth={1.6} />
+              }
               label="Generic"
               sub="By molecule"
-              onPress={() => { triggerSelectionHaptic(); router.push("/dims/generic" as any); }}
+              onPress={() => {
+                triggerSelectionHaptic();
+                router.push("/dims/generic" as any);
+              }}
             />
           </View>
           <BrowseCard
             icon={<Leaf size={18} color="#86EFAC" strokeWidth={1.6} />}
             label="Herbal / Natural"
             sub="351 plant-based medicines"
-            onPress={() => { triggerSelectionHaptic(); setQuery("a"); setTypeFilter("herbal"); }}
+            onPress={() => {
+              triggerSelectionHaptic();
+              setQuery("a");
+              setTypeFilter("herbal");
+            }}
             wide
           />
           <View className="mt-3">
@@ -191,7 +342,10 @@ export default function DIMSScreen() {
               icon={<ShieldAlert size={18} color="#FF453A" strokeWidth={1.6} />}
               label="Interaction Checker"
               sub="Screen multiple drugs for class-based interactions"
-              onPress={() => { triggerSelectionHaptic(); router.push("/dims/interactions" as any); }}
+              onPress={() => {
+                triggerSelectionHaptic();
+                router.push("/dims/interactions" as any);
+              }}
               wide
             />
           </View>
@@ -199,8 +353,12 @@ export default function DIMSScreen() {
             <View className="h-20 w-20 items-center justify-center rounded-[28px] border border-border bg-ink-800">
               <Pill size={36} color="#C8F53C" strokeWidth={1.4} />
             </View>
-            <Text className="mt-4 font-bodySemi text-[15px] text-text-secondary">Search 21,700+ brands</Text>
-            <Text className="mt-1 font-body text-[12px] text-text-muted">Type a brand or generic name above</Text>
+            <Text className="mt-4 font-bodySemi text-[15px] text-text-secondary">
+              Search 21,700+ brands
+            </Text>
+            <Text className="mt-1 font-body text-[12px] text-text-muted">
+              Type a brand or generic name above
+            </Text>
           </View>
         </ScrollView>
       ) : results.length === 0 && !loading ? (
@@ -208,17 +366,25 @@ export default function DIMSScreen() {
           <View className="mb-4 h-16 w-16 items-center justify-center rounded-[24px] border border-border bg-ink-800">
             <Search size={28} color="#4A4A4F" strokeWidth={1.4} />
           </View>
-          <Text className="font-bodySemi text-[15px] text-text-secondary">No results</Text>
+          <Text className="font-bodySemi text-[15px] text-text-secondary">
+            No results
+          </Text>
           <Text className="mt-1 font-body text-[13px] text-text-muted">
-            No{typeFilter !== "all" ? ` ${typeFilter}` : ""} medicines matching "{query}"
+            No{typeFilter !== "all" ? ` ${typeFilter}` : ""} medicines matching
+            "{query}"
           </Text>
           {typeFilter !== "all" ? (
             <TouchableOpacity
-              onPress={() => { triggerSelectionHaptic(); setTypeFilter("all"); }}
+              onPress={() => {
+                triggerSelectionHaptic();
+                setTypeFilter("all");
+              }}
               className="mt-4 rounded-pill border border-border bg-ink-800 px-5 py-2.5"
               activeOpacity={0.78}
             >
-              <Text className="font-bodySemi text-[13px] text-mint">Search all types</Text>
+              <Text className="font-bodySemi text-[13px] text-mint">
+                Search all types
+              </Text>
             </TouchableOpacity>
           ) : null}
         </View>
@@ -230,12 +396,16 @@ export default function DIMSScreen() {
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           ItemSeparatorComponent={() => <View className="h-3" />}
-          ListHeaderComponent={results.length > 0 ? (
-            <Text className="mb-3 font-body text-[12px] text-text-muted">
-              {results.length}{results.length === 60 ? "+" : ""} result{results.length !== 1 ? "s" : ""}
-              {typeFilter !== "all" ? ` · ${typeFilter} only` : ""}
-            </Text>
-          ) : null}
+          ListHeaderComponent={
+            results.length > 0 ? (
+              <Text className="mb-3 font-body text-[12px] text-text-muted">
+                {results.length}
+                {results.length === 60 ? "+" : ""} result
+                {results.length !== 1 ? "s" : ""}
+                {typeFilter !== "all" ? ` · ${typeFilter} only` : ""}
+              </Text>
+            ) : null
+          }
           renderItem={({ item }) => (
             <PremiumMedicineCard
               brandName={item.brandName}
@@ -243,7 +413,11 @@ export default function DIMSScreen() {
               strength={item.strength ?? "Strength not listed"}
               manufacturer={item.manufacturerName ?? "Manufacturer not listed"}
               dosageForm={item.dosageForm ?? "Medicine"}
-              safetyNote={item.type === "herbal" ? "Herbal / plant-based medicine" : undefined}
+              safetyNote={
+                item.type === "herbal"
+                  ? "Herbal / plant-based medicine"
+                  : undefined
+              }
               onPress={() => router.push(`/dims/brand/${item.id}` as any)}
             />
           )}
@@ -254,7 +428,11 @@ export default function DIMSScreen() {
 }
 
 function BrowseCard({
-  icon, label, sub, onPress, wide = false,
+  icon,
+  label,
+  sub,
+  onPress,
+  wide = false,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -266,7 +444,9 @@ function BrowseCard({
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.78}
-      className={`flex-row items-center gap-3 rounded-2xl border border-border bg-ink-800 px-4 py-3 ${wide ? "flex-1" : "flex-1"}`}
+      className={`flex-row items-center gap-3 rounded-2xl border border-border bg-ink-800 px-4 py-3 ${
+        wide ? "flex-1" : "flex-1"
+      }`}
       accessibilityRole="button"
       accessibilityLabel={label}
     >
@@ -274,7 +454,9 @@ function BrowseCard({
         {icon}
       </View>
       <View>
-        <Text className="font-bodySemi text-[14px] text-text-primary">{label}</Text>
+        <Text className="font-bodySemi text-[14px] text-text-primary">
+          {label}
+        </Text>
         <Text className="font-body text-[11px] text-text-muted">{sub}</Text>
       </View>
     </TouchableOpacity>

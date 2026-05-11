@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { type Persona, markOnboarded, setPersona } from "@/lib/persona";
 import { router } from "expo-router";
 import { GraduationCap, Stethoscope, UserCheck } from "lucide-react";
-import { setPersona, markOnboarded, type Persona } from "@/lib/persona";
-import { ClinicalShell } from "@/components/layout/ClinicalShell";
-import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
-import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const OPTIONS = [
   {
@@ -35,12 +35,15 @@ export default function OnboardingScreen() {
     triggerSelectionHaptic();
     setPersona(p);
     markOnboarded();
-    router.replace("/(tabs)/gp/index");
+    router.replace("/auth" as any);
   }
 
   return (
     <ClinicalShell padded={false}>
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 36 }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 36 }}
+      >
         <ClinicalHumorHero
           title="Clinical OS"
           subtitle="DIMS, GP protocols, ER tools, and AI support — built for doctors on rounds."
@@ -66,8 +69,12 @@ export default function OnboardingScreen() {
                 <Icon size={26} color={opt.color} strokeWidth={1.6} />
               </View>
               <View className="flex-1">
-                <Text className="font-headingBold text-[16px] text-text-primary">{opt.label}</Text>
-                <Text className="mt-1 font-body text-[12px] leading-5 text-text-muted">{opt.sub}</Text>
+                <Text className="font-headingBold text-[16px] text-text-primary">
+                  {opt.label}
+                </Text>
+                <Text className="mt-1 font-body text-[12px] leading-5 text-text-muted">
+                  {opt.sub}
+                </Text>
               </View>
             </TouchableOpacity>
           );

@@ -43,6 +43,132 @@
       "when": 1777670343072,
       "tag": "0005_seed_gp_master_interpretation",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1747008000000,
+      "tag": "0023_wallet_clinics",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1747008000001,
+      "tag": "0006_seed_dengue_protocol",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1747008000002,
+      "tag": "0007_seed_typhoid_protocol",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1747008000003,
+      "tag": "0008_seed_malaria_protocol",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1747008000004,
+      "tag": "0009_add_drug_pricing",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1747008000005,
+      "tag": "0010_seed_quiz_questions",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1747008000006,
+      "tag": "0011_seed_osce_cases",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1747008000007,
+      "tag": "0012_link_conditions_to_drugs",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1747008000008,
+      "tag": "0013_gp_master_rx",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1747008000009,
+      "tag": "0014_conditions_chunk1",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1747008000010,
+      "tag": "0015_conditions_chunk2",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1747008000011,
+      "tag": "0016_conditions_chunk3",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1747008000012,
+      "tag": "0017_conditions_chunk4",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1747008000013,
+      "tag": "0018_conditions_chunk5",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1747008000014,
+      "tag": "0019_conditions_chunk6",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "6",
+      "when": 1747008000015,
+      "tag": "0020_conditions_chunk7",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "6",
+      "when": 1747008000016,
+      "tag": "0021_conditions_chunk8",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1747008000017,
+      "tag": "0022_dengue_sprint_a",
+      "breakpoints": true
     }
   ]
 }

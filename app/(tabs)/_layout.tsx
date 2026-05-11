@@ -1,9 +1,10 @@
 import { View } from "react-native";
 import { Tabs } from "expo-router";
 import Icons from "@/components/IconLibraryFixed";
+import { Wallet, House } from "lucide-react";
 
 export const unstable_settings = {
-  initialRouteName: "gp/index",
+  initialRouteName: "home/index",
 };
 
 const LIME = "#C8F53C";
@@ -59,13 +60,36 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="gp/index"
+        name="home/index"
         options={{
-          title: "GP Master",
+          title: "Home",
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
-              icon={<Icons.Protocol size={iconSize} color={focused ? LIME : INACTIVE} />}
+              icon={
+                <House
+                  size={iconSize}
+                  color={focused ? LIME : INACTIVE}
+                  strokeWidth={focused ? 2 : 1.6}
+                />
+              }
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="gp/index"
+        options={{
+          title: "GP",
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={
+                <Icons.Protocol
+                  size={iconSize}
+                  color={focused ? LIME : INACTIVE}
+                />
+              }
             />
           ),
         }}
@@ -77,7 +101,9 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
-              icon={<Icons.Drug size={iconSize} color={focused ? LIME : INACTIVE} />}
+              icon={
+                <Icons.Drug size={iconSize} color={focused ? LIME : INACTIVE} />
+              }
             />
           ),
         }}
@@ -89,7 +115,27 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
-              icon={<Icons.ER size={iconSize} color={focused ? LIME : INACTIVE} />}
+              icon={
+                <Icons.ER size={iconSize} color={focused ? LIME : INACTIVE} />
+              }
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="wallet/index"
+        options={{
+          title: "Wallet",
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon={
+                <Wallet
+                  size={iconSize}
+                  color={focused ? LIME : INACTIVE}
+                  strokeWidth={focused ? 2 : 1.6}
+                />
+              }
             />
           ),
         }}
@@ -101,7 +147,12 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabIcon
               focused={focused}
-              icon={<Icons.Settings size={iconSize} color={focused ? LIME : INACTIVE} />}
+              icon={
+                <Icons.Settings
+                  size={iconSize}
+                  color={focused ? LIME : INACTIVE}
+                />
+              }
             />
           ),
         }}
