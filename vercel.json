@@ -1,6 +1,5 @@
 {
-  "buildCommand": "npx expo export --platform web --output-dir web-out",
-  "installCommand": "npm install",
+  "buildCommand": "",
   "outputDirectory": "web-out",
   "cleanUrls": true,
   "framework": null,
