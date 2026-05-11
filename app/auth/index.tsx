@@ -1,5 +1,5 @@
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
-import { signIn, signUp } from "@/lib/auth";
+import { signIn, signUp, verifyEmail } from "@/lib/auth";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 import { router } from "expo-router";
 import { Eye, EyeOff, Pill } from "lucide-react";
@@ -65,13 +65,14 @@ export default function AuthScreen() {
     if (!code.trim()) return;
     setLoading(true);
     try {
+      await verifyEmail(pendingEmail, code.trim());
       await signIn(pendingEmail, password);
       triggerSelectionHaptic();
       router.replace("/(tabs)/home/index" as any);
-    } catch {
+    } catch (e: any) {
       Alert.alert(
-        "Verification",
-        "Enter the code from your email, then sign in.",
+        "Verification failed",
+        e?.message ?? "Invalid code. Check your email and try again.",
       );
     } finally {
       setLoading(false);

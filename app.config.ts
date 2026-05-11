@@ -46,8 +46,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     eas: {
       projectId: "",
     },
-    insforgeUrl: process.env.INSFORGE_URL ?? "https://g6e4susm.ap-southeast.insforge.app",
-    insforgeAnonKey: process.env.INSFORGE_ANON_KEY ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzQ1MDJ9.oj3OaKEgjBmLt7mOGWReR1UmFwc9yuyVbB1ytLUUpMk",
+    insforgeUrl:
+      process.env.INSFORGE_URL ?? "https://g6e4susm.ap-southeast.insforge.app",
+    insforgeAnonKey:
+      process.env.INSFORGE_ANON_KEY ??
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzQ1MDJ9.oj3OaKEgjBmLt7mOGWReR1UmFwc9yuyVbB1ytLUUpMk",
   },
   owner: "*",
 });

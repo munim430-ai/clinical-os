@@ -1,25 +1,74 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
-import {
-  GraduationCap, Stethoscope, UserCheck, Activity,
-  AlertTriangle, Database, RefreshCcw, Upload, CheckCircle2, XCircle, ShieldCheck,
-} from "lucide-react";
-import { router } from "expo-router";
-import { getPersona, setPersona, type Persona } from "@/lib/persona";
-import { getCaseCounts, type CaseCounts } from "@/lib/surveillance";
-import { getContentSummary, pullSyncFeeds, type PullResult } from "@/lib/content-sync";
-import { syncSurveillanceData, getLastSyncMs, canSyncNow } from "@/lib/surveillance-sync";
 import { useDatabase } from "@/db/provider";
-import { triggerSelectionHaptic, triggerSuccessHaptic } from "@/lib/clinical-haptics";
+import { getStoredUser, signOut } from "@/lib/auth";
+import {
+  triggerSelectionHaptic,
+  triggerSuccessHaptic,
+} from "@/lib/clinical-haptics";
+import {
+  type PullResult,
+  getContentSummary,
+  pullSyncFeeds,
+} from "@/lib/content-sync";
+import { type Persona, getPersona, setPersona } from "@/lib/persona";
+import { type CaseCounts, getCaseCounts } from "@/lib/surveillance";
+import {
+  canSyncNow,
+  getLastSyncMs,
+  syncSurveillanceData,
+} from "@/lib/surveillance-sync";
+import { router } from "expo-router";
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  Database,
+  GraduationCap,
+  LogOut,
+  RefreshCcw,
+  ShieldCheck,
+  Stethoscope,
+  Upload,
+  UserCheck,
+  XCircle,
+} from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const PERSONAS = [
-  { id: "student" as Persona, label: "Medical Student",       sub: "OSCE prep & quiz mode",  icon: GraduationCap, color: "#4499FF" },
-  { id: "intern"  as Persona, label: "Intern / House Officer", sub: "Clinical rotations",      icon: Stethoscope,   color: "#FFD60A" },
-  { id: "gp"      as Persona, label: "General Practitioner",  sub: "Full clinical access",    icon: UserCheck,     color: "#00C896" },
+  {
+    id: "student" as Persona,
+    label: "Medical Student",
+    sub: "OSCE prep & quiz mode",
+    icon: GraduationCap,
+    color: "#4499FF",
+  },
+  {
+    id: "intern" as Persona,
+    label: "Intern / House Officer",
+    sub: "Clinical rotations",
+    icon: Stethoscope,
+    color: "#FFD60A",
+  },
+  {
+    id: "gp" as Persona,
+    label: "General Practitioner",
+    sub: "Full clinical access",
+    icon: UserCheck,
+    color: "#00C896",
+  },
 ];
 
 const DISEASE_LABELS: Record<string, string> = {
-  dengue: "Dengue", typhoid: "Typhoid", malaria: "Malaria", cholera: "Cholera",
+  dengue: "Dengue",
+  typhoid: "Typhoid",
+  malaria: "Malaria",
+  cholera: "Cholera",
 };
 
 function formatLastSync(ms: number | undefined): string {
@@ -36,14 +85,25 @@ function formatLastSync(ms: number | undefined): string {
 export default function ProfileScreen() {
   const { db } = useDatabase();
   const [current, setCurrent] = useState<Persona>(getPersona());
+  const storedUser = getStoredUser();
   const [caseCounts, setCaseCounts] = useState<CaseCounts>({} as CaseCounts);
-  const [contentSummary, setContentSummary] = useState({ versions: 0, syncFeeds: 0, mediaAssets: 0 });
+  const [contentSummary, setContentSummary] = useState({
+    versions: 0,
+    syncFeeds: 0,
+    mediaAssets: 0,
+  });
   const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<"idle" | "ok" | "error" | "skipped">("idle");
+  const [syncStatus, setSyncStatus] = useState<
+    "idle" | "ok" | "error" | "skipped"
+  >("idle");
   const [syncMsg, setSyncMsg] = useState("");
-  const [lastSyncMs, setLastSyncMs] = useState<number | undefined>(getLastSyncMs());
+  const [lastSyncMs, setLastSyncMs] = useState<number | undefined>(
+    getLastSyncMs(),
+  );
   const [pulling, setPulling] = useState(false);
-  const [pullStatus, setPullStatus] = useState<"idle" | "ok" | "error" | "skipped">("idle");
+  const [pullStatus, setPullStatus] = useState<
+    "idle" | "ok" | "error" | "skipped"
+  >("idle");
   const [pullMsg, setPullMsg] = useState("");
   const totalCases = Object.values(caseCounts).reduce((a, b) => a + b, 0);
   const syncEnabled = canSyncNow();
@@ -70,7 +130,9 @@ export default function ProfileScreen() {
     setLastSyncMs(getLastSyncMs());
     if (result.status === "ok") {
       triggerSuccessHaptic();
-      setSyncMsg(`Synced ${result.synced} case${result.synced !== 1 ? "s" : ""}`);
+      setSyncMsg(
+        `Synced ${result.synced} case${result.synced !== 1 ? "s" : ""}`,
+      );
       getCaseCounts().then(setCaseCounts);
     } else if (result.status === "skipped") {
       setSyncMsg(result.reason);
@@ -93,7 +155,13 @@ export default function ProfileScreen() {
       setPullMsg(
         result.updated === 0
           ? "All feeds up to date"
-          : `Updated ${result.updated} feed${result.updated !== 1 ? "s" : ""}${result.alerts ? ` · ${result.alerts} new alert${result.alerts !== 1 ? "s" : ""}` : ""}`
+          : `Updated ${result.updated} feed${result.updated !== 1 ? "s" : ""}${
+              result.alerts
+                ? ` · ${result.alerts} new alert${
+                    result.alerts !== 1 ? "s" : ""
+                  }`
+                : ""
+            }`,
       );
       getContentSummary().then(setContentSummary);
     } else if (result.status === "skipped") {
@@ -110,13 +178,17 @@ export default function ProfileScreen() {
       contentContainerStyle={{ padding: 16, paddingBottom: 104 }}
       accessibilityLabel="Profile screen"
     >
-      <Text className="font-heading text-[32px] leading-10 text-text-primary">Profile</Text>
+      <Text className="font-heading text-[32px] leading-10 text-text-primary">
+        Profile
+      </Text>
       <Text className="mb-6 mt-1 font-body text-[13px] text-text-muted">
         Manage your role, content, and local activity
       </Text>
 
       {/* Persona selector */}
-      <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">Your Role</Text>
+      <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
+        Your Role
+      </Text>
       {PERSONAS.map((p) => {
         const Icon = p.icon;
         const active = current === p.id;
@@ -138,11 +210,18 @@ export default function ProfileScreen() {
               <Icon size={22} color={active ? p.color : "#505058"} />
             </View>
             <View className="flex-1">
-              <Text className="font-bodySemi text-[15px] text-text-primary">{p.label}</Text>
-              <Text className="mt-0.5 font-body text-[12px] text-text-muted">{p.sub}</Text>
+              <Text className="font-bodySemi text-[15px] text-text-primary">
+                {p.label}
+              </Text>
+              <Text className="mt-0.5 font-body text-[12px] text-text-muted">
+                {p.sub}
+              </Text>
             </View>
             {active ? (
-              <View className="h-3 w-3 rounded-full" style={{ backgroundColor: p.color }} />
+              <View
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: p.color }}
+              />
             ) : null}
           </TouchableOpacity>
         );
@@ -158,23 +237,31 @@ export default function ProfileScreen() {
             <View className="mb-3 flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <Activity size={16} color="#00C896" />
-                <Text className="font-bodySemi text-[15px] text-text-primary">{totalCases} Total Cases</Text>
+                <Text className="font-bodySemi text-[15px] text-text-primary">
+                  {totalCases} Total Cases
+                </Text>
               </View>
             </View>
 
             {Object.entries(caseCounts).map(([disease, count]) => (
-              <View key={disease} className="flex-row items-center justify-between border-b border-border-soft py-2 last:border-b-0">
+              <View
+                key={disease}
+                className="flex-row items-center justify-between border-b border-border-soft py-2 last:border-b-0"
+              >
                 <Text className="font-body text-[14px] text-text-secondary">
                   {DISEASE_LABELS[disease] ?? disease}
                 </Text>
                 <View className="rounded-lg bg-mint-soft px-3 py-0.5">
-                  <Text className="font-bodySemi text-[13px] text-mint">{count}</Text>
+                  <Text className="font-bodySemi text-[13px] text-mint">
+                    {count}
+                  </Text>
                 </View>
               </View>
             ))}
 
             <Text className="mb-4 mt-3 font-body text-[12px] text-text-muted">
-              Stored locally. No patient-identifying data. Last sync: {formatLastSync(lastSyncMs)}
+              Stored locally. No patient-identifying data. Last sync:{" "}
+              {formatLastSync(lastSyncMs)}
             </Text>
 
             {/* Sync button */}
@@ -197,18 +284,34 @@ export default function ProfileScreen() {
               ) : syncStatus === "error" ? (
                 <XCircle size={15} color="#FF453A" strokeWidth={2} />
               ) : (
-                <Upload size={15} color={syncEnabled ? "#0C0C0E" : "#505058"} strokeWidth={1.8} />
+                <Upload
+                  size={15}
+                  color={syncEnabled ? "#0C0C0E" : "#505058"}
+                  strokeWidth={1.8}
+                />
               )}
-              <Text className={[
-                "font-bodySemi text-[13px]",
-                syncEnabled ? "text-text-inverse" : "text-text-muted",
-              ].join(" ")}>
-                {syncing ? "Syncing…" : syncStatus === "ok" ? "Synced!" : "Sync to National Registry"}
+              <Text
+                className={[
+                  "font-bodySemi text-[13px]",
+                  syncEnabled ? "text-text-inverse" : "text-text-muted",
+                ].join(" ")}
+              >
+                {syncing
+                  ? "Syncing…"
+                  : syncStatus === "ok"
+                    ? "Synced!"
+                    : "Sync to National Registry"}
               </Text>
             </TouchableOpacity>
 
             {syncMsg && syncStatus !== "idle" ? (
-              <Text className={`mt-2 text-center font-body text-[11px] ${syncStatus === "error" ? "text-clinical-red" : "text-text-muted"}`}>
+              <Text
+                className={`mt-2 text-center font-body text-[11px] ${
+                  syncStatus === "error"
+                    ? "text-clinical-red"
+                    : "text-text-muted"
+                }`}
+              >
                 {syncMsg}
               </Text>
             ) : null}
@@ -230,15 +333,25 @@ export default function ProfileScreen() {
         <View className="rounded-clinical border border-border bg-ink-800 p-4">
           <View className="mb-3 flex-row items-center gap-2">
             <Database size={16} color="#00D7B5" />
-            <Text className="font-bodySemi text-[15px] text-text-primary">Offline Content Registry</Text>
+            <Text className="font-bodySemi text-[15px] text-text-primary">
+              Offline Content Registry
+            </Text>
           </View>
           <InfoRow label="Content versions" value={contentSummary.versions} />
-          <InfoRow label="Configured sync feeds" value={contentSummary.syncFeeds} />
-          <InfoRow label="Offline media assets" value={contentSummary.mediaAssets} last />
+          <InfoRow
+            label="Configured sync feeds"
+            value={contentSummary.syncFeeds}
+          />
+          <InfoRow
+            label="Offline media assets"
+            value={contentSummary.mediaAssets}
+            last
+          />
           <View className="mt-3 flex-row items-start gap-2 rounded-xl border border-border-accent bg-mint-soft px-3 py-2">
             <RefreshCcw size={13} color="#C8F53C" style={{ marginTop: 1 }} />
             <Text className="flex-1 font-body text-[12px] leading-5 text-text-secondary">
-              Pull updates from configured remote feeds without re-installing the app.
+              Pull updates from configured remote feeds without re-installing
+              the app.
             </Text>
           </View>
 
@@ -247,12 +360,16 @@ export default function ProfileScreen() {
             disabled={pulling || contentSummary.syncFeeds === 0}
             className={[
               "mt-3 flex-row items-center justify-center gap-2 rounded-2xl px-4 py-3",
-              contentSummary.syncFeeds > 0 ? "bg-mint" : "bg-ink-700 border border-border",
+              contentSummary.syncFeeds > 0
+                ? "bg-mint"
+                : "bg-ink-700 border border-border",
             ].join(" ")}
             activeOpacity={0.78}
             accessibilityRole="button"
             accessibilityLabel="Pull latest content from remote feeds"
-            accessibilityState={{ disabled: pulling || contentSummary.syncFeeds === 0 }}
+            accessibilityState={{
+              disabled: pulling || contentSummary.syncFeeds === 0,
+            }}
           >
             {pulling ? (
               <ActivityIndicator size="small" color="#0C0C0E" />
@@ -261,18 +378,34 @@ export default function ProfileScreen() {
             ) : pullStatus === "error" ? (
               <XCircle size={15} color="#FF453A" strokeWidth={2} />
             ) : (
-              <RefreshCcw size={15} color={contentSummary.syncFeeds > 0 ? "#0C0C0E" : "#505058"} strokeWidth={1.8} />
+              <RefreshCcw
+                size={15}
+                color={contentSummary.syncFeeds > 0 ? "#0C0C0E" : "#505058"}
+                strokeWidth={1.8}
+              />
             )}
-            <Text className={[
-              "font-bodySemi text-[13px]",
-              contentSummary.syncFeeds > 0 ? "text-text-inverse" : "text-text-muted",
-            ].join(" ")}>
-              {pulling ? "Pulling…" : pullStatus === "ok" ? "Up to date" : "Pull latest content"}
+            <Text
+              className={[
+                "font-bodySemi text-[13px]",
+                contentSummary.syncFeeds > 0
+                  ? "text-text-inverse"
+                  : "text-text-muted",
+              ].join(" ")}
+            >
+              {pulling
+                ? "Pulling…"
+                : pullStatus === "ok"
+                  ? "Up to date"
+                  : "Pull latest content"}
             </Text>
           </TouchableOpacity>
 
           {pullMsg && pullStatus !== "idle" ? (
-            <Text className={`mt-2 text-center font-body text-[11px] ${pullStatus === "error" ? "text-clinical-red" : "text-text-muted"}`}>
+            <Text
+              className={`mt-2 text-center font-body text-[11px] ${
+                pullStatus === "error" ? "text-clinical-red" : "text-text-muted"
+              }`}
+            >
               {pullMsg}
             </Text>
           ) : null}
@@ -287,14 +420,19 @@ export default function ProfileScreen() {
 
       {/* About */}
       <View className="mt-6 rounded-clinical border border-border bg-ink-800 p-4">
-        <Text className="mb-2 font-bodySemi text-[15px] text-text-primary">Clinical OS</Text>
+        <Text className="mb-2 font-bodySemi text-[15px] text-text-primary">
+          Clinical OS
+        </Text>
         <Text className="mb-3 font-body text-[13px] leading-5 text-text-muted">
-          Offline-first clinical reference for Bangladeshi doctors. GP protocols, drug search, emergency dosing, and legally sourced free content.
+          Offline-first clinical reference for Bangladeshi doctors. GP
+          protocols, drug search, emergency dosing, and legally sourced free
+          content.
         </Text>
         <View className="flex-row items-start gap-2 rounded-xl border border-border-red bg-clinical-redSoft px-3 py-2">
           <AlertTriangle size={13} color="#FF453A" style={{ marginTop: 1 }} />
           <Text className="flex-1 font-body text-[12px] leading-5 text-clinical-red">
-            For clinical reference only. All content must be reviewed by qualified medical professionals before clinical use.
+            For clinical reference only. All content must be reviewed by
+            qualified medical professionals before clinical use.
           </Text>
         </View>
       </View>
@@ -308,7 +446,43 @@ export default function ProfileScreen() {
         accessibilityLabel="Privacy policy"
       >
         <ShieldCheck size={13} color="#505058" strokeWidth={1.6} />
-        <Text className="font-body text-[12px] text-text-muted">Privacy Policy</Text>
+        <Text className="font-body text-[12px] text-text-muted">
+          Privacy Policy
+        </Text>
+      </TouchableOpacity>
+
+      {/* Sign out */}
+      {storedUser ? (
+        <TouchableOpacity
+          onPress={async () => {
+            triggerSelectionHaptic();
+            await signOut();
+            router.replace("/auth" as any);
+          }}
+          className="mt-5 flex-row items-center justify-center gap-2 rounded-clinical border border-border bg-ink-800 py-4"
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Sign out"
+        >
+          <LogOut size={15} color="#FF453A" strokeWidth={1.6} />
+          <Text className="font-bodySemi text-[14px] text-clinical-red">
+            Sign out
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+
+      {/* Legal links */}
+      <TouchableOpacity
+        onPress={() => router.push("/legal/privacy" as any)}
+        className="mt-5 flex-row items-center justify-center gap-2"
+        activeOpacity={0.7}
+        accessibilityRole="link"
+        accessibilityLabel="Privacy policy"
+      >
+        <ShieldCheck size={13} color="#505058" strokeWidth={1.6} />
+        <Text className="font-body text-[12px] text-text-muted">
+          Privacy Policy
+        </Text>
       </TouchableOpacity>
 
       <Text className="mt-3 text-center font-body text-[12px] text-text-muted">
@@ -318,9 +492,17 @@ export default function ProfileScreen() {
   );
 }
 
-function InfoRow({ label, value, last = false }: { label: string; value: number; last?: boolean }) {
+function InfoRow({
+  label,
+  value,
+  last = false,
+}: { label: string; value: number; last?: boolean }) {
   return (
-    <View className={`flex-row items-center justify-between py-2 ${last ? "" : "border-b border-border-soft"}`}>
+    <View
+      className={`flex-row items-center justify-between py-2 ${
+        last ? "" : "border-b border-border-soft"
+      }`}
+    >
       <Text className="font-body text-[14px] text-text-secondary">{label}</Text>
       <Text className="font-bodySemi text-[14px] text-mint">{value}</Text>
     </View>
