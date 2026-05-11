@@ -10,7 +10,7 @@ export const initialize = async (): Promise<SQLJsDatabase<typeof schema>> => {
   // GitHub Pages where the app is served from /clinical-os/.
   const dbUrl = new URL("database.sqlite", document.baseURI).href;
   const [SQL, buf] = await Promise.all([
-    initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` }),
+    initSqlJs({ locateFile: (file) => new URL(file, document.baseURI).href }),
     fetch(dbUrl).then((res) => res.arrayBuffer()),
   ]);
   const sqldb = new SQL.Database(new Uint8Array(buf));
