@@ -1,15 +1,9 @@
-import "./global.css";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { ThemeProvider } from "@react-navigation/native";
-import { SplashScreen, Stack, router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import * as React from "react";
-import { useEffect } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PortalHost } from "@/components/primitives/portal";
 import { DatabaseProvider } from "@/db/provider";
+import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { setAndroidNavigationBar } from "@/lib/android-navigation-bar";
 import { DARK_THEME } from "@/lib/constants";
+import { isOnboarded } from "@/lib/persona";
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -17,8 +11,14 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { useFrameworkReady } from "@/hooks/useFrameworkReady";
-import { isOnboarded } from "@/lib/persona";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { ThemeProvider } from "@react-navigation/native";
+import { SplashScreen, Stack, router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import * as React from "react";
+import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "./global.css";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -57,12 +57,57 @@ export default function RootLayout() {
           <BottomSheetModalProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="onboarding" options={{ headerShown: false, animation: "fade" }} />
-              <Stack.Screen name="dims/brand/[id]" options={{ headerShown: false }} />
-              <Stack.Screen name="dims/generic/[id]" options={{ headerShown: false }} />
-              <Stack.Screen name="gp/[system]" options={{ headerShown: false }} />
-              <Stack.Screen name="gp/condition/[id]" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="onboarding"
+                options={{ headerShown: false, animation: "fade" }}
+              />
+              <Stack.Screen
+                name="dims/brand/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="dims/generic"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="dims/generic/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="gp/[system]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="gp/condition/[id]"
+                options={{ headerShown: false }}
+              />
               <Stack.Screen name="gp/quiz" options={{ headerShown: false }} />
+              <Stack.Screen name="gp/ecg" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="gp/ecg/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="gp/cxr" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="gp/cxr/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="dims/companies"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="dims/companies/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="dims/interactions"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="legal/privacy"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </BottomSheetModalProvider>
         </GestureHandlerRootView>

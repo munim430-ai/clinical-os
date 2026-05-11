@@ -64,8 +64,12 @@ export const medicines = sqliteTable("medicines", {
 });
 
 export const genericIndications = sqliteTable("generic_indications", {
-  genericId: integer("generic_id").notNull().references(() => generics.id),
-  indicationId: integer("indication_id").notNull().references(() => indications.id),
+  genericId: integer("generic_id")
+    .notNull()
+    .references(() => generics.id),
+  indicationId: integer("indication_id")
+    .notNull()
+    .references(() => indications.id),
 });
 
 // ─── GP Master ───────────────────────────────────────────────────────────────
@@ -187,7 +191,9 @@ export const erDrugs = sqliteTable("er_drugs", {
   concentrationMgPerMl: real("concentration_mg_per_ml"),
   dilutionNotes: text("dilution_notes"),
   warningNote: text("warning_note"),
-  isPaediatricSafe: integer("is_paediatric_safe", { mode: "boolean" }).default(true),
+  isPaediatricSafe: integer("is_paediatric_safe", { mode: "boolean" }).default(
+    true,
+  ),
   orderIndex: integer("order_index"),
 });
 
@@ -199,6 +205,34 @@ export const caseLogs = sqliteTable("case_logs", {
   district: text("district"),
   loggedAt: text("logged_at").default(sql`(CURRENT_TIMESTAMP)`),
   synced: integer("synced", { mode: "boolean" }).default(false),
+});
+
+// ─── Wallet: Clinic Locations & Visit Logs ───────────────────────────────────
+
+export const clinics = sqliteTable("clinics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  nameBn: text("name_bn"),
+  address: text("address"),
+  schedule: text("schedule"),
+  feeBdt: integer("fee_bdt").notNull().default(500),
+  color: text("color").default("#00D7B5"),
+  active: integer("active", { mode: "boolean" }).default(true),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const visitLogs = sqliteTable("visit_logs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  clinicId: integer("clinic_id")
+    .notNull()
+    .references(() => clinics.id),
+  date: text("date").notNull(),
+  startTime: text("start_time"),
+  endTime: text("end_time"),
+  patients: integer("patients").notNull().default(0),
+  earningsBdt: integer("earnings_bdt").notNull().default(0),
+  notes: text("notes"),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 // ─── Content sync, legal imports, and offline media ──────────────────────────
@@ -240,7 +274,9 @@ export const mediaAssets = sqliteTable("media_assets", {
   checksum: text("checksum"),
   sizeBytes: integer("size_bytes"),
   lastSyncedAt: text("last_synced_at"),
-  offlineAvailable: integer("offline_available", { mode: "boolean" }).default(false),
+  offlineAvailable: integer("offline_available", { mode: "boolean" }).default(
+    false,
+  ),
 });
 
 export const appAlerts = sqliteTable("app_alerts", {
