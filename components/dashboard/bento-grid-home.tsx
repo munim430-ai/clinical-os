@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -34,6 +34,7 @@ import { sql } from 'drizzle-orm';
 import { useDatabase } from '@/db/provider';
 import { systems as systemsTable, conditions as conditionsTable } from '@/db/schema';
 import { getTotalCases } from '@/lib/surveillance';
+import { DailyPulse } from '@/components/dashboard/daily-pulse';
 
 const { width: screenWidth } = Dimensions.get('window');
 const cardSpacing = 12;
@@ -234,7 +235,12 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
           </View>
         </View>
 
-        {/* Bento Grid */}
+        
+        {/* DailyPulse */}
+        <View style={{ paddingHorizontal: 12, marginBottom: 4 }}>
+          <DailyPulse />
+        </View>
+{/* Bento Grid */}
         <View style={styles.grid}>
           {/* Large Stats Card */}
           <BentoCard
@@ -460,3 +466,4 @@ const styles = {
     height: 120, // Extra space for one-handed reach
   },
 };
+
