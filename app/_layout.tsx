@@ -2,6 +2,7 @@ import { PortalHost } from "@/components/primitives/portal";
 import { DatabaseProvider } from "@/db/provider";
 import { useFrameworkReady } from "@/hooks/useFrameworkReady";
 import { setAndroidNavigationBar } from "@/lib/android-navigation-bar";
+import { getStoredToken, restoreSession } from "@/lib/auth";
 import { DARK_THEME } from "@/lib/constants";
 import { isOnboarded } from "@/lib/persona";
 import {
@@ -44,8 +45,11 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loaded) return;
     SplashScreen.hideAsync();
+    restoreSession();
     if (!isOnboarded()) {
       router.replace("/onboarding");
+    } else if (!getStoredToken()) {
+      router.replace("/auth" as any);
     }
   }, [loaded]);
 
@@ -107,6 +111,10 @@ export default function RootLayout() {
               <Stack.Screen
                 name="legal/privacy"
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="auth/index"
+                options={{ headerShown: false, animation: "fade" }}
               />
               <Stack.Screen
                 name="prescription/index"

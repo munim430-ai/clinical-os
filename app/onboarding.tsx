@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
+import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { type Persona, markOnboarded, setPersona } from "@/lib/persona";
 import { router } from "expo-router";
 import { GraduationCap, Stethoscope, UserCheck } from "lucide-react";
-import { setPersona, markOnboarded, type Persona } from "@/lib/persona";
-import { ClinicalShell } from "@/components/layout/ClinicalShell";
-import { ClinicalHumorHero } from "@/components/hero/ClinicalHumorHero";
-import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const OPTIONS = [
   {
@@ -35,7 +35,7 @@ export default function OnboardingScreen() {
     triggerSelectionHaptic();
     setPersona(p);
     markOnboarded();
-    router.replace("/(tabs)/home/index");
+    router.replace("/auth" as any);
   }
 
   return (
