@@ -108,6 +108,10 @@ export default function RootLayout() {
                 name="legal/privacy"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="prescription/index"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </BottomSheetModalProvider>
         </GestureHandlerRootView>

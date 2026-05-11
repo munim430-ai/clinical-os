@@ -9,17 +9,20 @@ import {
 } from "@/db/schema";
 import { isBookmarked, toggleBookmark } from "@/lib/bookmarks";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { addDrugToDraft, getDrugCount } from "@/lib/prescription";
+import { useFocusEffect } from "@react-navigation/native";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
   ChevronRight,
+  ClipboardPlus,
   Heart,
   Pill,
   ShieldAlert,
   TrendingDown,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -42,6 +45,14 @@ export default function BrandDetailScreen() {
   const [data, setData] = useState<any>(null);
   const [alternatives, setAlternatives] = useState<AltRow[]>([]);
   const [bookmarked, setBookmarked] = useState(false);
+  const [rxCount, setRxCount] = useState(0);
+  const [addedToRx, setAddedToRx] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      setRxCount(getDrugCount());
+    }, []),
+  );
 
   useEffect(() => {
     if (!db || !id) return;
@@ -184,6 +195,76 @@ export default function BrandDetailScreen() {
               ) : null}
             </View>
           </View>
+
+          {/* Add to Prescription */}
+          <TouchableOpacity
+            onPress={() => {
+              triggerSelectionHaptic();
+              addDrugToDraft({
+                id: data.id,
+                brandName: data.brandName,
+                genericName: data.genericName ?? null,
+                strength: data.strength ?? null,
+                dosageForm: data.dosageForm ?? null,
+              });
+              setAddedToRx(true);
+              setRxCount(getDrugCount());
+            }}
+            className={
+              addedToRx
+                ? "mt-4 flex-row items-center justify-between rounded-clinical border border-mint bg-mint-soft p-4"
+                : "mt-4 flex-row items-center justify-between rounded-clinical border border-border bg-ink-800 p-4"
+            }
+            activeOpacity={0.78}
+            accessibilityRole="button"
+            accessibilityLabel="Add to prescription"
+          >
+            <View className="flex-1 flex-row items-center gap-3">
+              <View
+                className={`h-9 w-9 items-center justify-center rounded-2xl border ${
+                  addedToRx
+                    ? "bg-mint-soft border-mint"
+                    : "bg-ink-700 border-border-soft"
+                }`}
+              >
+                <ClipboardPlus
+                  size={16}
+                  color={addedToRx ? "#C8F53C" : "#7A7A80"}
+                  strokeWidth={1.7}
+                />
+              </View>
+              <View className="flex-1">
+                <Text
+                  className={`font-bodySemi text-[14px] ${
+                    addedToRx ? "text-mint" : "text-text-primary"
+                  }`}
+                >
+                  {addedToRx ? "Added to prescription" : "Add to prescription"}
+                </Text>
+                <Text className="mt-0.5 font-body text-[11px] text-text-muted">
+                  {rxCount > 0
+                    ? `${rxCount} drug${rxCount !== 1 ? "s" : ""} in current Rx`
+                    : "Start a new prescription"}
+                </Text>
+              </View>
+            </View>
+            {addedToRx ? (
+              <TouchableOpacity
+                onPress={() => {
+                  triggerSelectionHaptic();
+                  router.push("/prescription" as any);
+                }}
+                className="rounded-pill bg-mint px-3 py-1.5"
+                activeOpacity={0.78}
+              >
+                <Text className="font-bodySemi text-[12px] text-text-inverse">
+                  View Rx
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <ChevronRight size={17} color="#7A7A80" strokeWidth={1.6} />
+            )}
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => {

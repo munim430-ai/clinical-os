@@ -4,11 +4,13 @@ import { useDatabase } from "@/db/provider";
 import { dosageForms, generics, manufacturers, medicines } from "@/db/schema";
 import { type BookmarkEntry, getBookmarks } from "@/lib/bookmarks";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { getDrugCount } from "@/lib/prescription";
 import { useFocusEffect } from "@react-navigation/native";
 import { and, eq, like, or, sql } from "drizzle-orm";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   Building2,
+  ClipboardList,
   FlaskConical,
   Heart,
   Leaf,
@@ -117,10 +119,12 @@ export default function DIMSScreen() {
   }, [query, typeFilter, search]);
 
   const [bookmarks, setBookmarks] = useState<BookmarkEntry[]>([]);
+  const [rxCount, setRxCount] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
       setBookmarks(getBookmarks());
+      setRxCount(getDrugCount());
     }, []),
   );
 
@@ -128,13 +132,31 @@ export default function DIMSScreen() {
 
   return (
     <ClinicalShell>
-      <View className="pb-3 pt-2">
-        <Text className="font-heading text-[32px] leading-10 text-text-primary">
-          DIMS
-        </Text>
-        <Text className="mt-1 font-body text-[13px] text-text-muted">
-          Search 21,700+ Bangladesh drug brands
-        </Text>
+      <View className="pb-3 pt-2 flex-row items-start justify-between">
+        <View>
+          <Text className="font-heading text-[32px] leading-10 text-text-primary">
+            DIMS
+          </Text>
+          <Text className="mt-1 font-body text-[13px] text-text-muted">
+            Search 21,700+ Bangladesh drug brands
+          </Text>
+        </View>
+        {rxCount > 0 ? (
+          <TouchableOpacity
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push("/prescription" as any);
+            }}
+            className="mt-1 flex-row items-center gap-1.5 rounded-pill border border-mint bg-mint-soft px-3 py-2"
+            activeOpacity={0.78}
+            accessibilityLabel="View prescription"
+          >
+            <ClipboardList size={14} color="#C8F53C" strokeWidth={1.7} />
+            <Text className="font-bodySemi text-[12px] text-mint">
+              Rx · {rxCount}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {/* Search bar */}
