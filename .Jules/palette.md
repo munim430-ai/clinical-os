@@ -1,0 +1,4 @@
+## 2024-05-12 - Accessibility Roles and States in React Native
+
+**Learning:** Interactive components like `TouchableOpacity` or `Pressable` in React Native need explicit `accessibilityRole="button"` and `accessibilityLabel` when they only contain icons or have visual-only states. Additionally, using `accessibilityState` to communicate `expanded` or `selected` states is crucial for screen reader users to understand interactive lists and chips.
+**Action:** When adding or modifying interactive UI components like back buttons, expandable list items, or toggle chips, always ensure `accessibilityRole`, `accessibilityLabel`, and appropriate `accessibilityState` props are provided to make them accessible to screen readers.
