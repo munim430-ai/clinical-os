@@ -102,6 +102,8 @@ export default function GenericDetailScreen() {
             <TouchableOpacity
               onPress={() => { triggerSelectionHaptic(); router.back(); }}
               className="mr-3 h-11 w-11 items-center justify-center rounded-2xl border border-border bg-ink-800"
+              accessibilityRole="button"
+              accessibilityLabel="Back"
             >
               <ArrowLeft size={21} color="#C8F53C" strokeWidth={1.7} />
             </TouchableOpacity>
@@ -144,6 +146,9 @@ export default function GenericDetailScreen() {
                 onPress={() => { triggerSelectionHaptic(); setExpanded(open ? null : key); }}
                 className="mb-2 overflow-hidden rounded-clinical border border-border bg-ink-800"
                 activeOpacity={0.82}
+                accessibilityRole="button"
+                accessibilityLabel={label}
+                accessibilityState={{ expanded: open }}
               >
                 <View className="flex-row items-center justify-between p-4">
                   <Text className="flex-1 font-bodySemi text-[15px] text-text-primary">{label}</Text>
@@ -193,6 +198,8 @@ export default function GenericDetailScreen() {
                   onPress={() => { triggerSelectionHaptic(); router.push(`/dims/brand/${b.id}` as any); }}
                   className="mb-2 flex-row items-center justify-between rounded-clinical border border-border bg-ink-800 p-4"
                   activeOpacity={0.78}
+                  accessibilityRole="button"
+                  accessibilityLabel={`View brand ${b.brandName}`}
                 >
                   <View className="flex-1 pr-3">
                     <View className="flex-row items-center gap-2">
@@ -231,6 +238,8 @@ function SortChip({ label, active, onPress }: { label: string; active: boolean; 
       onPress={onPress}
       className={active ? "rounded-pill bg-mint px-3 py-1" : "rounded-pill border border-border bg-ink-800 px-3 py-1"}
       activeOpacity={0.78}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
     >
       <Text className={active ? "font-bodySemi text-[11px] text-text-inverse" : "font-bodySemi text-[11px] text-text-muted"}>
         {label}
