@@ -1,0 +1,3 @@
+## 2025-02-12 - Icon-only Interactive Component Accessibility Oversight
+**Learning:** This application heavily relies on interactive components such as `Pressable` and `TouchableOpacity` that contain only icons (e.g., ThemeToggle, ER mode back/search). In multiple places, these interactive elements were missing crucial accessibility properties, making it difficult for screen readers to interpret their functions.
+**Action:** When auditing or adding new icon-only buttons (`Pressable` or `TouchableOpacity`), always ensure that both `accessibilityRole="button"` and a descriptive `accessibilityLabel` are applied.
