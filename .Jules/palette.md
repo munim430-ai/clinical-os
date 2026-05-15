@@ -1,0 +1,3 @@
+## 2024-05-15 - [React Native Accessibility for Custom Buttons]
+**Learning:** Custom interactive components like `Pressable` or `TouchableOpacity` used in this app's UI (e.g., AI orbs, floating action buttons) require explicit `accessibilityRole="button"` and `accessibilityLabel` for screen readers to recognize them as buttons and announce them correctly. Using `accessibilityState` to communicate `expanded` or `selected` states is also critical for dynamic controls.
+**Action:** Always add `accessibilityRole="button"` and `accessibilityLabel` when using `Pressable` or `TouchableOpacity` as a custom button or icon-only control. Add `accessibilityState` if the control has an active or selected state.
