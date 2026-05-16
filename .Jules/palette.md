@@ -1,0 +1,3 @@
+## 2025-03-05 - Accessibility for Icon-Only Buttons
+**Learning:** React Native's `Pressable` does not automatically provide semantic meaning to screen readers. For icon-only interactive components like a theme toggle button, it's essential to add `accessibilityRole="button"` and `accessibilityLabel` to ensure users relying on screen readers can understand and interact with the element properly.
+**Action:** Always verify if a custom component or `Pressable` uses an icon without descriptive text, and apply appropriate accessibility props such as `accessibilityRole` and `accessibilityLabel` based on its function and state.
