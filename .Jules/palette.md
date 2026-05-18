@@ -1,0 +1,3 @@
+## 2024-05-18 - React Native Interactive Components Missing Accessibility
+**Learning:** Custom interactive components (like `Pressable` and `TouchableOpacity`) in this React Native app do not automatically receive button roles or text alternatives, unlike standard web `<button>` elements. This makes them invisible or unhelpful to screen readers by default.
+**Action:** Always ensure that custom interactive components use explicit `accessibilityRole="button"`, an `accessibilityLabel` (especially for icon-only buttons), and `accessibilityState` to properly communicate their function and state to assistive technologies.
