@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   TouchableOpacity,
   View,
@@ -6,14 +6,17 @@ import {
   Animated,
   StyleSheet,
   Dimensions,
-} from 'react-native';
+} from "react-native";
 
-const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
-import { BlurView } from 'expo-blur';
-import { Sparkles, MessageCircle, X } from 'lucide-react';
-import { MotiView } from 'moti';
-import { FrostedGlass } from '@/components/ui/glassmorphism';
-import { triggerSelectionHaptic, triggerSuccessHaptic } from '@/lib/clinical-haptics';
+const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+import { BlurView } from "expo-blur";
+import { Sparkles, MessageCircle, X } from "lucide-react";
+import { MotiView } from "moti";
+import { FrostedGlass } from "@/components/ui/glassmorphism";
+import {
+  triggerSelectionHaptic,
+  triggerSuccessHaptic,
+} from "@/lib/clinical-haptics";
 
 interface AIAssistantButtonProps {
   onPress?: () => void;
@@ -21,10 +24,10 @@ interface AIAssistantButtonProps {
   visible?: boolean;
 }
 
-export function AIAssistantButton({ 
-  onPress, 
-  onChatToggle, 
-  visible = true 
+export function AIAssistantButton({
+  onPress,
+  onChatToggle,
+  visible = true,
 }: AIAssistantButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPulsing, setIsPulsing] = useState(true);
@@ -48,7 +51,7 @@ export function AIAssistantButton({
             duration: 2000,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       pulseLoop.start();
 
@@ -65,7 +68,7 @@ export function AIAssistantButton({
             duration: 1500,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       glowLoop.start();
 
@@ -82,13 +85,13 @@ export function AIAssistantButton({
 
   const handlePress = () => {
     triggerSelectionHaptic();
-    
+
     if (isExpanded) {
       // Collapse
       setIsExpanded(false);
       setIsPulsing(true);
       onChatToggle?.(false);
-      
+
       // Animate out
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -108,7 +111,7 @@ export function AIAssistantButton({
       setIsPulsing(false);
       onChatToggle?.(true);
       onPress?.();
-      
+
       // Animate in
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -127,7 +130,7 @@ export function AIAssistantButton({
 
   const handleQuickAction = (action: string) => {
     triggerSuccessHaptic();
-    console.log('Quick action:', action);
+    console.log("Quick action:", action);
     // Handle quick actions here
   };
 
@@ -141,7 +144,7 @@ export function AIAssistantButton({
           scale: isExpanded ? 0.9 : 1,
         }}
         transition={{
-          type: 'spring',
+          type: "spring",
           stiffness: 300,
           damping: 30,
         }}
@@ -151,6 +154,9 @@ export function AIAssistantButton({
           style={styles.mainButton}
           onPress={handlePress}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Toggle Clinical AI Assistant"
+          accessibilityState={{ expanded: isExpanded }}
         >
           {/* Glow Effect */}
           <Animated.View
@@ -162,20 +168,16 @@ export function AIAssistantButton({
               },
             ]}
           />
-          
+
           {/* Button Content */}
-          <BlurView
-            intensity={100}
-            tint="dark"
-            style={styles.buttonBlur}
-          >
+          <BlurView intensity={100} tint="dark" style={styles.buttonBlur}>
             <View style={styles.buttonContent}>
               <MotiView
                 animate={{
-                  rotate: isExpanded ? '180deg' : '0deg',
+                  rotate: isExpanded ? "180deg" : "0deg",
                 }}
                 transition={{
-                  type: 'spring',
+                  type: "spring",
                   stiffness: 300,
                   damping: 30,
                 }}
@@ -204,14 +206,19 @@ export function AIAssistantButton({
         >
           <FrostedGlass style={styles.actionsContainer}>
             <Text style={styles.actionsTitle}>Clinical AI Assistant</Text>
-            
+
             {/* Quick Actions */}
             <View style={styles.quickActions}>
               <TouchableOpacity
                 style={styles.quickAction}
-                onPress={() => handleQuickAction('diagnosis')}
+                onPress={() => handleQuickAction("diagnosis")}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: '#00D7B5' + '20' }]}>
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: "#00D7B5" + "20" },
+                  ]}
+                >
                   <MessageCircle size={20} color="#00D7B5" />
                 </View>
                 <Text style={styles.quickActionText}>Diagnosis Help</Text>
@@ -219,9 +226,14 @@ export function AIAssistantButton({
 
               <TouchableOpacity
                 style={styles.quickAction}
-                onPress={() => handleQuickAction('drug')}
+                onPress={() => handleQuickAction("drug")}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: '#C8F53C' + '20' }]}>
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: "#C8F53C" + "20" },
+                  ]}
+                >
                   <Sparkles size={20} color="#C8F53C" />
                 </View>
                 <Text style={styles.quickActionText}>Drug Interactions</Text>
@@ -229,9 +241,14 @@ export function AIAssistantButton({
 
               <TouchableOpacity
                 style={styles.quickAction}
-                onPress={() => handleQuickAction('protocol')}
+                onPress={() => handleQuickAction("protocol")}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: '#64D2FF' + '20' }]}>
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: "#64D2FF" + "20" },
+                  ]}
+                >
                   <MessageCircle size={20} color="#64D2FF" />
                 </View>
                 <Text style={styles.quickActionText}>Protocol Guide</Text>
@@ -239,9 +256,14 @@ export function AIAssistantButton({
 
               <TouchableOpacity
                 style={styles.quickAction}
-                onPress={() => handleQuickAction('emergency')}
+                onPress={() => handleQuickAction("emergency")}
               >
-                <View style={[styles.quickActionIcon, { backgroundColor: '#FF453A' + '20' }]}>
+                <View
+                  style={[
+                    styles.quickActionIcon,
+                    { backgroundColor: "#FF453A" + "20" },
+                  ]}
+                >
                   <Sparkles size={20} color="#FF453A" />
                 </View>
                 <Text style={styles.quickActionText}>Emergency Support</Text>
@@ -250,7 +272,9 @@ export function AIAssistantButton({
 
             {/* Input Hint */}
             <View style={styles.inputHint}>
-              <Text style={styles.inputHintText}>Ask me anything about clinical practice...</Text>
+              <Text style={styles.inputHintText}>
+                Ask me anything about clinical practice...
+              </Text>
             </View>
           </FrostedGlass>
         </Animated.View>
@@ -261,40 +285,40 @@ export function AIAssistantButton({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     right: 20,
     zIndex: 1000,
   },
   mainButton: {
     width: 64,
     height: 64,
-    position: 'relative',
+    position: "relative",
   },
   glow: {
-    position: 'absolute',
+    position: "absolute",
     top: -10,
     left: -10,
     right: -10,
     bottom: -10,
     borderRadius: 42,
-    backgroundColor: '#C8F53C',
+    backgroundColor: "#C8F53C",
     opacity: 0.3,
   },
   buttonBlur: {
     flex: 1,
     borderRadius: 32,
     borderWidth: 1,
-    borderColor: 'rgba(184, 255, 210, 0.3)',
-    overflow: 'hidden',
+    borderColor: "rgba(184, 255, 210, 0.3)",
+    overflow: "hidden",
   },
   buttonContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(184, 255, 210, 0.1)',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(184, 255, 210, 0.1)",
   },
   expandedContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: 20,
     bottom: 180,
     width: screenWidth - 40,
@@ -304,48 +328,48 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   actionsTitle: {
     fontSize: 18,
-    fontFamily: 'Geist-Bold',
-    color: '#FFFFFF',
+    fontFamily: "Geist-Bold",
+    color: "#FFFFFF",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   quickActions: {
     gap: 12,
   },
   quickAction: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 12,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
   quickActionIcon: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 16,
   },
   quickActionText: {
     fontSize: 16,
-    fontFamily: 'Inter_600SemiBold',
-    color: '#FFFFFF',
+    fontFamily: "Inter_600SemiBold",
+    color: "#FFFFFF",
   },
   inputHint: {
     marginTop: 16,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
   inputHintText: {
     fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-    color: '#7A7A80',
-    textAlign: 'center',
+    fontFamily: "Inter_400Regular",
+    color: "#7A7A80",
+    textAlign: "center",
   },
 });

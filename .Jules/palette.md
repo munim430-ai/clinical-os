@@ -1,0 +1,3 @@
+## 2024-05-18 - [React Native A11y on Custom Buttons]
+**Learning:** React Native developers frequently use `Pressable` and `TouchableOpacity` for custom buttons (like icon-only floating action buttons or theme toggles) but forget to add `accessibilityRole="button"`, `accessibilityLabel`, and relevant `accessibilityState` (e.g., `selected`, `expanded`). Without these, screen readers announce them as generic "clickable" elements without context, completely breaking the experience for assistive tech users.
+**Action:** When auditing or implementing custom interactive components in React Native, explicitly check for and add these accessibility props. If it acts like a button, make sure it tells the screen reader it is a button.
