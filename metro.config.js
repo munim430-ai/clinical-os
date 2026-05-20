@@ -35,6 +35,15 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
       type: "sourceFile",
     };
   }
+
+  // Platform-specific stubbing for web
+  if (platform === "web" && moduleName === "@insforge/sdk") {
+    return {
+      filePath: path.resolve(__dirname, "lib/insforge.web.ts"),
+      type: "sourceFile",
+    };
+  }
+
   return context.resolveRequest(context, moduleName, platform);
 };
 
