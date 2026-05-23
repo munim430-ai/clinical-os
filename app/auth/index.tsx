@@ -178,6 +178,11 @@ export default function AuthScreen() {
                   onPress={() => setShowPass((v) => !v)}
                   className="absolute right-0 bottom-3"
                   hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    showPass ? "Hide password" : "Show password"
+                  }
+                  accessibilityState={{ expanded: showPass }}
                 >
                   {showPass ? (
                     <EyeOff size={18} color="#505058" strokeWidth={1.6} />

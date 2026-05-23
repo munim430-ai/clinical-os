@@ -1,0 +1,3 @@
+## 2024-06-25 - React Native Password Toggle Accessibility
+**Learning:** Icon-only password visibility toggles in React Native require explicit accessibility props to be usable with screen readers, as the icon components (`Eye`, `EyeOff`) themselves do not convey state context automatically.
+**Action:** Always add `accessibilityRole="button"`, a descriptive `accessibilityLabel` that changes based on state (e.g., "Show password" vs "Hide password"), and `accessibilityState={{ expanded: isVisible }}` to icon-only `TouchableOpacity` or `Pressable` components used as inline form toggles.
