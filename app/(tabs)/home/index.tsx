@@ -124,7 +124,10 @@ function todayISO() {
 function BMIModal({
   visible,
   onClose,
-}: { visible: boolean; onClose: () => void }) {
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
 
@@ -155,7 +158,12 @@ function BMIModal({
               <Text className="font-heading text-[22px] text-text-primary">
                 BMI Calculator
               </Text>
-              <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={onClose}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Close modal"
+              >
                 <X size={20} color="#7A7A80" />
               </TouchableOpacity>
             </View>
@@ -225,7 +233,10 @@ function BMIModal({
 function EGFRModal({
   visible,
   onClose,
-}: { visible: boolean; onClose: () => void }) {
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
   const [creatinine, setCreatinine] = useState("");
   const [age, setAge] = useState("");
   const [sex, setSex] = useState<"male" | "female">("male");
@@ -281,7 +292,12 @@ function EGFRModal({
               <Text className="font-heading text-[22px] text-text-primary">
                 eGFR (CKD-EPI 2021)
               </Text>
-              <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={onClose}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Close modal"
+              >
                 <X size={20} color="#7A7A80" />
               </TouchableOpacity>
             </View>
@@ -390,7 +406,10 @@ const PEDI_PRESETS = [
 function PediDoseModal({
   visible,
   onClose,
-}: { visible: boolean; onClose: () => void }) {
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
   const [weight, setWeight] = useState("");
   const [dosePerKg, setDosePerKg] = useState("");
   const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
@@ -419,7 +438,12 @@ function PediDoseModal({
               <Text className="font-heading text-[22px] text-text-primary">
                 Paediatric Dose
               </Text>
-              <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={onClose}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Close modal"
+              >
                 <X size={20} color="#7A7A80" />
               </TouchableOpacity>
             </View>
@@ -529,7 +553,10 @@ function PediDoseModal({
 function PregWheelModal({
   visible,
   onClose,
-}: { visible: boolean; onClose: () => void }) {
+}: {
+  visible: boolean;
+  onClose: () => void;
+}) {
   const [lmp, setLmp] = useState("");
 
   const result = useMemo(() => {
@@ -581,7 +608,12 @@ function PregWheelModal({
               <Text className="font-heading text-[22px] text-text-primary">
                 Pregnancy Wheel
               </Text>
-              <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={onClose}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Close modal"
+              >
                 <X size={20} color="#7A7A80" />
               </TouchableOpacity>
             </View>

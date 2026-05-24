@@ -1,0 +1,3 @@
+## 2026-05-24 - Accessibility Attributes on Icon-Only Close Buttons
+**Learning:** Found multiple instances of `<TouchableOpacity>` used for modal close actions containing only an `<X>` icon without `accessibilityRole` or `accessibilityLabel`. This makes these critical interactions invisible or unclear to screen reader users.
+**Action:** When adding close or dismiss buttons using icon-only touchables in React Native, always include `accessibilityRole="button"` and `accessibilityLabel="Close modal"` (or similar context-specific text) to ensure interactive elements are properly announced by assistive technologies.
