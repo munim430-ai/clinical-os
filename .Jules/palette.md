@@ -1,0 +1,3 @@
+## 2024-05-24 - Screen Reader Support for Icon-Only Buttons
+**Learning:** In React Native, custom interactive elements (like `Pressable` or `TouchableOpacity`) used for icon-only buttons do not have default screen reader context. Without explicit accessibility properties, screen readers will not announce the button's purpose or state, making the app inaccessible to visually impaired users.
+**Action:** Always add `accessibilityRole="button"`, a descriptive `accessibilityLabel` (e.g., "Switch to light theme"), and `accessibilityState` (e.g., to indicate `checked`, `expanded`, or `selected` states) to any custom interactive component acting as an icon-only button.
