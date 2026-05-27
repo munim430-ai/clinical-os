@@ -1,0 +1,3 @@
+## 2024-06-25 - Accessibility for React Native Icon Buttons
+**Learning:** `Pressable` and `TouchableOpacity` components in React Native, when used as icon-only buttons (like those for navigation or action triggers), do not implicitly provide actionable context to screen readers.
+**Action:** Always explicitly add `accessibilityRole="button"` and an appropriate, descriptive `accessibilityLabel` to any standalone interactive elements to ensure they are properly identified and described by assistive technologies like VoiceOver or TalkBack.
