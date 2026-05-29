@@ -1,0 +1,3 @@
+## 2025-05-29 - [Missing Accessibility State in Custom React Native Interactive Elements]
+**Learning:** Custom interactive components like `Pressable` and `TouchableOpacity` in React Native often lack inherent semantic meaning and state properties without explicit ARIA-like definitions. Screen readers rely heavily on attributes such as `accessibilityRole="button"`, `accessibilityLabel`, and `accessibilityState={{ selected: boolean }}` to convey their correct behavior.
+**Action:** When adding new interactive components or updating existing custom elements like Floating Action Buttons (`AIOrbButton`), always ensure that `accessibilityRole`, `accessibilityLabel`, and `accessibilityState` are applied if the element behaves like a standard control.
