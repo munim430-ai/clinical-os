@@ -1,0 +1,3 @@
+## 2024-05-30 - Interactive UI Accessibility States in React Native
+**Learning:** Expanding custom components using `TouchableOpacity` or `Pressable` such as tabs or cards without native state mappings can cause issues with screen readers as they do not announce their current toggle or active state properly.
+**Action:** Always add `accessibilityState={{ expanded: isExpanded }}` or `accessibilityState={{ selected: isSelected }}` alongside standard `accessibilityRole` and `accessibilityLabel` for interactive custom UI elements like accordion cards, toggle switches, or tabs.
