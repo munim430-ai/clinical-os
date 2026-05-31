@@ -21,10 +21,10 @@ interface AIAssistantButtonProps {
   visible?: boolean;
 }
 
-export function AIAssistantButton({ 
-  onPress, 
-  onChatToggle, 
-  visible = true 
+export function AIAssistantButton({
+  onPress,
+  onChatToggle,
+  visible = true
 }: AIAssistantButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPulsing, setIsPulsing] = useState(true);
@@ -82,13 +82,13 @@ export function AIAssistantButton({
 
   const handlePress = () => {
     triggerSelectionHaptic();
-    
+
     if (isExpanded) {
       // Collapse
       setIsExpanded(false);
       setIsPulsing(true);
       onChatToggle?.(false);
-      
+
       // Animate out
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -108,7 +108,7 @@ export function AIAssistantButton({
       setIsPulsing(false);
       onChatToggle?.(true);
       onPress?.();
-      
+
       // Animate in
       Animated.parallel([
         Animated.timing(slideAnim, {
@@ -162,7 +162,7 @@ export function AIAssistantButton({
               },
             ]}
           />
-          
+
           {/* Button Content */}
           <BlurView
             intensity={100}
@@ -204,7 +204,7 @@ export function AIAssistantButton({
         >
           <FrostedGlass style={styles.actionsContainer}>
             <Text style={styles.actionsTitle}>Clinical AI Assistant</Text>
-            
+
             {/* Quick Actions */}
             <View style={styles.quickActions}>
               <TouchableOpacity
