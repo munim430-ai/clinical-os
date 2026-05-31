@@ -8,35 +8,20 @@ type AIOrbButtonProps = {
   onPress?: () => void;
 };
 
-export function AIOrbButton({
-  label = "Ask Clinical AI",
-  active,
-  onPress,
-}: AIOrbButtonProps) {
+export function AIOrbButton({ label = "Ask Clinical AI", active, onPress }: AIOrbButtonProps) {
   const handlePress = () => {
     triggerSelectionHaptic();
     onPress?.();
   };
 
   return (
-    <View
-      pointerEvents="box-none"
-      className="absolute bottom-6 left-0 right-0 items-center"
-    >
-      <Pressable
-        onPress={handlePress}
-        hitSlop={10}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        accessibilityState={{ expanded: active }}
-      >
+    <View pointerEvents="box-none" className="absolute bottom-6 left-0 right-0 items-center">
+      <Pressable onPress={handlePress} hitSlop={10}>
         {({ pressed }) => (
           <View
             className={[
               "h-[54px] min-w-[176px] flex-row items-center justify-center gap-2 rounded-pill border px-5",
-              active
-                ? "border-border-accent bg-mint"
-                : "border-border-accent bg-mint-soft",
+              active ? "border-border-accent bg-mint" : "border-border-accent bg-mint-soft",
             ].join(" ")}
             style={{
               shadowColor: "#C8F53C",
@@ -46,18 +31,8 @@ export function AIOrbButton({
               elevation: 10,
             }}
           >
-            <Sparkles
-              size={17}
-              color={active ? "#050505" : "#C8F53C"}
-              strokeWidth={1.7}
-            />
-            <Text
-              className={
-                active
-                  ? "font-bodySemi text-[14px] text-text-inverse"
-                  : "font-bodySemi text-[14px] text-mint"
-              }
-            >
+            <Sparkles size={17} color={active ? "#050505" : "#C8F53C"} strokeWidth={1.7} />
+            <Text className={active ? "font-bodySemi text-[14px] text-text-inverse" : "font-bodySemi text-[14px] text-mint"}>
               {label}
             </Text>
           </View>
