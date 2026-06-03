@@ -1,0 +1,3 @@
+## 2025-06-03 - Added ARIA roles to interactive components
+**Learning:** In React Native/Expo Web, generic wrappers like Pressable and TouchableOpacity without an accessibilityRole act like unlabelled divs to screen readers. Adding 'accessibilityRole="button"' immediately communicates their interactive nature, and pairing them with 'accessibilityLabel' (or 'accessibilityState' for interactive states like expanding) drastically improves screen reader UX without complex markup changes.
+**Action:** Ensure all interactive components that trigger actions, especially custom UI wrappers, have explicit accessibility roles and labels to maintain baseline accessibility.
