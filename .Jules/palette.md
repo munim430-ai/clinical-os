@@ -1,0 +1,3 @@
+## 2024-05-15 - AI Assistant Accessibility Support
+**Learning:** React Native custom interactive components (like `TouchableOpacity` floating action buttons or icon-only buttons) do not automatically provide rich context to screen readers. We need to explicitly supply `accessibilityRole="button"`, state-dependent `accessibilityLabel`, and dynamic `accessibilityState={{ expanded: isExpanded }}` to make interactive orbs and sub-menus accessible.
+**Action:** When creating or modifying custom interactive components—especially icon-only FABs with expand/collapse behavior—always verify screen reader roles, labels, and state properties are properly implemented.
