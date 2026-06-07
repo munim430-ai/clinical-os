@@ -19,7 +19,7 @@
     "format": "biome check --no-errors-on-unmatched --apply .",
     "db:generate": "bun drizzle-kit generate",
     "import:bd-medicine-scraper": "node scripts/import-bd-medicine-scraper.mjs",
-    "expo-check": "npx expo install --check"
+    "expo-check": "npx expo install --fix"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.0",
