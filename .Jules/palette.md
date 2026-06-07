@@ -1,0 +1,3 @@
+## 2024-11-20 - [Add ARIA to Pressable]
+**Learning:** React Native's `Pressable` component when used for custom interactive UI elements like the `AIOrbButton` requires explicit explicit `accessibilityRole="button"`, `accessibilityLabel`, and `accessibilityState` props to function properly with screen readers, as these aren't inferred automatically.
+**Action:** When creating custom buttons using `Pressable` in React Native, ensure it's explicitly marked as a button via `accessibilityRole` and its dynamic states (like `selected` or `expanded`) are communicated to screen readers via `accessibilityState`.
