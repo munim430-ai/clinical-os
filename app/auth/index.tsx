@@ -129,6 +129,9 @@ export default function AuthScreen() {
                 disabled={loading}
                 className="mt-4 items-center rounded-clinical bg-mint py-4"
                 activeOpacity={0.82}
+                accessibilityRole="button"
+                accessibilityLabel="Verify and continue"
+                accessibilityState={{ disabled: loading }}
               >
                 {loading ? (
                   <ActivityIndicator color="#0C0C0E" />
@@ -141,6 +144,8 @@ export default function AuthScreen() {
               <TouchableOpacity
                 onPress={() => setMode("signin")}
                 className="mt-3 items-center py-2"
+                accessibilityRole="button"
+                accessibilityLabel="Back to sign in"
               >
                 <Text className="font-body text-[13px] text-text-muted">
                   Back to sign in
@@ -178,6 +183,10 @@ export default function AuthScreen() {
                   onPress={() => setShowPass((v) => !v)}
                   className="absolute right-0 bottom-3"
                   hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    showPass ? "Hide password" : "Show password"
+                  }
                 >
                   {showPass ? (
                     <EyeOff size={18} color="#505058" strokeWidth={1.6} />
@@ -192,6 +201,11 @@ export default function AuthScreen() {
                 disabled={loading}
                 className="mt-5 items-center rounded-clinical bg-mint py-4"
                 activeOpacity={0.82}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  mode === "signin" ? "Sign in" : "Create account"
+                }
+                accessibilityState={{ disabled: loading }}
               >
                 {loading ? (
                   <ActivityIndicator color="#0C0C0E" />
@@ -209,6 +223,10 @@ export default function AuthScreen() {
                 }}
                 className="mt-3 items-center py-2"
                 activeOpacity={0.78}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  mode === "signin" ? "Switch to sign up" : "Switch to sign in"
+                }
               >
                 <Text className="font-body text-[13px] text-text-muted">
                   {mode === "signin"
@@ -226,6 +244,8 @@ export default function AuthScreen() {
             }}
             className="mt-4 items-center py-2"
             activeOpacity={0.78}
+            accessibilityRole="button"
+            accessibilityLabel="Continue without account"
           >
             <Text className="font-body text-[12px] text-text-muted">
               Continue without account
@@ -272,6 +292,7 @@ function Field({
         autoCorrect={false}
         selectionColor="#C8F53C"
         className="font-body text-[15px] text-text-primary"
+        accessibilityLabel={label}
       />
     </View>
   );
