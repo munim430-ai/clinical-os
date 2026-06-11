@@ -29,7 +29,11 @@ export function PremiumMedicineCard({
   };
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable
+      onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={`View details for ${brandName}, ${genericName}, ${strength}`}
+    >
       {({ pressed }) => (
         <View
           className="overflow-hidden rounded-clinical border border-border bg-ink-800 p-4"
@@ -67,7 +71,9 @@ export function PremiumMedicineCard({
 
               <View className="mt-4 flex-row items-center gap-2">
                 <View className="rounded-xl border border-border-soft bg-ink-950 px-3 py-2">
-                  <Text className="font-bodySemi text-[13px] text-mint">{strength}</Text>
+                  <Text className="font-bodySemi text-[13px] text-mint">
+                    {strength}
+                  </Text>
                 </View>
 
                 <Text className="flex-1 font-body text-[13px] text-text-muted">
