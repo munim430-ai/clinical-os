@@ -1,0 +1,3 @@
+## 2024-05-18 - Essential A11y Attributes for Custom Interactive Components
+**Learning:** Found that custom interactive components in React Native (like `Pressable` or `TouchableOpacity` used for FABs, icon-only toggles, and AI orbs) do not automatically convey their purpose to screen readers. Relying solely on visual cues or child icons creates an inaccessible experience for visually impaired users.
+**Action:** Always include `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and `accessibilityState` (where applicable, e.g., to indicate `expanded` or `selected` state) for custom touchable wrappers. Additionally, ensure adequate touch targets are maintained by adding `hitSlop` properties, ensuring a minimum tap area for physical accessibility.
