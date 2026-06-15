@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing Accessibility Attributes on Custom Icon-Only Components
+**Learning:** React Native custom interactive components (like `Pressable` or `TouchableOpacity` used for icon-only buttons like theme toggles) often lack built-in semantic roles, accessibility labels, and adequate touch targets, negatively impacting screen reader users and those relying on larger hit areas.
+**Action:** Always verify and manually add `accessibilityRole="button"`, a descriptive, state-aware `accessibilityLabel`, and `hitSlop` (e.g., `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) to all icon-only interactive components.
