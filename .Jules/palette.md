@@ -1,0 +1,3 @@
+## 2024-06-18 - Missing ARIA/Accessibility bindings on React Native's Pressable buttons
+**Learning:** Custom interactive components (`Pressable`) in React Native often lack accessibility roles and labels by default. When acting as icon-only buttons, this provides no context to screen readers, creating critical accessibility barriers. Furthermore, small target areas reduce touch precision.
+**Action:** Always ensure that custom icon-only `Pressable` components have explicit `accessibilityRole="button"`, descriptive `accessibilityLabel` bindings, and adequate `hitSlop` configurations for reliable touch targets.
