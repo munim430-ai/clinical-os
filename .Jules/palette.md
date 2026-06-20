@@ -1,0 +1,3 @@
+## 2024-05-24 - Screen Reader Empty Targets in Interactive Components
+**Learning:** Custom interactive wrappers (like `TouchableOpacity` for `BentoCard` and icon-only buttons such as `Search`) across the app often lack basic `accessibilityRole` and `accessibilityLabel` attributes, creating "empty" touch targets for screen reader users. Additionally, icon-only buttons need `hitSlop` to ensure usable touch areas.
+**Action:** Always verify that every custom interactive component (`TouchableOpacity`, `Pressable`) includes `accessibilityRole="button"` and a contextual `accessibilityLabel`. Ensure icon-only buttons have an appropriate `hitSlop`.
