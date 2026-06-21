@@ -1,0 +1,3 @@
+## 2024-06-25 - TouchableOpacity icon-only buttons need proper hit targets and roles
+**Learning:** Icon-only buttons using `TouchableOpacity` in React Native components (like in Bento Grid) require explicit `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an expanded `hitSlop` to ensure they are screen-reader compatible and have an adequate touch target size.
+**Action:** Always add `accessibilityRole="button"`, `accessibilityLabel`, and `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}` to icon-only buttons, and use semantic titles for `accessibilityLabel` when buttons enclose complex content (like Bento cards).
