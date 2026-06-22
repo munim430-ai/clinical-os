@@ -1,3 +1,0 @@
-## 2024-05-18 - Accessibility for Custom Interactive Components
-**Learning:** Custom interactive components in React Native (like `Pressable` and `TextInput` inside custom wrappers) require explicit `accessibilityRole`, `accessibilityLabel`, and `accessibilityState` to ensure they are properly interpreted by screen readers. Specifically, using `accessibilityRole="button"` and mapping the `active` prop to `accessibilityState={{ selected: active }}` improves screen reader context for non-standard buttons like `AIOrbButton`.
-**Action:** Always verify that interactive custom components have appropriate accessibility attributes. When creating a custom button using `Pressable`, ensure it has an `accessibilityRole="button"` and a descriptive `accessibilityLabel`.
