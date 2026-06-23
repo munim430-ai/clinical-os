@@ -1,0 +1,3 @@
+## 2023-11-20 - [Accessibility on Touchables]
+**Learning:** In React Native, custom interactive components like `TouchableOpacity` or `Pressable` used for icon-only buttons or complex cards must have explicit `accessibilityRole="button"` and `accessibilityLabel` bindings, as well as `hitSlop` to ensure screen readers can announce them effectively and they have sufficient touch targets.
+**Action:** Always verify custom wrapper components have explicit `accessibilityLabel` bindings when they are created as a touchable pattern or an icon-only button without text children. Add `hitSlop` on icon buttons to ensure user interaction handles easily.
