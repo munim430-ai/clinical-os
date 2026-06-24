@@ -1,0 +1,3 @@
+## 2025-02-12 - [Accessibility] Improve icon-only ThemeToggle with screen-reader roles
+**Learning:** Found an accessibility issue pattern in the app's components, where icon-only `Pressable` components acting as buttons (like `ThemeToggle`) lacked `accessibilityRole`, `accessibilityLabel`, and `accessibilityState`. The screen reader might not read these interactable elements properly to visually impaired users.
+**Action:** When implementing custom buttons or icon-only touchable elements with `Pressable`, ensure you add `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an `accessibilityState` where relevant. Add `hitSlop` to ensure a larger touch target.
