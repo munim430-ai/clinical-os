@@ -1,0 +1,3 @@
+## 2024-06-28 - Explicit Accessibility Needs for React Native Icon Buttons
+**Learning:** Icon-only `Pressable` components in this React Native project do not inherit web-like semantic button behavior automatically. They lack screen reader context and often have too small a touch target for reliable mobile interaction.
+**Action:** When working with custom interactive components like `Pressable` or `TouchableOpacity` (especially those that are icon-only like `ThemeToggle`), always explicitly include `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and a `hitSlop` (e.g., `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) to ensure proper accessibility and usable touch targets.
