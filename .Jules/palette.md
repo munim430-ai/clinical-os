@@ -1,0 +1,3 @@
+## 2024-06-29 - Accessible Icon-Only Floating Actions
+**Learning:** Custom interactive components (like floating action buttons and expanded quick actions) built with `Pressable` or `TouchableOpacity` need explicit `accessibilityRole="button"`, meaningful `accessibilityLabel` attributes (especially when containing only icons like Sparkles or MessageCircle), and dynamic `accessibilityState` bindings (e.g., `expanded`) to communicate properly to screen reader users. Additionally, providing adequate `hitSlop` ensures functional usability for all users.
+**Action:** Always verify `accessibilityRole`, `accessibilityLabel`, and `hitSlop` are included when creating custom interactive components or icon-only buttons in React Native.
