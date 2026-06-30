@@ -1,0 +1,3 @@
+## 2024-06-25 - Missing Accessibility Properties on Interactive Icon Buttons
+**Learning:** The project relies on custom interactive components like `Pressable` for icon-only buttons (such as the `ThemeToggle`), which often lack default screen reader accessibility properties (`accessibilityRole`, `accessibilityLabel`) and sufficient touch target sizing (`hitSlop`).
+**Action:** When implementing or updating custom interactive components, especially those that are icon-only, always ensure `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an adequate `hitSlop` are included to provide full screen reader support and usable touch targets.
