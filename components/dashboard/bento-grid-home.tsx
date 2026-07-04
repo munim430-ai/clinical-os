@@ -228,6 +228,9 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
                 style={styles.searchButton}
                 onPress={() => { triggerSelectionHaptic(); onSearchPress(); }}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Search"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Search size={20} color="#C8F53C" />
               </TouchableOpacity>
