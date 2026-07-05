@@ -1,0 +1,3 @@
+## 2024-03-24 - Missing Accessibility Roles on Interactive Elements
+**Learning:** Many custom interactive components (buttons, cards, search bars) built with `Pressable` across the app lack basic accessibility attributes (`accessibilityRole`, `accessibilityLabel`), making them opaque to screen readers despite their rich visual feedback.
+**Action:** When building or auditing interactive components (especially custom ones wrapping `Pressable`), always ensure `accessibilityRole="button"` and a descriptive `accessibilityLabel` are present. For complex stateful elements like AI orbs, use `accessibilityState` to communicate the active state.
