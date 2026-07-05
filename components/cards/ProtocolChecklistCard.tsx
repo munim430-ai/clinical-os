@@ -1,5 +1,11 @@
 import { Pressable, Text, View } from "react-native";
-import { AlertOctagon, CheckCircle2, ClipboardCheck, Clock3, Stethoscope } from "lucide-react";
+import {
+  AlertOctagon,
+  CheckCircle2,
+  ClipboardCheck,
+  Clock3,
+  Stethoscope,
+} from "lucide-react";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 type ProtocolChecklistCardProps = {
@@ -23,7 +29,8 @@ export function ProtocolChecklistCard({
   lastUpdated,
   onPress,
 }: ProtocolChecklistCardProps) {
-  const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+  const progress =
+    totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
   const handlePress = () => {
     triggerSelectionHaptic();
@@ -31,7 +38,11 @@ export function ProtocolChecklistCard({
   };
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${title}, Protocol checklist, ${progress}% complete`}
+      onPress={handlePress}
+    >
       {({ pressed }) => (
         <View
           className={[
@@ -46,13 +57,19 @@ export function ProtocolChecklistCard({
                 <View
                   className={[
                     "h-9 w-9 items-center justify-center rounded-2xl border",
-                    critical ? "border-border-red bg-clinical-redSoft" : "border-border-soft bg-ink-700",
+                    critical
+                      ? "border-border-red bg-clinical-redSoft"
+                      : "border-border-soft bg-ink-700",
                   ].join(" ")}
                 >
                   {critical ? (
                     <AlertOctagon size={18} color="#FF453A" strokeWidth={1.6} />
                   ) : (
-                    <ClipboardCheck size={18} color="#C8F53C" strokeWidth={1.6} />
+                    <ClipboardCheck
+                      size={18}
+                      color="#C8F53C"
+                      strokeWidth={1.6}
+                    />
                   )}
                 </View>
 
@@ -61,31 +78,48 @@ export function ProtocolChecklistCard({
                 </Text>
               </View>
 
-              <Text className="font-headingBold text-[19px] leading-6 text-text-primary">{title}</Text>
+              <Text className="font-headingBold text-[19px] leading-6 text-text-primary">
+                {title}
+              </Text>
 
               <View className="mt-4 flex-row items-center gap-4">
                 <View className="flex-row items-center gap-1.5">
                   <Clock3 size={14} color="#7A7A80" strokeWidth={1.6} />
-                  <Text className="font-body text-[12px] text-text-muted">{estimatedTime}</Text>
+                  <Text className="font-body text-[12px] text-text-muted">
+                    {estimatedTime}
+                  </Text>
                 </View>
 
                 <View className="flex-row items-center gap-1.5">
                   <Stethoscope size={14} color="#7A7A80" strokeWidth={1.6} />
-                  <Text className="font-body text-[12px] text-text-muted">GP Master</Text>
+                  <Text className="font-body text-[12px] text-text-muted">
+                    GP Master
+                  </Text>
                 </View>
               </View>
             </View>
 
             <View className="items-end">
-              <Text className={critical ? "font-heading text-[24px] text-clinical-red" : "font-heading text-[24px] text-mint"}>
+              <Text
+                className={
+                  critical
+                    ? "font-heading text-[24px] text-clinical-red"
+                    : "font-heading text-[24px] text-mint"
+                }
+              >
                 {progress}%
               </Text>
-              <Text className="font-body text-[11px] text-text-muted">complete</Text>
+              <Text className="font-body text-[11px] text-text-muted">
+                complete
+              </Text>
             </View>
           </View>
 
           <View className="mt-5 h-2 overflow-hidden rounded-pill bg-ink-950">
-            <View className={critical ? "h-full bg-clinical-red" : "h-full bg-mint"} style={{ width: `${progress}%` }} />
+            <View
+              className={critical ? "h-full bg-clinical-red" : "h-full bg-mint"}
+              style={{ width: `${progress}%` }}
+            />
           </View>
 
           <View className="mt-4 flex-row items-center justify-between">
@@ -96,7 +130,11 @@ export function ProtocolChecklistCard({
               </Text>
             </View>
 
-            {lastUpdated ? <Text className="font-body text-[11px] text-text-muted">Updated {lastUpdated}</Text> : null}
+            {lastUpdated ? (
+              <Text className="font-body text-[11px] text-text-muted">
+                Updated {lastUpdated}
+              </Text>
+            ) : null}
           </View>
         </View>
       )}
