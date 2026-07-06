@@ -1,0 +1,3 @@
+## 2026-07-06 - [Added Accessibility to ER Mode Dashboard Navigation]
+**Learning:** Icon-only navigation buttons (`Pressable`, `TouchableOpacity`) often lack explicit accessible names (`accessibilityLabel`) and roles (`accessibilityRole`) in this React Native environment, leading to poor screen reader experiences. In addition, touch target sizes can be suboptimal without an explicit `hitSlop`.
+**Action:** Always add `accessibilityRole="button"` and a descriptive `accessibilityLabel` to custom icon-only components. Additionally, implement `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}` to ensure minimum adequate touch targets on mobile interfaces.
