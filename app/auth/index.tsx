@@ -182,7 +182,6 @@ export default function AuthScreen() {
                   accessibilityLabel={
                     showPass ? "Hide password" : "Show password"
                   }
-                  accessibilityState={{ expanded: showPass }}
                 >
                   {showPass ? (
                     <EyeOff size={18} color="#505058" strokeWidth={1.6} />
