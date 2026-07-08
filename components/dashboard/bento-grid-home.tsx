@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
-} from 'react-native';
+} from "react-native";
 import {
   Heart,
   Wind,
@@ -24,19 +24,22 @@ import {
   FileText,
   Search,
   FileImage,
-} from 'lucide-react';
-import { MotiView } from 'moti';
-import { GlassCard, FrostedGlass } from '@/components/ui/glassmorphism';
-import { AmbientMeshGradient } from '@/components/backgrounds/mesh-gradient';
-import { triggerSelectionHaptic } from '@/lib/clinical-haptics';
-import { router } from 'expo-router';
-import { sql } from 'drizzle-orm';
-import { useDatabase } from '@/db/provider';
-import { systems as systemsTable, conditions as conditionsTable } from '@/db/schema';
-import { getTotalCases } from '@/lib/surveillance';
-import { DailyPulse } from '@/components/dashboard/daily-pulse';
+} from "lucide-react";
+import { MotiView } from "moti";
+import { GlassCard, FrostedGlass } from "@/components/ui/glassmorphism";
+import { AmbientMeshGradient } from "@/components/backgrounds/mesh-gradient";
+import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
+import { router } from "expo-router";
+import { sql } from "drizzle-orm";
+import { useDatabase } from "@/db/provider";
+import {
+  systems as systemsTable,
+  conditions as conditionsTable,
+} from "@/db/schema";
+import { getTotalCases } from "@/lib/surveillance";
+import { DailyPulse } from "@/components/dashboard/daily-pulse";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 const cardSpacing = 12;
 
 interface BentoCardProps {
@@ -44,35 +47,35 @@ interface BentoCardProps {
   subtitle?: string;
   icon: React.ReactNode;
   color: string;
-  size: 'small' | 'medium' | 'large' | 'wide' | 'tall';
+  size: "small" | "medium" | "large" | "wide" | "tall";
   onPress: () => void;
   badge?: string;
   value?: string | number;
-  trend?: 'up' | 'down' | 'neutral';
+  trend?: "up" | "down" | "neutral";
 }
 
-function BentoCard({ 
-  title, 
-  subtitle, 
-  icon, 
-  color, 
-  size, 
-  onPress, 
-  badge, 
-  value, 
-  trend 
+function BentoCard({
+  title,
+  subtitle,
+  icon,
+  color,
+  size,
+  onPress,
+  badge,
+  value,
+  trend,
 }: BentoCardProps) {
   const getSizeStyles = () => {
     switch (size) {
-      case 'small':
+      case "small":
         return { width: (screenWidth - 48) / 2, height: 120 };
-      case 'medium':
+      case "medium":
         return { width: (screenWidth - 48) / 2, height: 160 };
-      case 'large':
+      case "large":
         return { width: screenWidth - 24, height: 200 };
-      case 'wide':
+      case "wide":
         return { width: screenWidth - 24, height: 120 };
-      case 'tall':
+      case "tall":
         return { width: (screenWidth - 48) / 2, height: 200 };
       default:
         return { width: (screenWidth - 48) / 2, height: 160 };
@@ -85,7 +88,7 @@ function BentoCard({
     <MotiView
       from={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <TouchableOpacity
         style={[sizeStyles]}
@@ -95,22 +98,24 @@ function BentoCard({
         }}
         activeOpacity={0.7}
       >
-        <GlassCard 
-          elevated 
-          style={[
-            styles.card,
-            { borderLeftWidth: 3, borderLeftColor: color }
-          ]}
+        <GlassCard
+          elevated
+          style={[styles.card, { borderLeftWidth: 3, borderLeftColor: color }]}
         >
           <View style={styles.cardContent}>
             {/* Header */}
             <View style={styles.cardHeader}>
-              <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+              <View
+                style={[
+                  styles.iconContainer,
+                  { backgroundColor: color + "20" },
+                ]}
+              >
                 {icon}
               </View>
               {badge && (
                 <View style={[styles.badge, { backgroundColor: color }]}>
-                  <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>
+                  <Text style={[styles.badgeText, { color: "#FFFFFF" }]}>
                     {badge}
                   </Text>
                 </View>
@@ -120,17 +125,21 @@ function BentoCard({
             {/* Content */}
             <View style={styles.cardBody}>
               <Text style={styles.cardTitle}>{title}</Text>
-              {subtitle && (
-                <Text style={styles.cardSubtitle}>{subtitle}</Text>
-              )}
-              
+              {subtitle && <Text style={styles.cardSubtitle}>{subtitle}</Text>}
+
               {value !== undefined && (
                 <View style={styles.valueContainer}>
                   <Text style={[styles.cardValue, { color }]}>{value}</Text>
                   {trend && (
-                    <TrendingUp 
-                      size={16} 
-                      color={trend === 'up' ? '#00D7B5' : trend === 'down' ? '#FF453A' : '#7A7A80'} 
+                    <TrendingUp
+                      size={16}
+                      color={
+                        trend === "up"
+                          ? "#00D7B5"
+                          : trend === "down"
+                            ? "#FF453A"
+                            : "#7A7A80"
+                      }
                     />
                   )}
                 </View>
@@ -143,7 +152,13 @@ function BentoCard({
   );
 }
 
-export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any; onSearchPress?: () => void }) {
+export function BentoGridHome({
+  navigation,
+  onSearchPress,
+}: {
+  navigation?: any;
+  onSearchPress?: () => void;
+}) {
   const { db } = useDatabase();
   const [sysList, setSysList] = useState<any[]>([]);
   const [condCount, setCondCount] = useState(0);
@@ -152,28 +167,39 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
 
   useEffect(() => {
     if (!db) return;
-    
+
     const loadData = async () => {
       try {
         const [sysRows, countRows] = await Promise.all([
           db.select().from(systemsTable),
-          db.select({
-            systemId: conditionsTable.systemId,
-            count: sql<number>`count(*)`,
-          }).from(conditionsTable).groupBy(conditionsTable.systemId),
+          db
+            .select({
+              systemId: conditionsTable.systemId,
+              count: sql<number>`count(*)`,
+            })
+            .from(conditionsTable)
+            .groupBy(conditionsTable.systemId),
         ]);
-        const countMap = countRows.reduce<Record<string, number>>((acc, row) => {
-          if (row.systemId) acc[row.systemId] = Number(row.count);
-          return acc;
-        }, {});
-        const total = countRows.reduce((sum, row) => sum + Number(row.count), 0);
-        setSysList(sysRows.map(s => ({ ...s, conditionCount: countMap[s.id] ?? 0 })));
+        const countMap = countRows.reduce<Record<string, number>>(
+          (acc, row) => {
+            if (row.systemId) acc[row.systemId] = Number(row.count);
+            return acc;
+          },
+          {},
+        );
+        const total = countRows.reduce(
+          (sum, row) => sum + Number(row.count),
+          0,
+        );
+        setSysList(
+          sysRows.map((s) => ({ ...s, conditionCount: countMap[s.id] ?? 0 })),
+        );
         setCondCount(total);
-        
+
         const cases = await getTotalCases();
         setTotalCases(cases);
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error("Error loading data:", error);
       } finally {
         setLoading(false);
       }
@@ -187,15 +213,15 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
   };
 
   const handleERPress = () => {
-    router.push('/(tabs)/er');
+    router.push("/(tabs)/er");
   };
 
   const handleDIMSPress = () => {
-    router.push('/(tabs)/dims');
+    router.push("/(tabs)/dims");
   };
 
   const handleQuizPress = () => {
-    router.push('/gp/quiz');
+    router.push("/gp/quiz");
   };
 
   if (loading) {
@@ -211,7 +237,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
 
   return (
     <AmbientMeshGradient>
-      <ScrollView 
+      <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
@@ -221,13 +247,21 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
           <View style={styles.headerRow}>
             <View>
               <Text style={styles.headerTitle}>Clinical OS</Text>
-              <Text style={styles.headerSubtitle}>Premium Medical Dashboard</Text>
+              <Text style={styles.headerSubtitle}>
+                Premium Medical Dashboard
+              </Text>
             </View>
             {onSearchPress && (
               <TouchableOpacity
                 style={styles.searchButton}
-                onPress={() => { triggerSelectionHaptic(); onSearchPress(); }}
+                onPress={() => {
+                  triggerSelectionHaptic();
+                  onSearchPress();
+                }}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Open search"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Search size={20} color="#C8F53C" />
               </TouchableOpacity>
@@ -235,12 +269,11 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
           </View>
         </View>
 
-        
         {/* DailyPulse */}
         <View style={{ paddingHorizontal: 12, marginBottom: 4 }}>
           <DailyPulse />
         </View>
-{/* Bento Grid */}
+        {/* Bento Grid */}
         <View style={styles.grid}>
           {/* Large Stats Card */}
           <BentoCard
@@ -257,16 +290,29 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
           {/* System Cards Row */}
           <View style={styles.row}>
             {sysList.slice(0, 2).map((system, index) => {
-              const IconComponent = {
-                Heart, Wind, Activity, Brain, Baby, FlaskConical, Stethoscope, Syringe
-              }[system.icon] || Stethoscope;
-              
+              const IconComponent =
+                {
+                  Heart,
+                  Wind,
+                  Activity,
+                  Brain,
+                  Baby,
+                  FlaskConical,
+                  Stethoscope,
+                  Syringe,
+                }[system.icon] || Stethoscope;
+
               return (
                 <BentoCard
                   key={system.id}
                   title={system.name}
                   subtitle={`${system.conditionCount ?? 0} conditions`}
-                  icon={<IconComponent size={20} color={system.color || "#C8F53C"} />}
+                  icon={
+                    <IconComponent
+                      size={20}
+                      color={system.color || "#C8F53C"}
+                    />
+                  }
                   color={system.color || "#C8F53C"}
                   size="medium"
                   onPress={() => handleSystemPress(system)}
@@ -286,7 +332,7 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
               onPress={handleERPress}
               badge="ER"
             />
-            
+
             <BentoCard
               title="Drug Index"
               subtitle="Medicines & dosage"
@@ -327,7 +373,10 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
               icon={<Activity size={20} color="#FF453A" />}
               color="#FF453A"
               size="small"
-              onPress={() => { triggerSelectionHaptic(); router.push('/gp/ecg' as any); }}
+              onPress={() => {
+                triggerSelectionHaptic();
+                router.push("/gp/ecg" as any);
+              }}
             />
           </View>
 
@@ -338,7 +387,10 @@ export function BentoGridHome({ navigation, onSearchPress }: { navigation?: any;
             icon={<FileImage size={24} color="#C8F53C" />}
             color="#C8F53C"
             size="wide"
-            onPress={() => { triggerSelectionHaptic(); router.push('/gp/cxr' as any); }}
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push("/gp/cxr" as any);
+            }}
           />
         </View>
 
@@ -359,51 +411,51 @@ const styles = {
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    fontFamily: 'Inter_500Medium',
-    color: '#B8B8BE',
+    fontFamily: "Inter_500Medium",
+    color: "#B8B8BE",
   },
   header: {
     paddingHorizontal: 12,
     marginBottom: 24,
   },
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   searchButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(200,245,60,0.1)',
+    backgroundColor: "rgba(200,245,60,0.1)",
     borderWidth: 1,
-    borderColor: 'rgba(200,245,60,0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "rgba(200,245,60,0.3)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerTitle: {
     fontSize: 32,
-    fontFamily: 'Geist-ExtraBold',
-    color: '#FFFFFF',
+    fontFamily: "Geist-ExtraBold",
+    color: "#FFFFFF",
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    fontFamily: 'Inter_500Medium',
-    color: '#B8B8BE',
+    fontFamily: "Inter_500Medium",
+    color: "#B8B8BE",
   },
   grid: {
     flex: 1,
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: cardSpacing,
   },
   card: {
@@ -413,20 +465,20 @@ const styles = {
   },
   cardContent: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom: 12,
   },
   iconContainer: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   badge: {
     paddingHorizontal: 8,
@@ -435,35 +487,34 @@ const styles = {
   },
   badgeText: {
     fontSize: 10,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: "Inter_600SemiBold",
   },
   cardBody: {
     flex: 1,
   },
   cardTitle: {
     fontSize: 16,
-    fontFamily: 'Inter_600SemiBold',
-    color: '#FFFFFF',
+    fontFamily: "Inter_600SemiBold",
+    color: "#FFFFFF",
     marginBottom: 4,
   },
   cardSubtitle: {
     fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-    color: '#B8B8BE',
+    fontFamily: "Inter_400Regular",
+    color: "#B8B8BE",
     marginBottom: 8,
   },
   valueContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 8,
   },
   cardValue: {
     fontSize: 24,
-    fontFamily: 'Geist-Bold',
+    fontFamily: "Geist-Bold",
   },
   bottomSpacing: {
     height: 120, // Extra space for one-handed reach
   },
 };
-
