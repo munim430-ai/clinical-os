@@ -1,0 +1,3 @@
+## 2024-07-10 - Adding Accessibility to Interactive Floating Buttons
+**Learning:** Custom interactive floating components (like AI quick actions and floating buttons) frequently omit accessibility basics when initially developed. Without these attributes, users on assistive devices cannot identify the component's purpose or if it has expandable states.
+**Action:** When working on custom interactive elements (e.g., `TouchableOpacity`, `Pressable`), always ensure `accessibilityRole`, `accessibilityLabel`, and (if applicable) `accessibilityState` are added. Also, enforce adequate `hitSlop` to create usable touch targets.
