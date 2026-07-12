@@ -1,0 +1,4 @@
+
+## 2024-07-12 - Critical Accessibility Properties for React Native Interactive Components
+**Learning:** In React Native applications, custom interactive components like `Pressable` or `TouchableOpacity` (especially those used for floating action buttons, AI orbs, or icon-only buttons) do not automatically provide sufficient context to screen readers or optimal touch targets. Simply adding an `onPress` handler is inadequate for users relying on assistive technologies or users with motor impairments.
+**Action:** Always include `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an adequate `hitSlop` (e.g., `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) for custom interactive components to ensure screen reader accessibility and usable touch targets. Additionally, utilize `accessibilityState` to communicate states like `expanded` or `selected` when applicable.
