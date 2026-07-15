@@ -1,0 +1,3 @@
+## 2024-11-20 - [Accessibility bindings for Custom interactive Elements]
+**Learning:** In React Native/Expo apps, custom interactive elements (e.g., `Pressable`, `TouchableOpacity` used for AI orbs or theme toggles) frequently lack proper semantics unless explicitly declared with `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and `accessibilityState`. For larger touch targets, an object-based `hitSlop` is necessary.
+**Action:** Always manually add these bindings and adjust `hitSlop` when creating or modifying custom interactive icon buttons or floating action components to ensure full screen reader support and accessibility.
