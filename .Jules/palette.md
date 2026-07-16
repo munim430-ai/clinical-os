@@ -1,0 +1,3 @@
+## 2024-11-20 - Adding Accessibility to Icon-only Buttons
+**Learning:** In this React Native application, custom interactive components like `Pressable` used for icon-only buttons (like `ThemeToggle`) lack default accessibility semantics. This makes them invisible or confusing to screen readers and difficult to interact with on touch devices due to small touch targets.
+**Action:** Always add `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an adequate `hitSlop` (e.g., `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) to icon-only `Pressable` or `TouchableOpacity` components to ensure proper screen reader accessibility and usable touch targets.
