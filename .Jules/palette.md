@@ -1,0 +1,3 @@
+## 2024-05-24 - Interactive Component Accessibility in React Native
+**Learning:** Custom interactive components like floating AI orbs and icon-only buttons in React Native (`Pressable`, `TouchableOpacity`) often lack essential accessibility properties and sufficient hit targets by default, leading to poor screen reader experiences and difficult touch targets for motor-impaired users.
+**Action:** Always add `accessibilityRole="button"`, an explicit `accessibilityLabel`, contextual `accessibilityState` (e.g., `{ selected: active }`), and adequate `hitSlop` (e.g., `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) to all custom interactive elements, especially those lacking text content.
