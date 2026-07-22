@@ -1,0 +1,3 @@
+## 2024-05-15 - Interactive Custom Components Accessibility Bindings
+**Learning:** Custom interactive wrappers in React Native (like `TouchableOpacity` and `Pressable` used for floating action buttons or AI orbs) require explicit accessibility bindings. Notably, `accessibilityState={{ expanded: isExpanded }}` is crucial for expandable UI elements, and a sufficient `hitSlop` is necessary for usable touch targets.
+**Action:** Always ensure custom touch targets are given explicit `accessibilityRole="button"`, dynamic descriptive `accessibilityLabel`s, relevant `accessibilityState`, and a reasonable `hitSlop` (e.g. 10px on all sides) when building or modifying such components.
