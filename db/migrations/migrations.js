@@ -1,13 +1,11 @@
 // This file is required for Expo/React Native SQLite migrations - https://orm.drizzle.team/quick-sqlite/expo
 
-import journal from "./meta/_journal.json";
 import m0000 from "./0000_quick_psynapse.sql";
 import m0001 from "./0001_seed_drugs.sql";
 import m0002 from "./0002_seed_clinical.sql";
 import m0003 from "./0003_content_sync.sql";
 import m0004 from "./0004_seed_bd_medicine.sql";
 import m0005 from "./0005_seed_gp_master_interpretation.sql";
-import m0006 from "./0023_wallet_clinics.sql";
 import m0007 from "./0006_seed_dengue_protocol.sql";
 import m0008 from "./0007_seed_typhoid_protocol.sql";
 import m0009 from "./0008_seed_malaria_protocol.sql";
@@ -25,6 +23,10 @@ import m0020 from "./0019_conditions_chunk6.sql";
 import m0021 from "./0020_conditions_chunk7.sql";
 import m0022 from "./0021_conditions_chunk8.sql";
 import m0023 from "./0022_dengue_sprint_a.sql";
+import m0006 from "./0023_wallet_clinics.sql";
+import m0024 from "./0024_equal_lionheart.sql";
+import m0025 from "./0025_seed_rx_data.sql";
+import journal from "./meta/_journal.json";
 
 export default {
   journal,
@@ -53,5 +55,7 @@ export default {
     m0021,
     m0022,
     m0023,
+    m0024,
+    m0025,
   },
 };

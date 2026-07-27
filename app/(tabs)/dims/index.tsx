@@ -4,7 +4,7 @@ import { useDatabase } from "@/db/provider";
 import { dosageForms, generics, manufacturers, medicines } from "@/db/schema";
 import { type BookmarkEntry, getBookmarks } from "@/lib/bookmarks";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
-import { getDrugCount } from "@/lib/prescription";
+import { useRxStore } from "@/lib/rx-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { and, eq, like, or, sql } from "drizzle-orm";
 import { router, useLocalSearchParams } from "expo-router";
@@ -119,12 +119,11 @@ export default function DIMSScreen() {
   }, [query, typeFilter, search]);
 
   const [bookmarks, setBookmarks] = useState<BookmarkEntry[]>([]);
-  const [rxCount, setRxCount] = useState(0);
+  const rxCount = useRxStore((s) => s.medicines.length);
 
   useFocusEffect(
     useCallback(() => {
       setBookmarks(getBookmarks());
-      setRxCount(getDrugCount());
     }, []),
   );
 
@@ -145,7 +144,7 @@ export default function DIMSScreen() {
           <TouchableOpacity
             onPress={() => {
               triggerSelectionHaptic();
-              router.push("/prescription" as any);
+              router.push("/(tabs)/prescribe" as any);
             }}
             className="mt-1 flex-row items-center gap-1.5 rounded-pill border border-mint bg-mint-soft px-3 py-2"
             activeOpacity={0.78}

@@ -4,6 +4,17 @@ export function triggerSelectionHaptic() {
   void Haptics.selectionAsync();
 }
 
+export function triggerImpactHaptic(
+  style: "light" | "medium" | "heavy" = "medium",
+) {
+  const map = {
+    light: Haptics.ImpactFeedbackStyle.Light,
+    medium: Haptics.ImpactFeedbackStyle.Medium,
+    heavy: Haptics.ImpactFeedbackStyle.Heavy,
+  } as const;
+  void Haptics.impactAsync(map[style]);
+}
+
 export function triggerSuccessHaptic() {
   void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 }

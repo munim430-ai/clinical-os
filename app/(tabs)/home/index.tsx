@@ -1,12 +1,15 @@
+import { BrandedFooter } from "@/components/premium/BrandedFooter";
 import { useDatabase } from "@/db/provider";
-import { visitLogs } from "@/db/schema";
+import { prescriptions, visitLogs } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import { router } from "expo-router";
 import {
   Baby,
   Calculator,
   Calendar,
+  ClipboardList,
   Lightbulb,
+  PenLine,
   Pill,
   Scale,
   Stethoscope,
@@ -837,6 +840,15 @@ export default function HomeScreen() {
   const [recentVisits, setRecentVisits] = useState<
     { id: number; date: string; patients: number; earningsBdt: number }[]
   >([]);
+  const [recentRx, setRecentRx] = useState<
+    {
+      id: number;
+      rxNumber: string;
+      patientName: string;
+      medicinesJson: string | null;
+      createdAt: string | null;
+    }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   const loadStats = useCallback(async () => {
@@ -852,6 +864,20 @@ export default function HomeScreen() {
     setTodayPatients(todayVisits.reduce((s, v) => s + v.patients, 0));
     setTodayEarnings(todayVisits.reduce((s, v) => s + v.earningsBdt, 0));
     setRecentVisits(visits.slice(0, 3));
+
+    const rx = await db
+      .select({
+        id: prescriptions.id,
+        rxNumber: prescriptions.rxNumber,
+        patientName: prescriptions.patientName,
+        medicinesJson: prescriptions.medicinesJson,
+        createdAt: prescriptions.createdAt,
+      })
+      .from(prescriptions)
+      .orderBy(desc(prescriptions.createdAt))
+      .limit(3)
+      .all();
+    setRecentRx(rx);
     setLoading(false);
   }, [db]);
 
@@ -928,18 +954,24 @@ export default function HomeScreen() {
         </Text>
         <DailyPulse />
 
+        {/* ── new prescription CTA ─────────────────────────────────── */}
+        <TouchableOpacity
+          onPress={() => router.navigate("/(tabs)/prescribe")}
+          activeOpacity={0.85}
+          className="mb-5 flex-row items-center justify-center gap-2 rounded-clinical bg-accent-primary py-4 shadow-glowLime"
+          accessibilityRole="button"
+        >
+          <PenLine size={18} color="#0C0C0E" strokeWidth={2} />
+          <Text className="font-bodySemi text-[15px] text-text-inverse">
+            New Prescription
+          </Text>
+        </TouchableOpacity>
+
         {/* ── quick actions ─────────────────────────────────────────── */}
         <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
           Quick Access
         </Text>
         <View className="mb-2 flex-row gap-3">
-          <QuickAction
-            icon={Stethoscope}
-            label="GP Master"
-            sub="Conditions & protocols"
-            color="#C8F53C"
-            onPress={() => router.navigate("/(tabs)/gp")}
-          />
           <QuickAction
             icon={Pill}
             label="DIMS"
@@ -947,8 +979,15 @@ export default function HomeScreen() {
             color="#00D7B5"
             onPress={() => router.navigate("/(tabs)/dims")}
           />
+          <QuickAction
+            icon={ClipboardList}
+            label="Patient Queue"
+            sub="Manage chamber queue"
+            color="#64D2FF"
+            onPress={() => router.navigate("/(tabs)/patients")}
+          />
         </View>
-        <View className="mb-4 flex-row gap-3">
+        <View className="mb-2 flex-row gap-3">
           <QuickAction
             icon={Zap}
             label="ER Doses"
@@ -957,13 +996,63 @@ export default function HomeScreen() {
             onPress={() => router.navigate("/(tabs)/er")}
           />
           <QuickAction
+            icon={Stethoscope}
+            label="GP Master"
+            sub="Conditions & protocols"
+            color="#C8F53C"
+            onPress={() => router.navigate("/(tabs)/gp")}
+          />
+        </View>
+        <View className="mb-4 flex-row gap-3">
+          <QuickAction
             icon={Wallet}
             label="Wallet"
             sub="Track earnings"
             color="#FFD60A"
             onPress={() => router.navigate("/(tabs)/wallet")}
           />
+          <View className="flex-1" />
         </View>
+
+        {/* ── recent prescriptions ─────────────────────────────────── */}
+        {recentRx.length > 0 ? (
+          <View className="mb-5">
+            <View className="mb-3 flex-row items-center justify-between">
+              <Text className="font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
+                Recent Prescriptions
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push("/prescription/list" as never)}
+              >
+                <Text className="font-bodySemi text-[11px] text-accent-primary">
+                  View All
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {recentRx.map((rx) => {
+              const count = rx.medicinesJson
+                ? (JSON.parse(rx.medicinesJson) as unknown[]).length
+                : 0;
+              return (
+                <TouchableOpacity
+                  key={rx.id}
+                  onPress={() => router.push(`/prescription/${rx.id}` as never)}
+                  className="mb-2 flex-row items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3"
+                >
+                  <View>
+                    <Text className="font-bodySemi text-[13px] text-text-primary">
+                      {rx.patientName}
+                    </Text>
+                    <Text className="mt-0.5 font-body text-[11px] text-text-tertiary">
+                      {rx.rxNumber} · {count} drug{count !== 1 ? "s" : ""}
+                    </Text>
+                  </View>
+                  <PenLine size={14} color="#7A7A80" />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : null}
 
         {/* ── recent activity ───────────────────────────────────────── */}
         {recentVisits.length > 0 ? (
@@ -1020,6 +1109,8 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         ) : null}
+
+        <BrandedFooter />
       </View>
     </ScrollView>
   );

@@ -117,7 +117,51 @@ export default function RootLayout() {
                 options={{ headerShown: false, animation: "fade" }}
               />
               <Stack.Screen
-                name="prescription/index"
+                name="prescription/patient-select"
+                options={{ headerShown: false, presentation: "modal" }}
+              />
+              <Stack.Screen
+                name="prescription/medicine-picker"
+                options={{ headerShown: false, presentation: "modal" }}
+              />
+              <Stack.Screen
+                name="prescription/preview"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="prescription/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="prescription/list"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="patients/[id]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="patients/new"
+                options={{ headerShown: false, presentation: "modal" }}
+              />
+              <Stack.Screen
+                name="profile/edit"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="profile/letterhead"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="settings/index"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="settings/backup"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="settings/about"
                 options={{ headerShown: false }}
               />
             </Stack>

@@ -1,4 +1,8 @@
 import { ClinicalShell } from "@/components/layout/ClinicalShell";
+import {
+  MedicineDoseSheet,
+  type MedicineDoseSheetRef,
+} from "@/components/premium/MedicineDoseSheet";
 import { useDatabase } from "@/db/provider";
 import {
   dosageForms,
@@ -8,9 +12,11 @@ import {
   medicines,
 } from "@/db/schema";
 import { isBookmarked, toggleBookmark } from "@/lib/bookmarks";
-import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
-import { addDrugToDraft, getDrugCount } from "@/lib/prescription";
-import { useFocusEffect } from "@react-navigation/native";
+import {
+  triggerSelectionHaptic,
+  triggerSuccessHaptic,
+} from "@/lib/clinical-haptics";
+import { useRxStore } from "@/lib/rx-store";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -22,7 +28,7 @@ import {
   ShieldAlert,
   TrendingDown,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -45,14 +51,19 @@ export default function BrandDetailScreen() {
   const [data, setData] = useState<any>(null);
   const [alternatives, setAlternatives] = useState<AltRow[]>([]);
   const [bookmarked, setBookmarked] = useState(false);
-  const [rxCount, setRxCount] = useState(0);
-  const [addedToRx, setAddedToRx] = useState(false);
-
-  useFocusEffect(
-    useCallback(() => {
-      setRxCount(getDrugCount());
-    }, []),
+  const rx = useRxStore();
+  const rxCount = rx.medicines.length;
+  const addedToRx = rx.medicines.some((m) => m.medicineId === data?.id);
+  const allergicToThis = Boolean(
+    rx.patient.allergies &&
+      data?.genericName &&
+      rx.patient.allergies
+        .split(",")
+        .map((a: string) => a.trim().toLowerCase())
+        .filter(Boolean)
+        .some((a: string) => data.genericName.toLowerCase().includes(a)),
   );
+  const sheetRef = useRef<MedicineDoseSheetRef>(null);
 
   useEffect(() => {
     if (!db || !id) return;
@@ -196,19 +207,27 @@ export default function BrandDetailScreen() {
             </View>
           </View>
 
+          {/* Allergy warning */}
+          {allergicToThis ? (
+            <View className="mt-4 flex-row items-center gap-2 rounded-clinical border border-clinical-red/40 bg-clinical-redSoft px-4 py-3">
+              <ShieldAlert size={16} color="#FF453A" strokeWidth={1.8} />
+              <Text className="flex-1 font-bodySemi text-[12px] text-clinical-red">
+                Current patient has a recorded allergy to this generic
+              </Text>
+            </View>
+          ) : null}
+
           {/* Add to Prescription */}
           <TouchableOpacity
             onPress={() => {
               triggerSelectionHaptic();
-              addDrugToDraft({
-                id: data.id,
+              sheetRef.current?.present({
+                medicineId: data.id,
                 brandName: data.brandName,
                 genericName: data.genericName ?? null,
                 strength: data.strength ?? null,
                 dosageForm: data.dosageForm ?? null,
               });
-              setAddedToRx(true);
-              setRxCount(getDrugCount());
             }}
             className={
               addedToRx
@@ -252,7 +271,7 @@ export default function BrandDetailScreen() {
               <TouchableOpacity
                 onPress={() => {
                   triggerSelectionHaptic();
-                  router.push("/prescription" as any);
+                  router.push("/(tabs)/prescribe" as any);
                 }}
                 className="rounded-pill bg-mint px-3 py-1.5"
                 activeOpacity={0.78}
@@ -392,6 +411,15 @@ export default function BrandDetailScreen() {
           ) : null}
         </View>
       </ScrollView>
+
+      <MedicineDoseSheet
+        ref={sheetRef}
+        patientAllergies={rx.patient.allergies}
+        onConfirm={(med) => {
+          rx.addMedicine(med);
+          triggerSuccessHaptic();
+        }}
+      />
     </ClinicalShell>
   );
 }

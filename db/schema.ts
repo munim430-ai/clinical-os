@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // ─── DIMS: Drug Information & Management System ──────────────────────────────
 
@@ -218,6 +218,10 @@ export const clinics = sqliteTable("clinics", {
   feeBdt: integer("fee_bdt").notNull().default(500),
   color: text("color").default("#00D7B5"),
   active: integer("active", { mode: "boolean" }).default(true),
+  feeModel: text("fee_model").default("FULL"), // FULL | SPLIT | RENT
+  splitPercent: real("split_percent"),
+  monthlyRent: integer("monthly_rent"),
+  nextSerial: integer("next_serial").default(1),
   createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
 
@@ -232,7 +236,150 @@ export const visitLogs = sqliteTable("visit_logs", {
   patients: integer("patients").notNull().default(0),
   earningsBdt: integer("earnings_bdt").notNull().default(0),
   notes: text("notes"),
+  prescriptionId: integer("prescription_id").references(() => prescriptions.id),
   createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// ─── Patient Registry ─────────────────────────────────────────────────────────
+
+export const patients = sqliteTable("patients", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  ageYears: integer("age_years"),
+  ageMonths: integer("age_months"),
+  gender: text("gender"), // male | female | other
+  bloodGroup: text("blood_group"),
+  heightCm: real("height_cm"),
+  weightKg: real("weight_kg"),
+  drugAllergies: text("drug_allergies"), // comma-separated generics
+  chronicConditions: text("chronic_conditions"),
+  notes: text("notes"),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: text("updated_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// ─── Prescriptions ────────────────────────────────────────────────────────────
+
+export const prescriptions = sqliteTable("prescriptions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  rxNumber: text("rx_number").notNull().unique(),
+  patientId: integer("patient_id").references(() => patients.id),
+  patientName: text("patient_name").notNull(),
+  patientAge: text("patient_age"),
+  patientGender: text("patient_gender"),
+  patientPhone: text("patient_phone"),
+  clinicId: integer("clinic_id").references(() => clinics.id),
+  chiefComplaints: text("chief_complaints"),
+  onExamination: text("on_examination"),
+  investigations: text("investigations"),
+  diagnoses: text("diagnoses"),
+  medicinesJson: text("medicines_json"),
+  advice: text("advice"),
+  followUpDate: text("follow_up_date"),
+  visitFee: integer("visit_fee").default(0),
+  bp: text("bp"),
+  pulse: integer("pulse"),
+  temperature: real("temperature"),
+  spo2: real("spo2"),
+  weightKg: real("weight_kg"),
+  qrToken: text("qr_token").unique(),
+  pdfPath: text("pdf_path"),
+  status: text("status").default("active"),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// ─── Quick-pick data ──────────────────────────────────────────────────────────
+
+export const chiefComplaints = sqliteTable("chief_complaints", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  text: text("text").notNull(),
+  category: text("category"),
+  sortOrder: integer("sort_order").default(0),
+});
+
+export const diagnosisQuickPicks = sqliteTable("diagnosis_quick_picks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  label: text("label").notNull(),
+  icd10Code: text("icd10_code"),
+  category: text("category"),
+  sortOrder: integer("sort_order").default(0),
+});
+
+export const adviceQuickPicks = sqliteTable("advice_quick_picks", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  text: text("text").notNull(),
+  category: text("category"),
+  sortOrder: integer("sort_order").default(0),
+});
+
+// ─── Serial Queue ─────────────────────────────────────────────────────────────
+
+export const appointments = sqliteTable("appointments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  clinicId: integer("clinic_id")
+    .notNull()
+    .references(() => clinics.id),
+  patientId: integer("patient_id").references(() => patients.id),
+  patientName: text("patient_name").notNull(),
+  patientPhone: text("patient_phone"),
+  serialNumber: integer("serial_number").notNull(),
+  date: text("date").notNull(),
+  timeSlot: text("time_slot"),
+  status: text("status").default("waiting"), // waiting | in_progress | done | no_show
+  prescriptionId: integer("prescription_id").references(() => prescriptions.id),
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// ─── Doctor Profile ───────────────────────────────────────────────────────────
+
+export const doctorProfile = sqliteTable("doctor_profile", {
+  id: integer("id").primaryKey().default(1),
+  name: text("name"),
+  qualifications: text("qualifications"),
+  specialty: text("specialty"),
+  bmdcReg: text("bmdc_reg"),
+  bmdcVerified: integer("bmdc_verified", { mode: "boolean" }).default(false),
+  phone: text("phone"),
+  email: text("email"),
+  chamberLine1: text("chamber_line1"),
+  chamberLine2: text("chamber_line2"),
+  signatureImageUri: text("signature_image_uri"),
+  logoImageUri: text("logo_image_uri"),
+  letterheadTemplate: text("letterhead_template").default("default"),
+  updatedAt: text("updated_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// ─── Vitals Log (for patient history trends) ─────────────────────────────────
+
+export const vitalsLog = sqliteTable("vitals_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
+  prescriptionId: integer("prescription_id").references(() => prescriptions.id),
+  bp: text("bp"),
+  pulse: integer("pulse"),
+  temperature: real("temperature"),
+  spo2: real("spo2"),
+  weightKg: real("weight_kg"),
+  heightCm: real("height_cm"),
+  recordedAt: text("recorded_at").default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+// ─── Data Version Registry (for backup/restore system) ───────────────────────
+
+export const dataVersions = sqliteTable("data_versions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  version: text("version").notNull(), // "2026.07.27-v1"
+  type: text("type").notNull(), // "auto" | "manual" | "pre-migration"
+  entity: text("entity").notNull(), // "full_db" | "prescriptions" | "patients"
+  recordCount: integer("record_count"),
+  fileSizeBytes: integer("file_size_bytes"),
+  filePath: text("file_path"), // relative to app documents dir
+  checksum: text("checksum"), // sha256
+  createdAt: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+  notes: text("notes"),
 });
 
 // ─── Content sync, legal imports, and offline media ──────────────────────────
