@@ -1,27 +1,28 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
-import { useState, useEffect, useCallback, useMemo } from "react";
 import { useDatabase } from "@/db/provider";
 import { clinics, visitLogs } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { type FeeModel, computeDoctorShare } from "@/lib/settlement";
+import { desc, eq } from "drizzle-orm";
 import {
+  Calendar,
+  Clock,
   MapPin,
   Play,
-  Square,
   Plus,
-  Clock,
+  Square,
   Users,
-  Calendar,
   Wallet,
 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // ── types ──────────────────────────────────────────────────────────────────
 
@@ -100,6 +101,7 @@ function ElapsedTimer({ startTime }: { startTime: Date }) {
 function ClinicCard({
   clinic,
   monthEarnings,
+  monthVisits,
   active,
   onStart,
   onEnd,
@@ -107,6 +109,7 @@ function ClinicCard({
 }: {
   clinic: Clinic;
   monthEarnings: number;
+  monthVisits: number;
   active: ActiveVisit | null;
   onStart: () => void;
   onEnd: () => void;
@@ -114,6 +117,14 @@ function ClinicCard({
 }) {
   const isActive = active?.clinicId === clinic.id;
   const accentColor = clinic.color ?? "#00D7B5";
+  const feeModel = (clinic.feeModel ?? "FULL") as FeeModel;
+  const { doctorShare, chamberShare } = computeDoctorShare(
+    monthEarnings,
+    feeModel,
+    clinic.splitPercent,
+    clinic.monthlyRent,
+    monthVisits,
+  );
 
   return (
     <View
@@ -192,6 +203,35 @@ function ClinicCard({
             </Text>
           </View>
         </View>
+
+        {/* settlement breakdown */}
+        {feeModel !== "FULL" ? (
+          <View className="mt-3 flex-row gap-2">
+            <View className="flex-1 rounded-xl border border-border-soft bg-ink-800 px-3 py-2">
+              <Text className="font-body text-[9.5px] text-text-tertiary">
+                Doctor's Share
+              </Text>
+              <Text
+                className="font-headingBold text-[15px]"
+                style={{ color: accentColor }}
+              >
+                ৳{doctorShare.toLocaleString()}
+              </Text>
+            </View>
+            <View className="flex-1 rounded-xl border border-border-soft bg-ink-800 px-3 py-2">
+              <Text className="font-body text-[9.5px] text-text-tertiary">
+                Chamber (
+                {feeModel === "SPLIT"
+                  ? `${100 - (clinic.splitPercent ?? 0)}%`
+                  : "Rent"}
+                )
+              </Text>
+              <Text className="font-headingBold text-[15px] text-text-tertiary">
+                ৳{chamberShare.toLocaleString()}
+              </Text>
+            </View>
+          </View>
+        ) : null}
 
         {/* active visit live banner */}
         {isActive && active ? (
@@ -355,6 +395,9 @@ function AddClinicModal({
     schedule: string;
     feeBdt: number;
     color: string;
+    feeModel: FeeModel;
+    splitPercent: number | null;
+    monthlyRent: number | null;
   }) => void;
 }) {
   const [name, setName] = useState("");
@@ -363,6 +406,9 @@ function AddClinicModal({
   const [schedule, setSchedule] = useState("");
   const [fee, setFee] = useState("500");
   const [color, setColor] = useState(CLINIC_COLORS[0]);
+  const [feeModel, setFeeModel] = useState<FeeModel>("FULL");
+  const [splitPercent, setSplitPercent] = useState("70");
+  const [monthlyRent, setMonthlyRent] = useState("10000");
 
   const reset = () => {
     setName("");
@@ -371,6 +417,9 @@ function AddClinicModal({
     setSchedule("");
     setFee("500");
     setColor(CLINIC_COLORS[0]);
+    setFeeModel("FULL");
+    setSplitPercent("70");
+    setMonthlyRent("10000");
   };
 
   const handleSave = () => {
@@ -382,6 +431,9 @@ function AddClinicModal({
       schedule: schedule.trim(),
       feeBdt: Number(fee) || 500,
       color,
+      feeModel,
+      splitPercent: feeModel === "SPLIT" ? Number(splitPercent) || 100 : null,
+      monthlyRent: feeModel === "RENT" ? Number(monthlyRent) || 0 : null,
     });
     reset();
   };
@@ -456,6 +508,64 @@ function AddClinicModal({
             />
 
             <Text className="mb-2 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
+              Fee Model
+            </Text>
+            <View className="mb-3 flex-row rounded-xl border border-border bg-ink-800 p-1">
+              {(["FULL", "SPLIT", "RENT"] as FeeModel[]).map((m) => (
+                <TouchableOpacity
+                  key={m}
+                  onPress={() => setFeeModel(m)}
+                  className={`flex-1 items-center rounded-lg py-2 ${
+                    feeModel === m ? "bg-mint" : ""
+                  }`}
+                  activeOpacity={0.78}
+                >
+                  <Text
+                    className={`font-bodySemi text-[12px] ${
+                      feeModel === m
+                        ? "text-text-inverse"
+                        : "text-text-secondary"
+                    }`}
+                  >
+                    {m}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {feeModel === "SPLIT" ? (
+              <>
+                <Text className="mb-1 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
+                  Doctor's Share (%)
+                </Text>
+                <TextInput
+                  value={splitPercent}
+                  onChangeText={setSplitPercent}
+                  keyboardType="numeric"
+                  placeholder="70"
+                  placeholderTextColor="#4A4A4F"
+                  className={`${inputCls} mb-4`}
+                />
+              </>
+            ) : null}
+
+            {feeModel === "RENT" ? (
+              <>
+                <Text className="mb-1 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
+                  Monthly Rent (৳)
+                </Text>
+                <TextInput
+                  value={monthlyRent}
+                  onChangeText={setMonthlyRent}
+                  keyboardType="numeric"
+                  placeholder="10000"
+                  placeholderTextColor="#4A4A4F"
+                  className={`${inputCls} mb-4`}
+                />
+              </>
+            ) : null}
+
+            <Text className="mb-2 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
               Color
             </Text>
             <View className="mb-5 flex-row gap-2">
@@ -502,6 +612,9 @@ export default function WalletScreen() {
   const [monthEarningsMap, setMonthEarningsMap] = useState<
     Record<number, number>
   >({});
+  const [monthVisitsMap, setMonthVisitsMap] = useState<Record<number, number>>(
+    {},
+  );
   const [activeVisit, setActiveVisit] = useState<ActiveVisit | null>(null);
   const [showAddClinic, setShowAddClinic] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -524,13 +637,19 @@ export default function WalletScreen() {
 
     const prefix = monthPrefix();
     const map: Record<number, number> = {};
-    for (const c of cls) map[c.id] = 0;
+    const visitsMap: Record<number, number> = {};
+    for (const c of cls) {
+      map[c.id] = 0;
+      visitsMap[c.id] = 0;
+    }
     for (const v of visits) {
       if (v.date.startsWith(prefix)) {
         map[v.clinicId] = (map[v.clinicId] ?? 0) + v.earningsBdt;
+        visitsMap[v.clinicId] = (visitsMap[v.clinicId] ?? 0) + 1;
       }
     }
     setMonthEarningsMap(map);
+    setMonthVisitsMap(visitsMap);
     setLoading(false);
   }, [db]);
 
@@ -600,6 +719,9 @@ export default function WalletScreen() {
       schedule: string;
       feeBdt: number;
       color: string;
+      feeModel: FeeModel;
+      splitPercent: number | null;
+      monthlyRent: number | null;
     }) => {
       if (!db) return;
       await db.insert(clinics).values({
@@ -609,6 +731,9 @@ export default function WalletScreen() {
         schedule: data.schedule || null,
         feeBdt: data.feeBdt,
         color: data.color,
+        feeModel: data.feeModel,
+        splitPercent: data.splitPercent,
+        monthlyRent: data.monthlyRent,
       });
       setShowAddClinic(false);
       loadData();
@@ -762,6 +887,7 @@ export default function WalletScreen() {
                 key={clinic.id}
                 clinic={clinic}
                 monthEarnings={monthEarningsMap[clinic.id] ?? 0}
+                monthVisits={monthVisitsMap[clinic.id] ?? 0}
                 active={activeVisit}
                 onStart={() => handleStart(clinic)}
                 onEnd={handleEnd}

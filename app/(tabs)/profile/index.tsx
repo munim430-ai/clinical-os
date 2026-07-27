@@ -1,4 +1,12 @@
+import { BrandedFooter } from "@/components/premium/BrandedFooter";
 import { useDatabase } from "@/db/provider";
+import {
+  clinics,
+  doctorProfile,
+  patients,
+  prescriptions,
+  visitLogs,
+} from "@/db/schema";
 import { getStoredUser, signOut } from "@/lib/auth";
 import {
   triggerSelectionHaptic,
@@ -16,12 +24,17 @@ import {
   getLastSyncMs,
   syncSurveillanceData,
 } from "@/lib/surveillance-sync";
+import { eq } from "drizzle-orm";
 import { router } from "expo-router";
 import {
   Activity,
   AlertTriangle,
+  Archive,
+  BadgeCheck,
   CheckCircle2,
+  ChevronRight,
   Database,
+  FileSignature,
   GraduationCap,
   LogOut,
   RefreshCcw,
@@ -29,6 +42,7 @@ import {
   Stethoscope,
   Upload,
   UserCheck,
+  Wallet as WalletIcon,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -39,6 +53,149 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+function monthPrefix() {
+  return new Date().toISOString().slice(0, 7);
+}
+
+type DoctorProfile = typeof doctorProfile.$inferSelect;
+
+function DoctorCard({ doctor }: { doctor: DoctorProfile | null }) {
+  const name = doctor?.name?.trim() ? doctor.name : "Add your name";
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        triggerSelectionHaptic();
+        router.push("/profile/edit" as any);
+      }}
+      activeOpacity={0.75}
+      className="mb-6 flex-row items-center gap-4 rounded-clinical border border-border bg-surface p-4"
+    >
+      <View className="h-14 w-14 items-center justify-center rounded-full bg-accent-primarySoft">
+        <Text className="font-heading text-[18px] text-accent-primary">
+          {name.slice(0, 1).toUpperCase()}
+        </Text>
+      </View>
+      <View className="flex-1">
+        <Text className="font-headingSemi text-[16px] text-text-primary">
+          {doctor?.name?.trim() ? `Dr. ${doctor.name}` : name}
+        </Text>
+        {doctor?.specialty ? (
+          <Text className="mt-0.5 font-body text-[12px] text-text-tertiary">
+            {doctor.specialty}
+          </Text>
+        ) : null}
+        <View className="mt-1.5 flex-row items-center gap-1.5">
+          <BadgeCheck
+            size={13}
+            color={doctor?.bmdcVerified ? "#00D7B5" : "#FFD60A"}
+            strokeWidth={1.8}
+          />
+          <Text
+            className="font-bodySemi text-[11px]"
+            style={{ color: doctor?.bmdcVerified ? "#00D7B5" : "#FFD60A" }}
+          >
+            {doctor?.bmdcVerified ? "BM&DC Verified" : "Unverified"}
+          </Text>
+        </View>
+      </View>
+      <ChevronRight size={17} color="#7A7A80" />
+    </TouchableOpacity>
+  );
+}
+
+function StatsSummary({
+  stats,
+}: {
+  stats: {
+    prescriptions: number;
+    patients: number;
+    earnings: number;
+    clinics: number;
+  };
+}) {
+  return (
+    <View className="mb-6 flex-row flex-wrap gap-2.5">
+      <StatTile label="Prescriptions" value={String(stats.prescriptions)} />
+      <StatTile label="Patients" value={String(stats.patients)} />
+      <StatTile
+        label="Earnings (mo)"
+        value={`৳${stats.earnings.toLocaleString()}`}
+      />
+      <StatTile label="Active Clinics" value={String(stats.clinics)} />
+    </View>
+  );
+}
+
+function StatTile({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="min-w-[47%] flex-1 rounded-xl border border-border bg-surface px-3.5 py-3">
+      <Text className="font-body text-[10px] text-text-tertiary">{label}</Text>
+      <Text className="mt-0.5 font-heading text-[18px] text-text-primary">
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+function QuickLinks() {
+  const links = [
+    {
+      icon: BadgeCheck,
+      label: "BM&DC Verification",
+      route: "/profile/edit",
+      color: "#00D7B5",
+    },
+    {
+      icon: FileSignature,
+      label: "Letterhead Studio",
+      route: "/profile/letterhead",
+      color: "#C8F53C",
+    },
+    {
+      icon: WalletIcon,
+      label: "Wallet & Settlement",
+      route: "/(tabs)/wallet",
+      color: "#FFD60A",
+    },
+    {
+      icon: Archive,
+      label: "Backup & Restore",
+      route: "/settings/backup",
+      color: "#7B2FBE",
+    },
+  ];
+  return (
+    <View className="mb-6">
+      <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
+        Quick Links
+      </Text>
+      <View className="flex-row flex-wrap gap-2.5">
+        {links.map((l) => (
+          <TouchableOpacity
+            key={l.route}
+            onPress={() => {
+              triggerSelectionHaptic();
+              router.push(l.route as any);
+            }}
+            activeOpacity={0.75}
+            className="min-w-[47%] flex-1 rounded-clinical border border-border bg-surface p-3.5"
+          >
+            <View
+              className="mb-2 h-9 w-9 items-center justify-center rounded-xl"
+              style={{ backgroundColor: `${l.color}22` }}
+            >
+              <l.icon size={17} color={l.color} strokeWidth={1.8} />
+            </View>
+            <Text className="font-bodySemi text-[12.5px] text-text-primary">
+              {l.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 const PERSONAS = [
   {
@@ -108,10 +265,45 @@ export default function ProfileScreen() {
   const totalCases = Object.values(caseCounts).reduce((a, b) => a + b, 0);
   const syncEnabled = canSyncNow();
 
+  const [doctor, setDoctor] = useState<DoctorProfile | null>(null);
+  const [stats, setStats] = useState({
+    prescriptions: 0,
+    patients: 0,
+    earnings: 0,
+    clinics: 0,
+  });
+
   useEffect(() => {
     getCaseCounts().then(setCaseCounts);
     getContentSummary().then(setContentSummary);
   }, []);
+
+  useEffect(() => {
+    if (!db) return;
+    db.select()
+      .from(doctorProfile)
+      .limit(1)
+
+      .then((rows) => setDoctor(rows[0] ?? null));
+
+    Promise.all([
+      db.select().from(prescriptions).all(),
+      db.select().from(patients).all(),
+      db.select().from(clinics).where(eq(clinics.active, true)).all(),
+      db.select().from(visitLogs).all(),
+    ]).then(([rxRows, patientRows, clinicRows, visitRows]) => {
+      const prefix = monthPrefix();
+      const earnings = visitRows
+        .filter((v) => v.date.startsWith(prefix))
+        .reduce((sum, v) => sum + v.earningsBdt, 0);
+      setStats({
+        prescriptions: rxRows.length,
+        patients: patientRows.length,
+        earnings,
+        clinics: clinicRows.length,
+      });
+    });
+  }, [db]);
 
   function handleSelect(p: Persona) {
     triggerSelectionHaptic();
@@ -181,9 +373,13 @@ export default function ProfileScreen() {
       <Text className="font-heading text-[32px] leading-10 text-text-primary">
         Profile
       </Text>
-      <Text className="mb-6 mt-1 font-body text-[13px] text-text-muted">
+      <Text className="mb-5 mt-1 font-body text-[13px] text-text-muted">
         Manage your role, content, and local activity
       </Text>
+
+      <DoctorCard doctor={doctor} />
+      <StatsSummary stats={stats} />
+      <QuickLinks />
 
       {/* Persona selector */}
       <Text className="mb-3 font-bodySemi text-[11px] uppercase tracking-[1.5px] text-text-muted">
@@ -488,6 +684,8 @@ export default function ProfileScreen() {
       <Text className="mt-3 text-center font-body text-[12px] text-text-muted">
         Version 1.1.1 · Free Clinical OS
       </Text>
+
+      <BrandedFooter />
     </ScrollView>
   );
 }

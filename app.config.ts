@@ -37,7 +37,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     output: "static",
     favicon: "./assets/images/favicon.png",
   },
-  plugins: ["expo-router", "expo-sqlite", "expo-font", "expo-web-browser"],
+  plugins: [
+    "expo-router",
+    "expo-sqlite",
+    "expo-font",
+    "expo-web-browser",
+    "expo-secure-store",
+  ],
   experiments: {
     typedRoutes: true,
     baseUrl: process.env.VERCEL ? "/" : "/clinical-os",
