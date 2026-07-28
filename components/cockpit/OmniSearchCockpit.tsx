@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { BlurView } from "expo-blur";
-import { Search, Pill, ClipboardList, Siren, Calculator, Bookmark, Sparkles } from "lucide-react";
+import {
+  Search,
+  Pill,
+  ClipboardList,
+  Siren,
+  Calculator,
+  Bookmark,
+  Sparkles,
+} from "lucide-react";
 import { triggerSelectionHaptic } from "@/lib/clinical-haptics";
 
 type OmniSearchResult = {
@@ -27,10 +35,17 @@ const categoryMeta = {
   ai: { label: "AI Suggestions", icon: Sparkles, color: "#C8F53C" },
 };
 
-export function OmniSearchCockpit({ value, results = [], onChangeText, onResultPress }: OmniSearchCockpitProps) {
+export function OmniSearchCockpit({
+  value,
+  results = [],
+  onChangeText,
+  onResultPress,
+}: OmniSearchCockpitProps) {
   const [focused, setFocused] = useState(false);
 
-  const groupedResults = results.reduce<Record<OmniSearchResult["category"], OmniSearchResult[]>>(
+  const groupedResults = results.reduce<
+    Record<OmniSearchResult["category"], OmniSearchResult[]>
+  >(
     (acc, result) => {
       acc[result.category].push(result);
       return acc;
@@ -40,17 +55,26 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
 
   return (
     <View pointerEvents="box-none" className="z-20">
-      {focused ? <BlurView intensity={36} tint="dark" className="absolute -left-4 -right-4 -top-8 h-screen" /> : null}
+      {focused ? (
+        <BlurView
+          intensity={36}
+          tint="dark"
+          className="absolute -left-4 -right-4 -top-8 h-screen"
+        />
+      ) : null}
 
-      <View
-        className="overflow-hidden rounded-[28px] border border-border bg-ink-800/80"
-      >
+      <View className="overflow-hidden rounded-[28px] border border-border bg-ink-800/80">
         <BlurView intensity={28} tint="dark" className="px-4 py-3">
           <View className="flex-row items-center gap-3">
-            <Search size={19} color={focused ? "#C8F53C" : "#7A7A80"} strokeWidth={1.6} />
+            <Search
+              size={19}
+              color={focused ? "#C8F53C" : "#7A7A80"}
+              strokeWidth={1.6}
+            />
             <TextInput
               value={value}
               onChangeText={onChangeText}
+              accessibilityLabel="Search"
               onFocus={() => {
                 triggerSelectionHaptic();
                 setFocused(true);
@@ -65,7 +89,9 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
 
           {focused ? (
             <View className="mt-3 max-h-[440px] gap-4 border-t border-border-soft pt-4">
-              {(Object.keys(groupedResults) as OmniSearchResult["category"][]).map((category) => {
+              {(
+                Object.keys(groupedResults) as OmniSearchResult["category"][]
+              ).map((category) => {
                 const group = groupedResults[category];
                 if (group.length === 0) return null;
                 const Icon = categoryMeta[category].icon;
@@ -73,7 +99,11 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
                 return (
                   <View key={category} className="gap-2">
                     <View className="flex-row items-center gap-2">
-                      <Icon size={14} color={categoryMeta[category].color} strokeWidth={1.6} />
+                      <Icon
+                        size={14}
+                        color={categoryMeta[category].color}
+                        strokeWidth={1.6}
+                      />
                       <Text className="font-bodySemi text-[11px] uppercase tracking-[1.4px] text-text-muted">
                         {categoryMeta[category].label}
                       </Text>
@@ -86,11 +116,16 @@ export function OmniSearchCockpit({ value, results = [], onChangeText, onResultP
                           triggerSelectionHaptic();
                           onResultPress?.(result);
                         }}
+                        accessibilityRole="button"
                         className="rounded-2xl border border-border-soft bg-ink-950 px-3 py-3"
                       >
-                        <Text className="font-bodySemi text-[14px] text-text-primary">{result.title}</Text>
+                        <Text className="font-bodySemi text-[14px] text-text-primary">
+                          {result.title}
+                        </Text>
                         {result.subtitle ? (
-                          <Text className="mt-1 font-body text-[12px] text-text-muted">{result.subtitle}</Text>
+                          <Text className="mt-1 font-body text-[12px] text-text-muted">
+                            {result.subtitle}
+                          </Text>
                         ) : null}
                       </Pressable>
                     ))}
