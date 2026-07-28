@@ -1,0 +1,3 @@
+## 2026-07-28 - [Accessible React Native Interactive Components]
+**Learning:** Custom interactive components in React Native (e.g., `Pressable`, `TextInput`) need explicit accessibility attributes like `accessibilityRole`, `accessibilityLabel`, and `accessibilityState` to be screen reader friendly, as well as adequate `hitSlop` (e.g., `{ top: 10, bottom: 10, left: 10, right: 10 }`) to ensure usable touch targets, especially for icon-only buttons.
+**Action:** When implementing custom interactive elements, always ensure they have descriptive accessibility labels, the appropriate roles/states (like 'button' or 'selected'), and sufficient `hitSlop` areas.
