@@ -24,7 +24,10 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 function Field({
   label,
   children,
-}: { label: string; children: React.ReactNode }) {
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <View className="mb-4">
       <Text className="mb-1.5 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
@@ -130,6 +133,9 @@ export default function NewPatientScreen() {
     <View className="flex-1 bg-background">
       <View className="flex-row items-center gap-3 px-4 pb-3 pt-2">
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           onPress={() => {
             triggerSelectionHaptic();
             router.back();
@@ -199,6 +205,9 @@ export default function NewPatientScreen() {
             {GENDERS.map((g) => (
               <Pressable
                 key={g}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: gender === g }}
+                accessibilityLabel={g}
                 onPress={() => {
                   triggerSelectionHaptic();
                   setGender(g);
@@ -230,6 +239,9 @@ export default function NewPatientScreen() {
             {BLOOD_GROUPS.map((bg) => (
               <Pressable
                 key={bg}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: bloodGroup === bg }}
+                accessibilityLabel={`Blood group ${bg}`}
                 onPress={() => {
                   triggerSelectionHaptic();
                   setBloodGroup(bg);
@@ -306,6 +318,9 @@ export default function NewPatientScreen() {
                     {a}
                   </Text>
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${a} allergy`}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     onPress={() =>
                       setAllergies((prev) => prev.filter((x) => x !== a))
                     }
@@ -340,6 +355,11 @@ export default function NewPatientScreen() {
         </Field>
 
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityState={{
+            disabled: !name.trim() || saving,
+            busy: saving,
+          }}
           disabled={!name.trim() || saving}
           onPress={handleSave}
           className={cn(
