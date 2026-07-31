@@ -146,6 +146,8 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
             style={styles.backdrop}
             activeOpacity={1}
             onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Close search"
           />
 
           {/* Search Cockpit */}
@@ -175,6 +177,7 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
                     onBlur={handleBlur}
                     autoCapitalize="none"
                     autoCorrect={false}
+                    accessibilityLabel="Search query"
                   />
                 </View>
                 
@@ -184,6 +187,9 @@ export function OmniSearchCockpit({ visible, onClose, onSelect }: OmniSearchCock
                     triggerSelectionHaptic();
                     // Handle AI search
                   }}
+                  accessibilityRole="button"
+                  accessibilityLabel="AI Search"
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Sparkles size={16} color="#C8F53C" />
                 </TouchableOpacity>
