@@ -1,0 +1,3 @@
+## 2026-07-31 - [AI Orb Button Accessibility]
+**Learning:** Custom interactive elements like AI orbs or custom buttons often lack fundamental screen reader accessibility out-of-the-box (like `accessibilityRole`, `accessibilityLabel`, and `accessibilityState`) when using custom wrappers like `Pressable`. Providing a robust `hitSlop` is also important for touch accessibility on small or uniquely shaped touch targets.
+**Action:** When implementing custom interactive components such as `Pressable` or `TouchableOpacity`, always ensure to explicitly set `accessibilityRole`, `accessibilityLabel`, `accessibilityState` (like expanded/selected) and an appropriate `hitSlop` to provide an accessible and usable experience for all users.
