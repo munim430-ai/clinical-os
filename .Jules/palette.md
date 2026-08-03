@@ -1,0 +1,3 @@
+## 2024-05-14 - Theme Toggle Accessibility
+**Learning:** `Pressable` icon-only buttons in the UI missing explicit `accessibilityLabel` and `accessibilityRole` props can be confusing for screen reader users since there's no context for the action, and smaller targets without a defined `hitSlop` can be difficult to interact with on mobile.
+**Action:** Always provide explicit `accessibilityRole="button"`, a descriptive `accessibilityLabel` that updates based on the current state if applicable (e.g., light vs dark mode), and a `hitSlop` of at least `10` on all sides to improve touch target size for `Pressable` wrapper components.
