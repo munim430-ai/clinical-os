@@ -1,0 +1,3 @@
+## 2025-02-23 - Interactive Elements Accessibility in React Native
+**Learning:** Custom interactive components (`Pressable`, `TouchableOpacity`) acting as buttons, especially icon-only or floating action buttons, require explicit bindings to function well with screen readers and be easily tappable on mobile devices.
+**Action:** Always add `accessibilityRole="button"`, a descriptive `accessibilityLabel`, contextual `accessibilityState` (e.g. `selected` or `expanded`), and an object-based `hitSlop` (e.g. `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) for custom interactive elements in React Native.
