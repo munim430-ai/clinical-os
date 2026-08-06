@@ -1,0 +1,3 @@
+## 2024-08-06 - Accessible Icon-Only Touch Targets in React Native
+**Learning:** Icon-only custom buttons (like `Pressable`) are completely invisible to screen readers without explicit `accessibilityRole` and `accessibilityLabel` bindings, and often have touch targets that are too small and difficult to hit on mobile screens, degrading both accessibility and usability.
+**Action:** Always add `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an expanded `hitSlop` (e.g., `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}`) to all custom interactive components to ensure full screen reader support and comfortable tap areas.
