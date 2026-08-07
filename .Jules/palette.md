@@ -1,0 +1,3 @@
+## 2024-05-24 - Interactive Component Accessibility in React Native
+**Learning:** Icon-only interactive components (like `Pressable` or `TouchableOpacity` wrappers around SVGs) in this React Native app are frequently missing critical screen-reader semantics and adequate touch targets, rendering them completely inaccessible or difficult to tap.
+**Action:** When creating or modifying custom interactive components (like floating action buttons, AI orbs, or theme toggles), explicitly add `accessibilityRole="button"`, a descriptive `accessibilityLabel`, and an expanded touch area using `hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}` to ensure universal usability.
