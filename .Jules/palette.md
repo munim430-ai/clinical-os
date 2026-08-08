@@ -1,0 +1,3 @@
+## 2024-05-24 - Accessibility bindings for React Native Interactive Components
+**Learning:** React Native custom interactive components (like Pressable) used for floating actions, orbs, or icon-only buttons frequently lack base semantic meaning (`accessibilityRole`) and name (`accessibilityLabel`). Even if they have text visually, they must be explicitly bound. Using expanded `hitSlop` is also required to make touch targets sufficiently large and usable.
+**Action:** Always ensure any `<Pressable>` or custom wrapper has `accessibilityRole="button"`, an explicit `accessibilityLabel`, and a `hitSlop` object (e.g., `{{ top: 10, bottom: 10, left: 10, right: 10 }}`). Also bind `accessibilityState` to reflect toggled or expanded statuses.
