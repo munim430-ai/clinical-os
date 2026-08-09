@@ -24,7 +24,10 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 function Field({
   label,
   children,
-}: { label: string; children: React.ReactNode }) {
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <View className="mb-4">
       <Text className="mb-1.5 font-bodySemi text-[11px] uppercase tracking-widest text-text-tertiary">
@@ -135,6 +138,8 @@ export default function NewPatientScreen() {
             router.back();
           }}
           className="h-10 w-10 items-center justify-center rounded-2xl border border-border bg-surface"
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
         >
           <ArrowLeft size={19} color="#F5F5F7" strokeWidth={1.7} />
         </TouchableOpacity>
@@ -203,6 +208,8 @@ export default function NewPatientScreen() {
                   triggerSelectionHaptic();
                   setGender(g);
                 }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: gender === g }}
                 className={cn(
                   "flex-1 items-center rounded-xl border py-2.5 capitalize",
                   gender === g
@@ -234,6 +241,8 @@ export default function NewPatientScreen() {
                   triggerSelectionHaptic();
                   setBloodGroup(bg);
                 }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: bloodGroup === bg }}
                 className={cn(
                   "rounded-pill border px-3.5 py-2",
                   bloodGroup === bg
@@ -309,6 +318,9 @@ export default function NewPatientScreen() {
                     onPress={() =>
                       setAllergies((prev) => prev.filter((x) => x !== a))
                     }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${a} allergy`}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <X size={12} color="#FF453A" />
                   </TouchableOpacity>
@@ -346,6 +358,8 @@ export default function NewPatientScreen() {
             "mt-2 items-center rounded-2xl py-4",
             name.trim() ? "bg-accent-primary" : "bg-surface-elevated",
           )}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !name.trim() || saving }}
         >
           <Text
             className={cn(
