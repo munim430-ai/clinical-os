@@ -1,0 +1,3 @@
+## 2026-05-22 - React Native Pressable Accessibility
+**Learning:** In this React Native application, custom interactive components using `Pressable` (especially for icon-only buttons or floating action buttons like AI orbs) must explicitly define accessibility properties for screen readers, unlike standard web `<button>` elements. Without these, the interactive element's purpose and state are invisible to assistive technologies.
+**Action:** Always add `accessibilityRole="button"`, an appropriate `accessibilityLabel`, and an `accessibilityState` (e.g., `expanded` or `selected`) to custom `Pressable` components, particularly those without text content or those representing floating action states.
